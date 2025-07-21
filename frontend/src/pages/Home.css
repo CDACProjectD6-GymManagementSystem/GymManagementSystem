@@ -1,0 +1,28 @@
+/* Home.css */
+
+.home-container {
+  background-image: url("/images/gymbg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  padding: 40px;
+}
+
+.home-container h1 {
+  font-size: 3rem;
+  color: #004aad; /* Blue title */
+  margin-bottom: 20px;
+}
+
+.home-container p,
+.home-container li {
+  font-size: 1.2rem;
+  color: #ffcc00; /* Yellow for subpoints */
+  margin-bottom: 10px;
+}
+
+.home-container ul {
+  padding-left: 20px;
+}
