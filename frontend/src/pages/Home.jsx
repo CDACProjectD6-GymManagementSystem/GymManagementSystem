@@ -1,6 +1,6 @@
 import React from "react";
 import { FaDumbbell, FaUserFriends, FaHeartbeat, FaRunning, FaBiking, FaYinYang, FaUserShield, FaChild, FaBox, FaClock, FaMobileAlt, FaShower, FaLeaf, FaGift } from "react-icons/fa";
-import "./Home.css";
+import "../styles/Home.css";
 
 const Home = () => {
   return (

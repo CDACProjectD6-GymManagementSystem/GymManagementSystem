@@ -10,16 +10,17 @@
   padding: 40px;
 }
 
+
 .home-container h1 {
   font-size: 3rem;
-  color: #004aad; /* Blue title */
+  color: #004aad; 
   margin-bottom: 20px;
 }
 
 .home-container p,
 .home-container li {
   font-size: 1.2rem;
-  color: #ffcc00; /* Yellow for subpoints */
+  color: #ffcc00; 
   margin-bottom: 10px;
 }
 

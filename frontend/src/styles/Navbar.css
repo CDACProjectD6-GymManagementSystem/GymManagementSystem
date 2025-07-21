@@ -1,0 +1,15 @@
+/* Navbar.css */
+
+.nav-hover {
+  transition: all 0.3s ease;
+}
+
+.nav-hover:hover {
+  color: #ffcc00 !important;
+  transform: scale(1.05);
+  text-shadow: 0 0 5px rgba(255, 255, 0, 0.4);
+}
+
+.navbar-brand span:hover {
+  text-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
+}
