@@ -6,7 +6,7 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import UserDashboard from "./pages/User/UserDashboard";
 import TrainerDashboard from "./pages/Trainer/TrainerDashboard";
-import AdminDashboard from "./pages/Admin/AdminDashboard";
+import Admin from "./pages/Admin/Admin"
 import ReceptionDashboard from "./pages/Receptionist/ReceptionistDashboard";
 
 const AppContent = () => {
@@ -22,7 +22,7 @@ const AppContent = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard" element={<Admin />} />
         <Route path="/reception-dashboard" element={<ReceptionDashboard />} />
       </Routes>
     </>

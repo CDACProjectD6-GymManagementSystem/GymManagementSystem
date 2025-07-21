@@ -1,0 +1,162 @@
+/* ==== Admin Panel Container ==== */
+.admin-container {
+  background: #f1f5ff;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  padding-bottom: 32px;
+}
+
+/* ==== NAVBAR ==== */
+.admin-navbar {
+  display: flex;
+  gap: 32px;
+  background: #333;
+  padding: 18px 28px;
+  color: #fff;
+  font-size: 1.18rem;
+  align-items: center;
+  margin-bottom: 32px;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 10px #004aad22;
+}
+.admin-navbar-item {
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 3px;
+  transition: color 0.18s;
+}
+.admin-navbar-item.active, .admin-navbar-item:hover {
+  color: #ffcc00;
+}
+.admin-navbar-item.active::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -3px; height: 2px;
+  background: #ffcc00;
+  border-radius: 2px;
+}
+
+/* ==== MAIN CARD ==== */
+.admin-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 3px 16px #004aad22;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px 34px;
+  margin-bottom: 32px;
+}
+
+/* ==== HEADER ==== */
+.admin-card h2 {
+  color: #004aad;
+  font-weight: bold;
+  margin-top: 0;
+}
+
+/* ==== FORM ==== */
+.admin-form {
+  background: #eceffb;
+  padding: 18px;
+  border-radius: 9px;
+  /* box-shadow: 0 1px 4px #95baff30; */
+  margin-bottom: 18px;
+}
+.admin-form label {
+  color: #004aad;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  margin-bottom: 13px;
+}
+.admin-form input,
+.admin-form select {
+  margin-left: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #004aad;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* ==== BUTTONS ==== */
+.admin-btn {
+  background: #004aad;
+  color: #ffcc00;
+  padding: 8px 24px;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 1rem;
+  transition: transform 0.16s, background 0.16s;
+}
+.admin-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: #00317e;
+}
+.admin-btn.cancel {
+  background: #888;
+  color: #fff;
+}
+.admin-btn.cancel:hover {
+  background: #444;
+}
+.admin-btn.delete {
+  background: #ff3e30;
+  color: #fff;
+}
+.admin-btn.delete:hover {
+  background: #b71c1c;
+}
+
+/* ==== TABLE ==== */
+.admin-table {
+  width: 100%;
+  background: #fff7e6;
+  border-collapse: collapse;
+  margin-top: 10px;
+  box-shadow: 0 2px 10px #ffcc0055;
+}
+.admin-table th,
+.admin-table td {
+  border: 1px solid #ffe082;
+  padding: 8px 14px;
+  text-align: left;
+}
+.admin-table th {
+  color: #004aad;
+  background: #ffe08215;
+  font-weight: 600;
+}
+.admin-table tbody tr:nth-child(even) {
+  background: #fffbe8;
+}
+.admin-table tbody tr:hover {
+  background: #e6f3ff;
+  transition: background 0.2s;
+}
+.admin-table .no-data-row td {
+  color: #888;
+  text-align: center;
+  font-size: 1rem;
+  padding: 18px 8px;
+}
+
+/* ==== DROPDOWNS ==== */
+.admin-select-label {
+  font-weight: 600;
+  color: #004aad;
+  font-size: 1.12rem;
+  margin-bottom: 10px;
+  display: block;
+}
+.admin-select {
+  margin-left: 9px;
+  padding: 7px 10px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  border: 1px solid #004aad;
+}
