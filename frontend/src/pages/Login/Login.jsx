@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import '../styles/Login.css';
+import '../../styles/Login.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -9,7 +9,22 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log('Logging in with:', { email, password });
+
+    // Define credentials and their target routes
+    const users = [
+      { email: 'user@gymmate.com', password: 'user123', path: '/user-dashboard' },
+      { email: 'trainer@gymmate.com', password: 'trainer123', path: '/trainer-dashboard' },
+      { email: 'admin@gymmate.com', password: 'admin123', path: '/admin-dashboard' },
+      { email: 'reception@gymmate.com', password: 'reception123', path: '/reception-dashboard' },
+    ];
+
+    const found = users.find((u) => u.email === email && u.password === password);
+
+    if (found) {
+      navigate(found.path);
+    } else {
+      alert("Invalid credentials!");
+    }
   };
 
   return (
