@@ -5,8 +5,10 @@ import UserSection from "./UserSection";
 import StaffSection from "./StaffSection";
 import SubscriptionSection from "./SubscriptionSection";
 import EquipmentSection from "./EquipmentSection";
+import DashboardSection from "./DashboardSection";
 
 const sections = [
+  "Admin Dashboard",
   "Manage Users",
   "Manage Staff",
   "Manage Subscription",
@@ -18,6 +20,7 @@ export default function Admin() {
   return (
     <div className="admin-container">
       <Navbar items={sections} current={current} onNav={setCurrent} />
+      {current === "Admin Dashboard" && <DashboardSection />}
       {current === "Manage Users" && <UserSection />}
       {current === "Manage Staff" && <StaffSection />}
       {current === "Manage Subscription" && <SubscriptionSection />}
