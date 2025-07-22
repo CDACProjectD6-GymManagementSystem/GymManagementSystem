@@ -8,6 +8,7 @@ import UserDashboard from "./pages/User/UserDashboard";
 import TrainerDashboard from "./pages/Trainer/TrainerDashboard";
 import Admin from "./pages/Admin/Admin"
 import ReceptionDashboard from "./pages/Receptionist/ReceptionistDashboard";
+import Plans from "./Plans/Plans";
 
 const AppContent = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ const AppContent = () => {
         <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
         <Route path="/admin-dashboard" element={<Admin />} />
         <Route path="/reception-dashboard" element={<ReceptionDashboard />} />
+        <Route path="/plans" element={<Plans />} />
       </Routes>
     </>
   );
