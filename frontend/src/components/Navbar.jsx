@@ -30,16 +30,24 @@ const Navbar = () => {
       <div className="collapse navbar-collapse" id="navbarNav">
         <ul className="navbar-nav ms-auto gap-2">
           <li className="nav-item">
-            <Link className="nav-link text-white nav-hover" to="#"><FaCheckCircle className="me-1" />View Plans</Link>
+            <Link className="nav-link text-white nav-hover" to="/plans">
+              <FaCheckCircle className="me-1" /> View Plans
+            </Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link text-white nav-hover" to="#"><FaUsers className="me-1" />Our Trainers</Link>
+            <Link className="nav-link text-white nav-hover" to="/trainers">
+              <FaUsers className="me-1" /> Our Trainers
+            </Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link text-white nav-hover" to="#"><FaInfoCircle className="me-1" />About Us</Link>
+            <Link className="nav-link text-white nav-hover" to="/about">
+              <FaInfoCircle className="me-1" /> About Us
+            </Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link text-white nav-hover" to="#"><FaPhoneAlt className="me-1" />Contact Us</Link>
+            <Link className="nav-link text-white nav-hover" to="/contact">
+              <FaPhoneAlt className="me-1" /> Contact Us
+            </Link>
           </li>
         </ul>
 
