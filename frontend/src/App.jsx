@@ -16,6 +16,7 @@ import TrainerDashboard from "./pages/Trainer/TrainerDashboard";
 import ReceptionDashboard from "./pages/Receptionist/ReceptionistDashboard";
 import Plans from "./Plans/Plans";
 import Trainers from "./pages/Trainer/Trainer";
+import PaymentPage from './pages/Payment/PaymentPage';
 
 // These are the only routes/pages handled at top-level (all else is modular inside User or Admin)
 const authPages = ["/login", "/register"];
@@ -47,6 +48,7 @@ function AppContent() {
         <Route path="/reception-dashboard" element={<ReceptionDashboard />} />
         <Route path="/plans" element={<Plans />} />
         <Route path="/trainers" element={<Trainers />} />
+        <Route path="/payment" element={<PaymentPage />} />
       </Routes>
     </>
   );

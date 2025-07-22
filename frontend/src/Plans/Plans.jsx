@@ -1,7 +1,8 @@
 import React from "react";
 import "../styles/Plans.css";
+import { Link } from 'react-router-dom';
 
-const plans = [
+export const plans = [
   {
     id: 1,
     name: "Basic",
@@ -79,8 +80,13 @@ const Plans = () => {
                 </ul>
               </div>
               <div className="card-footer text-center">
-                <button className="btn btn-outline-primary w-100">Choose Plan</button>
-              </div>
+               <Link 
+                  to={`/payment?planId=${plan.id}`} 
+                  className="btn btn-outline-primary w-100"
+                >
+                  Choose Plan
+                </Link>
+               </div>
             </div>
           </div>
         ))}
