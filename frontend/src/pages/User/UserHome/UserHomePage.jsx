@@ -16,31 +16,31 @@ const demoUser = {
 
 const cardData = [
   {
-    path: "/profile",
+    path: "/user/profile",
     icon: <FaUserCircle size={38} className="mb-2" color="#f7c948" />,
     title: "Profile",
     desc: "View and update your personal info",
   },
   {
-    path: "/membership",
+    path: "/user/membership",
     icon: <FaIdCard size={38} className="mb-2" color="#f7c948" />,
     title: "Membership",
     desc: "Check status, plans, renewals",
   },
   {
-    path: "/workout",
+    path: "/user/workout",
     icon: <FaHeartbeat size={38} className="mb-2" color="#f7c948" />,
     title: "Workout & Diet",
     desc: "Access workout plans and diet charts",
   },
   {
-    path: "/schedule",
+    path: "/user/schedule",
     icon: <FaCalendarCheck size={38} className="mb-2" color="#f7c948" />,
     title: "Schedule",
     desc: "Check your training sessions and attendance",
   },
   {
-    path: "/feedback",
+    path: "/user/feedback",
     icon: <FaComments size={38} className="mb-2" color="#f7c948" />,
     title: "Support & Feedback",
     desc: "Submit issues or suggestions",

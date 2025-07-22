@@ -1,45 +1,54 @@
+// UserNavbar.jsx
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaDumbbell,
   FaUserCircle,
   FaAppleAlt,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import "../styles/Navbar.css";
 
 const navLinks = [
   {
     label: "Dashboard",
-    path: "/user-dashboard",
+    path: "/user",
     icon: <FaHome className="me-1" />,
   },
   {
     label: "Workouts",
-    path: "/workout",
+    path: "/user/workout",
     icon: <FaDumbbell className="me-1" />,
   },
   {
     label: "Diet & Nutrition",
-    path: "/diet-nutrition",
+    path: "/user/diet-nutrition",
     icon: <FaAppleAlt className="me-1" />,
   },
   {
     label: "Profile",
-    path: "/profile",
+    path: "/user/profile",
     icon: <FaUserCircle className="me-1" />,
   },
 ];
 
 const UserNavbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Here you would clear any localStorage/session values for user/session
+    // localStorage.removeItem("userLoggedIn");
+    navigate("/");
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-3">
       <Link className="navbar-brand d-flex align-items-center" to="/user-dashboard">
         <FaDumbbell className="me-2 text-warning" size={22} />
         <span className="fw-bold fs-4 text-warning">GymMate</span>
       </Link>
-
       <button
         className="navbar-toggler"
         type="button"
@@ -66,6 +75,14 @@ const UserNavbar = () => {
             </li>
           ))}
         </ul>
+        {/* Logout button */}
+        <button
+          className="btn btn-outline-warning ms-4"
+          style={{ fontWeight: 700 }}
+          onClick={handleLogout}
+        >
+          <FaSignOutAlt className="mb-1 me-1" /> Logout
+        </button>
       </div>
     </nav>
   );
