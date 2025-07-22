@@ -10,6 +10,7 @@ import Admin from "./pages/Admin/Admin"
 import ReceptionDashboard from "./pages/Receptionist/ReceptionistDashboard";
 import Plans from "./Plans/Plans";
 import Trainers from "./pages/Trainer/Trainer";
+import PaymentPage from './pages/Payment/PaymentPage';
 
 const AppContent = () => {
   const location = useLocation();
@@ -28,6 +29,7 @@ const AppContent = () => {
         <Route path="/reception-dashboard" element={<ReceptionDashboard />} />
         <Route path="/plans" element={<Plans />} />
         <Route path="/trainers" element={<Trainers />} />
+        <Route path="/payment" element={<PaymentPage />} />
       </Routes>
     </>
   );
