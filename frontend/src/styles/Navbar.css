@@ -1,5 +1,14 @@
 /* Navbar.css */
 
+.sticky-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1030; /* ensures it stays above everything */
+}
+
+
 .nav-hover {
   transition: all 0.3s ease;
 }

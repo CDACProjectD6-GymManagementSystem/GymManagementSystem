@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../../styles/Admin.css";
-import Navbar from "./Navbar";
+import Navbar from "../../components/AdminNavbar";
 import UserSection from "./UserSection";
 import StaffSection from "./StaffSection";
 import SubscriptionSection from "./SubscriptionSection";

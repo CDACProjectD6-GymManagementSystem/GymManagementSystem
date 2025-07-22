@@ -59,7 +59,6 @@ const AppContent = () => {
   return (
     <>
       {showUserNavbar && <UserNavbar />}
-      {showMainNavbar && <Navbar />}
       <Routes>
         {/* Public pages */}
         <Route path="/" element={<Home />} />

@@ -1,5 +1,5 @@
 import React from "react";
-import "../../styles/Admin.css";
+import "../styles/Admin.css";
 
 const Navbar = ({ items, current, onNav }) => (
   <div className="admin-navbar">
@@ -16,3 +16,7 @@ const Navbar = ({ items, current, onNav }) => (
 );
 
 export default Navbar;
+
+
+
+

@@ -1,14 +1,14 @@
 /* Home.css */
-
 .home-container {
-  background-image: url("/images/gymbg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  padding-top: 100px; /* For fixed navbar */
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
-  padding: 40px;
+  padding-left: 40px;
+  padding-right: 40px;
+  background-color: #f8f9fa; /* clean white-gray background */
 }
+
+
 
 
 .home-container h1 {
@@ -26,4 +26,9 @@
 
 .home-container ul {
   padding-left: 20px;
+}
+
+/* Home.css */
+.home-container {
+  padding-top: 100px; /* Adjust based on navbar height */
 }
