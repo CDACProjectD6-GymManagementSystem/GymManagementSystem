@@ -11,6 +11,7 @@ import trainer3 from "../../../public/images/Trainer3.png";
 import trainer4 from "../../../public/images/Trainer4.png";
 import PaymentPage from "../Payment/PaymentPage";
 
+
 export const plans = [
   {
     id: 1,
