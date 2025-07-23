@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
-import { plans } from '../../Plans/Plans';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
+import {plans} from "../Home/Home";
+
 
 const PaymentPage = () => {
   const [searchParams] = useSearchParams();

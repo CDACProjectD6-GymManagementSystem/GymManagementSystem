@@ -9,8 +9,9 @@ import trainer1 from "../../../public/images/Trainer1.png";
 import trainer2 from "../../../public/images/Trainer2.png";
 import trainer3 from "../../../public/images/Trainer3.png";
 import trainer4 from "../../../public/images/Trainer4.png";
+import PaymentPage from "../Payment/PaymentPage";
 
-const plans = [
+export const plans = [
   {
     id: 1,
     name: "Basic",
@@ -168,8 +169,12 @@ const Home = () => {
                     </ul>
                   </div>
                   <div className="card-footer text-center">
-                    <button className="btn btn-outline-primary w-100">Choose Plan</button>
-                  </div>
+                    <Link 
+                  to={`/payment?planId=${plan.id}`} 
+                  className="btn btn-outline-primary w-100"
+                >
+                  Choose Plan
+                </Link></div>
                 </div>
               </div>
             ))}
