@@ -10,6 +10,7 @@ import trainer2 from "../../../public/images/Trainer2.png";
 import trainer3 from "../../../public/images/Trainer3.png";
 import trainer4 from "../../../public/images/Trainer4.png";
 
+
 const plans = [
   {
     id: 1,

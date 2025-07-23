@@ -51,7 +51,7 @@
   background: #232323;
   border-radius: 16px;
   box-shadow: 0 6px 20px #ffd60040;
-  max-width: 960px;
+  max-width: 100%;
   margin: 0 auto 48px;
   padding: 36px 40px;
   color: #fafafa;
@@ -242,11 +242,10 @@
 
 /* ==== Dashboard Specific Styles ==== */
 .dashboard-card {
-  /* Reuse admin-card styles for consistency */
   background: #232323;
   border-radius: 16px;
   box-shadow: 0 6px 20px #ffd60040;
-  max-width: 960px;
+  max-width: 100%;
   margin: 0 auto 48px;
   padding: 36px 40px;
   color: #fafafa;

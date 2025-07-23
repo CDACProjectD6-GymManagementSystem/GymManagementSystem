@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/Plans.css";
 import { Link } from 'react-router-dom';
+import PaymentPage from "../pages/Payment/PaymentPage";
 
 export const plans = [
   {

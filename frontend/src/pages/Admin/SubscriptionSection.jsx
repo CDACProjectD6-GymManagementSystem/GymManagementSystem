@@ -113,12 +113,7 @@ const SubscriptionSection = () => {
   };
 
   return (
-    <div className="admin-card"style={{
-    minWidth: 900,     
-    maxWidth: 1200,    
-    margin: "auto",
-    padding: "30px 40px"
-  }}>
+    <div className="admin-card">
       <h2>Manage Subscriptions</h2>
       <form className="admin-form" onSubmit={handleSubmit}>
         <Input
