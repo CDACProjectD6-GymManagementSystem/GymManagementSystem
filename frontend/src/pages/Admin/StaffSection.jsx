@@ -30,13 +30,15 @@ const StaffSection = () => {
           { name: "email", label: "Email", type: "email" },
           { name: "mobile", label: "Mobile" },
           { name: "expertise", label: "Expertise" },
-          { name: "certification", label: "Certification" }, // Added here
+          { name: "certification", label: "Certification" },
+          { name: "salary", label: "Salary" }, 
         ]
       : [
           { name: "firstname", label: "First Name" },
           { name: "lastname", label: "Last Name" },
           { name: "email", label: "Email", type: "email" },
           { name: "mobile", label: "Mobile" },
+          { name: "salary", label: "Salary" }, 
         ];
 
   const staffList = type === "trainer" ? trainers : receps;
@@ -53,6 +55,7 @@ const StaffSection = () => {
       mobile: "",
       expertise: "",
       certification: "",
+      salary:"",
     });
 
   const handleSubmit = (e) => {
@@ -75,6 +78,7 @@ const StaffSection = () => {
       ...staffList[i],
       expertise: staffList[i].expertise || "",
       certification: staffList[i].certification || "",
+      salary:staffList[i].certification||"",
     });
   };
 
@@ -143,6 +147,7 @@ const StaffSection = () => {
             <th>Mobile</th>
             {type === "trainer" && <th>Expertise</th>}
             {type === "trainer" && <th>Certification</th>}
+            <th>Salary</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -155,6 +160,7 @@ const StaffSection = () => {
               <td>{s.mobile}</td>
               {type === "trainer" && <td>{s.expertise}</td>}
               {type === "trainer" && <td>{s.certification}</td>}
+              <td>{s.salary}</td>
               <td>
                 <button className="admin-btn" onClick={() => handleEdit(i)}>
                   Edit

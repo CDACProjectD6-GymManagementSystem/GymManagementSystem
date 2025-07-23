@@ -35,6 +35,8 @@ const EquipmentSection = () => {
         <Input name="description" label="Description" value={form.description} onChange={handleChange} required />
         <Input name="quantity" label="Quantity" type="number" value={form.quantity} onChange={handleChange} required />
         <Input name="dateOfInstallation" label="Date Of Installation" type="date" value={form.dateOfInstallation} onChange={handleChange} required />
+        <Input name="price" label="Price" type="number" value={form.price} onChange={handleChange} required />
+      
         <button type="submit" className="admin-btn">
           {editing !== null ? "Update" : "Add"} Equipment
         </button>
@@ -44,7 +46,7 @@ const EquipmentSection = () => {
             className="admin-btn cancel"
             onClick={() => {
               setEditing(null);
-              setForm({ name: "", description: "", quantity: "" ,dateOfInstallation:"" });
+              setForm({ name: "", description: "", quantity: "" ,dateOfInstallation:"",price:"" });
             }}
           >
             Cancel
@@ -54,7 +56,7 @@ const EquipmentSection = () => {
       <table className="admin-table">
         <thead>
           <tr>
-            <th>Name</th><th>Description</th><th>Quantity</th><th>Date Of Installation</th><th>Actions</th>
+            <th>Name</th><th>Description</th><th>Quantity</th><th>Date Of Installation</th><th>Price</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -64,6 +66,7 @@ const EquipmentSection = () => {
               <td>{e.description}</td>
               <td>{e.quantity}</td>
               <td>{e.dateOfInstallation}</td>
+              <td>{e.price}</td>
               <td>
                 <button className="admin-btn" onClick={() => handleEdit(i)}>Edit</button>
                 <button className="admin-btn delete" onClick={() => handleDelete(i)}>Delete</button>
