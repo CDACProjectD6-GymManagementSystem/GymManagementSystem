@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../../styles/Admin.css";
-import Navbar from "../../components/AdminNavbar";
+import AdminNavbar from "../../components/AdminNavbar"; "../../components/AdminNavbar";
 import UserSection from "./UserSection";
 import StaffSection from "./StaffSection";
 import SubscriptionSection from "./SubscriptionSection";
@@ -19,7 +19,7 @@ export default function Admin() {
   const [current, setCurrent] = useState(sections[0]);
   return (
     <div className="admin-container">
-      <Navbar items={sections} current={current} onNav={setCurrent} />
+      <AdminNavbar items={sections} current={current} onNav={setCurrent} />
       {current === "Admin Dashboard" && <DashboardSection />}
       {current === "Manage Users" && <UserSection />}
       {current === "Manage Staff" && <StaffSection />}

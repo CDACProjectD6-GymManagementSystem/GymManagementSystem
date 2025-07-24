@@ -3,7 +3,7 @@ import "../../styles/Admin.css";
 
 const Input = ({ label, ...props }) => (
   <label>
-    {label}:
+    {label} :
     <input {...props} />
   </label>
 );
@@ -58,6 +58,7 @@ const UserSection = () => {
           </button>
         )}
       </form>
+      
       <table className="admin-table">
         <thead>
           <tr>

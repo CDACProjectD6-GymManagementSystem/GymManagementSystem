@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 import "../styles/Admin.css";
 
-const Navbar = ({ items, current, onNav }) => {
+const AdminNavbar = ({ items, current, onNav }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -24,7 +24,7 @@ const Navbar = ({ items, current, onNav }) => {
         </span>
       ))}
       <button
-        className="btn btn-outline-warning ms-3"
+        className="btn btn-primary"
         style={{ fontWeight: 700, float: "right" }}
         onClick={handleLogout}
       >
@@ -34,4 +34,4 @@ const Navbar = ({ items, current, onNav }) => {
   );
 };
 
-export default Navbar;
+export default AdminNavbar;
