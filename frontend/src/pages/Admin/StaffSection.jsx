@@ -3,7 +3,7 @@ import "../../styles/Admin.css";
 
 const Input = ({ label, ...props }) => (
   <label>
-    {label}:
+    {label} :
     <input {...props} />
   </label>
 );
