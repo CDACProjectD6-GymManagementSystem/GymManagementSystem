@@ -1,6 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 // Generic/public pages
 import Home from "./pages/Home/Home";
@@ -13,7 +17,7 @@ import Admin from "./pages/Admin/Admin";   // Modular Admin Dashboard (unchanged
 
 // Other dashboards & utility pages
 import TrainerDashboard from "./pages/Trainer/TrainerDashboard";
-import ReceptionDashboard from "./pages/Receptionist/ReceptionistDashboard";
+import ReceptionistDashboard from "./pages/Receptionist/ReceptionistDashboard";
 import Trainers from "./pages/Trainer/Trainer";
 import PaymentPage from './pages/Payment/PaymentPage';
 
@@ -26,7 +30,8 @@ function AppContent() {
   const hideNavbar =
     authPages.includes(location.pathname) ||
     location.pathname.startsWith("/user") ||
-    location.pathname.startsWith("/admin");
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/reception-dashboard");
 
   return (
     <>
@@ -44,7 +49,7 @@ function AppContent() {
 
         {/* Standalone dashboards & utility routes */}
         <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
-        <Route path="/reception-dashboard" element={<ReceptionDashboard />} />
+        <Route path="/reception-dashboard/*" element={<ReceptionistDashboard />} />
         <Route path="/trainers" element={<Trainers />} />
         <Route path="/payment" element={<PaymentPage />} />
       </Routes>
