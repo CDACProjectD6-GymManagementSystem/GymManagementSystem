@@ -13,7 +13,7 @@ export default function Login() {
     // Define credentials and their target routes
     const users = [
       { email: 'user@gymmate.com', password: 'user123', path: '/user' },
-      { email: 'trainer@gymmate.com', password: 'trainer123', path: '/trainer-dashboard' },
+      { email: 'trainer@gymmate.com', password: 'trainer123', path: '/trainer' },
       { email: 'admin@gymmate.com', password: 'admin123', path: '/admin-dashboard' },
       { email: 'reception@gymmate.com', password: 'reception123', path: '/reception-dashboard' },
     ];
