@@ -1,4 +1,3 @@
-// UserNavbar.jsx
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -8,8 +7,7 @@ import {
   FaAppleAlt,
   FaSignOutAlt,
 } from "react-icons/fa";
-import "../styles/Navbar.css";
-
+ 
 const navLinks = [
   {
     label: "Dashboard",
@@ -34,17 +32,15 @@ const navLinks = [
 ];
 
 const UserNavbar = () => {
-  const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Here you would clear any localStorage/session values for user/session
     // localStorage.removeItem("userLoggedIn");
     navigate("/");
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-3">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-3 user-navbar-custom">
       <Link className="navbar-brand d-flex align-items-center" to="/user-dashboard">
         <FaDumbbell className="me-2 text-warning" size={22} />
         <span className="fw-bold fs-4 text-warning">GymMate</span>
@@ -63,10 +59,7 @@ const UserNavbar = () => {
           {navLinks.map(({ label, path, icon }) => (
             <li className="nav-item" key={label}>
               <Link
-                className={
-                  "nav-link text-white nav-hover" +
-                  (location.pathname === path ? " active fw-bold text-warning" : "")
-                }
+                className="nav-link user-navlink"
                 to={path}
               >
                 {icon}
@@ -75,10 +68,8 @@ const UserNavbar = () => {
             </li>
           ))}
         </ul>
-        {/* Logout button */}
         <button
-          className="btn btn-outline-warning ms-4"
-          style={{ fontWeight: 700 }}
+          className="btn btn-outline-warning ms-4 user-logout-btn"
           onClick={handleLogout}
         >
           <FaSignOutAlt className="mb-1 me-1" /> Logout

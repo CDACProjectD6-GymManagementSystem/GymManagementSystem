@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   FaUserCircle,
@@ -7,8 +7,8 @@ import {
   FaCalendarCheck,
   FaComments,
 } from "react-icons/fa";
+import "./UserHomePage.css";
 
-// Demo profile photo and name
 const demoUser = {
   name: "Jane Doe",
   photo: "https://randomuser.me/api/portraits/women/44.jpg",
@@ -17,167 +17,73 @@ const demoUser = {
 const cardData = [
   {
     path: "/user/profile",
-    icon: <FaUserCircle size={38} className="mb-2" color="#f7c948" />,
+    icon: <FaUserCircle size={32} color="#000" />,
     title: "Profile",
-    desc: "View and update your personal info",
+    desc: "Update your info",
   },
   {
     path: "/user/membership",
-    icon: <FaIdCard size={38} className="mb-2" color="#f7c948" />,
+    icon: <FaIdCard size={32} color="#000" />,
     title: "Membership",
-    desc: "Check status, plans, renewals",
+    desc: "Plans & renewal",
   },
   {
     path: "/user/workout",
-    icon: <FaHeartbeat size={38} className="mb-2" color="#f7c948" />,
-    title: "Workout & Diet",
-    desc: "Access workout plans and diet charts",
+    icon: <FaHeartbeat size={32} color="#000" />,
+    title: "Workout",
+    desc: "Plans & diets",
   },
   {
     path: "/user/schedule",
-    icon: <FaCalendarCheck size={38} className="mb-2" color="#f7c948" />,
+    icon: <FaCalendarCheck size={32} color="#000" />,
     title: "Schedule",
-    desc: "Check your training sessions and attendance",
+    desc: "Sessions",
   },
   {
     path: "/user/feedback",
-    icon: <FaComments size={38} className="mb-2" color="#f7c948" />,
-    title: "Support & Feedback",
-    desc: "Submit issues or suggestions",
+    icon: <FaComments size={32} color="#000" />,
+    title: "Feedback",
+    desc: "Help & support",
   },
 ];
 
-// Live Clock
-const LiveTime = () => {
-  const [now, setNow] = useState(new Date());
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-  return (
-    <div style={{ fontFamily: "monospace", fontSize: 16, color: "#f7c948" }}>
-      {now.toLocaleTimeString()}
-    </div>
-  );
-};
-
-// User Panel Navbar (dark/yellow theme)
 const UserNavbar = ({ user }) => (
-  <nav
-    className="navbar navbar-expand navbar-dark"
-    style={{ background: "#23272b", borderBottom: "4px solid #f7c948" }}
-  >
-    <div className="container-fluid d-flex">
-      <span className="navbar-brand fw-bold fs-4 d-flex align-items-center">
-        <span style={{ color: "#f7c948" }}>GymMate User Panel</span>
-      </span>
-      <div className="ms-auto d-flex align-items-center gap-3">
-        <LiveTime />
-        <img
-          src={user.photo}
-          alt="Profile"
-          className="rounded-circle border border-2"
-          style={{
-            width: 38,
-            height: 38,
-            objectFit: "cover",
-            borderColor: "#f7c948",
-          }}
-        />
-        <span
-          className="fw-semibold"
-          style={{ color: "#f7c948", letterSpacing: 0.2 }}
-        >
-          {user.name}
-        </span>
-      </div>
+  <nav className="user-navbar">
+    <span className="brand">GymMate</span>
+    <div className="user-info">
+      <img
+        src={user.photo}
+        alt="Profile"
+        className="user-img"
+      />
+      <span className="user-name">{user.name}</span>
     </div>
   </nav>
 );
 
-const UserHomePage = () => {
-  return (
-    <div style={{ background: "#181a1b", minHeight: "100vh" }}>
-      {/* Custom Navbar for user panel */}
-      <UserNavbar user={demoUser} />
-
-      <div className="container py-5">
-        <h2
-          className="text-center fw-bold mb-1"
-          style={{
-            color: "#f7c948",
-            textShadow: "0 1px 24px #000b",
-            letterSpacing: 1,
-          }}
-        >
-          Welcome, <span style={{ color: "#fff" }}>{demoUser.name}</span>!
-        </h2>
-        <p
-          className="text-center mb-5 fs-5"
-          style={{
-            color: "#dedede",
-            fontWeight: 500,
-          }}
-        >
-          Ready to make progress today? Check out your options below.
-        </p>
-
-        <div className="row g-4 justify-content-center">
-          {cardData.map((card) => (
-            <div className="col-md-4 col-sm-6" key={card.path}>
-              <Link to={card.path} className="text-decoration-none">
-                <div
-                  className="card shadow h-100 home-card"
-                  style={{
-                    border: "2.5px solid #23272b",
-                    borderRadius: 20,
-                    transition: "transform .15s, box-shadow .15s, border .15s",
-                    background:
-                      "linear-gradient(132deg, #212428 70%, #282a36 100%)",
-                    color: "#fff",
-                  }}
-                >
-                  <div className="card-body text-center d-flex flex-column align-items-center">
-                    {card.icon}
-                    <h5
-                      className="card-title fw-bold"
-                      style={{ color: "#f7c948" }}
-                    >
-                      {card.title}
-                    </h5>
-                    <p className="card-text">{card.desc}</p>
-                    <button
-                      className="btn btn-outline-warning btn-sm mt-2"
-                      style={{
-                        color: "#f7c948",
-                        borderColor: "#f7c948",
-                        fontWeight: "bold",
-                      }}
-                      tabIndex={-1}
-                    >
-                      Go
-                    </button>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
+const UserHomePage = () => (
+  <div className="user-homepage-root">
+    <UserNavbar user={demoUser} />
+    <div className="content-container">
+      <h2 className="welcome-heading">
+        Welcome, <span className="username">{demoUser.name}</span>
+      </h2>
+      <div className="choose-text">
+        Choose an option
       </div>
-
-      {/* Inline hover style */}
-      <style>
-        {`
-          .home-card:hover {
-            transform: translateY(-8px) scale(1.03);
-            box-shadow: 0 8px 32px 0 #f7c94833 !important;
-            border: 2.5px solid #f7c948 !important;
-            background: linear-gradient(140deg,#ffd70022 20%,#222 100%);
-          }
-        `}
-      </style>
+      <div className="card-wrapper">
+        {cardData.map(card => (
+          <Link to={card.path} key={card.path} className="home-card-link">
+            <div className="home-card">
+              {card.icon}
+              <div className="card-title">{card.title}</div>
+              <div className="card-desc">{card.desc}</div>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
 export default UserHomePage;
