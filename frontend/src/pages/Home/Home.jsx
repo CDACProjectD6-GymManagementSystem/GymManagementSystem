@@ -1,16 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FaDumbbell, FaUserFriends, FaHeartbeat, FaRunning, FaBiking, FaYinYang, FaUserShield,
   FaChild, FaBox, FaClock, FaMobileAlt, FaShower, FaLeaf, FaGift
 } from "react-icons/fa";
-import "../../styles/Home.css";
 import trainer1 from "../../../public/images/Trainer1.png";
 import trainer2 from "../../../public/images/Trainer2.png";
 import trainer3 from "../../../public/images/Trainer3.png";
 import trainer4 from "../../../public/images/Trainer4.png";
-import PaymentPage from "../Payment/PaymentPage";
-
 
 export const plans = [
   {
@@ -98,35 +95,133 @@ const trainers = [
   }
 ];
 
+// Utility for scaling on hover
+const useHoverScale = () => {
+  const [hover, setHover] = useState(false);
+  const style = {
+    transform: hover ? "translateY(-7px) scale(1.018)" : "none",
+    boxShadow: hover ? "0 6px 20px #eee" : "0 1px 10px #f2f2f2",
+    transition: "transform 0.16s, box-shadow 0.2s"
+  };
+  return [hover, setHover, style];
+};
+
 const Home = () => {
+  const isMobile = window.innerWidth < 768;
+  const mainFontColor = "#222";
+  const accentColor = "#007bff"; // Bootstrap primary blue, adjust as desired
+  const cardBorder = "#e5e5e5";
+  const cardShadow = "0 3px 18px #ececec";
+  const iconColor = "#222";
+
+  const titleStyle = {
+    color: mainFontColor,
+    letterSpacing: "1.2px",
+    fontSize: isMobile ? "1.7rem" : "2.2rem",
+    fontWeight: 800,
+    margin: "0.4em 0"
+  };
+  const highlightStyle = {
+    color: accentColor,
+    borderBottom: `3px solid ${accentColor}`,
+    borderRadius: "3px",
+    padding: "0 0.25em"
+  };
+  const sectionTitleStyle = {
+    color: mainFontColor,
+    borderLeft: `4px solid ${accentColor}`,
+    paddingLeft: isMobile ? 8 : 14,
+    textTransform: "uppercase",
+    fontSize: isMobile ? "1.05rem" : "1.4rem",
+    letterSpacing: "1px",
+    fontWeight: 700,
+    marginBottom: isMobile ? "1.2rem" : "2rem",
+    marginTop: "0"
+  };
+  const cardStyle = {
+    background: "#fff",
+    color: mainFontColor,
+    borderRadius: 14,
+    border: `1px solid ${cardBorder}`,
+    boxShadow: cardShadow,
+    margin: "0 auto",
+    display: "flex",
+    flexDirection: "column",
+    height: "100%"
+  };
+  const outlineBtnStyle = {
+    border: `2px solid ${accentColor}`,
+    background: "#fff",
+    color: accentColor,
+    fontWeight: "bold",
+    borderRadius: "22px",
+    padding: "0.5rem 1.5rem",
+    transition: "all 0.12s",
+    fontSize: "1.02rem",
+    outline: "none",
+    cursor: "pointer",
+    textDecoration: "none",
+    marginTop: "0.4em"
+  };
+  const outlineBtnHoverStyle = {
+    ...outlineBtnStyle,
+    background: accentColor,
+    color: "#fff",
+  };
+
   return (
-    <div className="home-container">
-      <div className="container">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#fff",
+        color: mainFontColor,
+        fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif",
+        padding: 0,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: isMobile ? 14 : 36,
+        }}
+      >
 
         {/* Welcome Section */}
-        <div className="text-center mb-5">
-          <h1 className="fw-bold">
-            Welcome to <span className="text-primary">GymMate Fitness Club</span>
+        <div style={{ textAlign: "center", marginBottom: "2.4rem" }}>
+          <h1 style={titleStyle}>
+            Welcome to <span style={highlightStyle}>GymMate Fitness Club</span>
           </h1>
-          <p className="fs-5">
-            <FaDumbbell className="me-2" /> A complete fitness ecosystem where you build your body and mind.
+          <p style={{ fontSize: isMobile ? "1.08rem" : "1.16rem", color: "#555", fontWeight: 500 }}>
+            <FaDumbbell style={{ marginRight: 8, color: iconColor, fontSize: "1.15em" }} />
+            A complete fitness ecosystem where you build your body and mind.
           </p>
         </div>
 
-            <section id="about" className="mb-5">
-      <h2 className="text-center fw-bold mb-4">About Us</h2>
-      <p className="fs-5 text-center">
-        GymMate was founded with a mission to make fitness accessible and enjoyable for everyone.
-        Whether you're just starting out or an experienced athlete, our certified trainers, modern facilities,
-        and community-focused approach help you reach your goals. We believe in empowering every individual with
-        knowledge, tools, and motivation to live healthier, stronger lives.
-      </p>
-    </section>
+        {/* About Us */}
+        <section id="about" style={{ marginBottom: "2.3rem" }}>
+          <h2 style={sectionTitleStyle}>About Us</h2>
+          <p style={{
+            fontSize: isMobile ? "0.98rem" : "1.15rem",
+            color: "#2d2c2c",
+            textAlign: "center",
+            fontWeight: 400
+          }}>
+            GymMate was founded with a mission to make fitness accessible and enjoyable for everyone.
+            Whether you're just starting out or an experienced athlete, our certified trainers, modern facilities,
+            and community-focused approach help you reach your goals. We believe in empowering every individual with
+            knowledge, tools, and motivation to live healthier, stronger lives.
+          </p>
+        </section>
 
         {/* How Our Gym Works */}
-        <div className="mb-5">
-          <h3 className="fw-bold text-dark"><FaUserFriends className="me-2" />How Our Gym Works</h3>
-          <p className="fs-5">
+        <div style={{ marginBottom: "2.3rem" }}>
+          <h3 style={sectionTitleStyle}>
+            <FaUserFriends style={{ marginRight: 8, color: iconColor }} />
+            How Our Gym Works
+          </h3>
+          <p style={{ fontSize: isMobile ? "1rem" : "1.13rem", color: "#555" }}>
             At GymMate, every member begins with a personalized onboarding session including a fitness assessment and a custom workout plan.
             We offer flexible membership plans—daily, monthly, and yearly—so you can train at your own pace.
             Our certified trainers are available daily, and your performance is tracked monthly to help you achieve your goals.
@@ -134,110 +229,216 @@ const Home = () => {
         </div>
 
         {/* Activities */}
-        <div className="mb-5">
-          <h3 className="fw-bold text-dark"><FaHeartbeat className="me-2" />Activities at GymMate</h3>
-          <p className="fs-5">
-            <FaYinYang className="me-2" /> <strong>Yoga & Meditation</strong> help improve flexibility and mental clarity. <br />
-            <FaDumbbell className="me-2" /> <strong>Strength Training</strong> includes free weights and resistance machines. <br />
-            <FaBiking className="me-2" /> <strong>Cardio Zone</strong> has treadmills, bikes, and ellipticals for endurance. <br />
-            <FaRunning className="me-2" /> <strong>CrossFit & HIIT</strong> for intense fat-burning workouts. <br />
-            <FaBox className="me-2" /> <strong>Boxing & MMA</strong> builds strength and self-defense skills. <br />
-            <FaLeaf className="me-2" /> <strong>Zumba & Dance</strong> workouts to make fitness fun. <br />
-            <FaChild className="me-2" /> <strong>Kids Fitness</strong> ensures children aged 6–14 stay active and fit. <br />
-            <FaUserFriends className="me-2" /> <strong>Group Classes</strong> every day for all skill levels.
-          </p>
+        <div style={{ marginBottom: "2.3rem" }}>
+          <h3 style={sectionTitleStyle}>
+            <FaHeartbeat style={{ marginRight: 8, color: iconColor }} />
+            Activities at GymMate
+          </h3>
+          <div
+            style={{
+              background: "#fafcfd",
+              borderRadius: 16,
+              padding: isMobile ? "0.7rem 0.4rem" : "1.1rem 0.85rem",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 10,
+              boxShadow: "0 2px 10px #f6f6f6",
+              marginTop: 8
+            }}
+          >
+            {[
+              [<FaYinYang />, <b>Yoga & Meditation</b>, "improve flexibility & clarity"],
+              [<FaDumbbell />, <b>Strength Training</b>, "free weights & machines"],
+              [<FaBiking />, <b>Cardio Zone</b>, "treadmill, bikes, endurance"],
+              [<FaRunning />, <b>CrossFit & HIIT</b>, "fat-burning workouts"],
+              [<FaBox />, <b>Boxing & MMA</b>, "self-defense & power"],
+              [<FaLeaf />, <b>Zumba & Dance</b>, "fun fitness"],
+              [<FaChild />, <b>Kids Fitness</b>, "ages 6–14 stay active"],
+              [<FaUserFriends />, <b>Group Classes</b>, "daily, all levels"]
+            ].map(([icon, label, desc], idx) => (
+              <div
+                key={idx}
+                style={{
+                  flex: "1 1 230px",
+                  minWidth: 200,
+                  color: "#262626",
+                  fontWeight: 500,
+                  marginBottom: 6,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span style={{ marginRight: 9, fontSize: "1.07em", color: iconColor }}>{icon}</span>
+                <span>{label} <span style={{ color: "#6e6e6e", fontWeight: 400, fontSize: "90%" }}>- {desc}</span></span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Membership Plans Section */}
-        <section id="plans" className="mb-5">
-          <h2 className="text-center mb-4 text-primary">Our Membership Plans</h2>
-          <div className="row">
-            {plans.map(plan => (
-              <div className="col-md-6 col-lg-4 mb-4" key={plan.id}>
-                <div className="card h-100 shadow">
-                  <div className="card-body">
-                    <h4 className="card-title text-success">{plan.name}</h4>
-                    <p className="card-text">{plan.description}</p>
-                    <ul className="list-unstyled small">
-                      <li><strong>Gym Access:</strong> {plan.gymAccess}</li>
-                      <li><strong>Diet Consultation:</strong> {plan.dietConsultation}</li>
-                      <li><strong>Group Classes:</strong> {plan.groupClasses.join(", ")}</li>
-                      <li><strong>Sauna Access:</strong> {plan.saunaAccess}</li>
-                      <li><strong>Duration:</strong> {plan.duration}</li>
-                      <li><strong>Total Price:</strong> ₹{plan.price}</li>
-                      <li><strong>Monthly Rate:</strong> ₹{plan.pricePerMonth}</li>
-                      <li><strong>Discount:</strong> {plan.discount}</li>
-                    </ul>
-                  </div>
-                  <div className="card-footer text-center">
-                    <Link 
-                  to={`/payment?planId=${plan.id}`} 
-                  className="btn btn-outline-primary w-100"
+        <section id="plans" style={{ marginBottom: "2.3rem" }}>
+          <h2 style={{ ...sectionTitleStyle, textAlign: "center" }}>Our Membership Plans</h2>
+          <div style={{
+            margin: 0, display: "flex", flexWrap: "wrap"
+          }}>
+            {plans.map(plan => {
+              const [hover, setHover, scaleStyle] = useHoverScale();
+              return (
+                <div
+                  key={plan.id}
+                  style={{
+                    flex: "1 1 320px",
+                    maxWidth: 390,
+                    minWidth: 240,
+                    margin: "0 1.2rem 1.4rem 0",
+                    ...scaleStyle
+                  }}
+                  onMouseEnter={() => setHover(true)}
+                  onMouseLeave={() => setHover(false)}
                 >
-                  Choose Plan
-                </Link></div>
+                  <div style={cardStyle}>
+                    <div style={{ padding: isMobile ? "1.1rem" : "1.45rem" }}>
+                      <h4 style={{
+                        color: accentColor,
+                        fontWeight: 700,
+                        letterSpacing: "0.43px",
+                        fontSize: "1.17rem",
+                        marginBottom: "0.45rem"
+                      }}>{plan.name}</h4>
+                      <p style={{ margin: 0, marginBottom: "0.45rem", color: "#181818" }}>{plan.description}</p>
+                      <ul style={{ listStyle: "none", padding: 0, fontSize: "0.96em", color: "#353535", marginBottom: 0 }}>
+                        <li><strong>Gym Access:</strong> {plan.gymAccess}</li>
+                        <li><strong>Diet Consultation:</strong> {plan.dietConsultation}</li>
+                        <li><strong>Group Classes:</strong> {plan.groupClasses.join(", ")}</li>
+                        <li><strong>Sauna Access:</strong> {plan.saunaAccess}</li>
+                        <li><strong>Duration:</strong> {plan.duration}</li>
+                        <li><strong>Total Price:</strong> ₹{plan.price}</li>
+                        <li><strong>Monthly Rate:</strong> ₹{plan.pricePerMonth}</li>
+                        <li><strong>Discount:</strong> {plan.discount}</li>
+                      </ul>
+                    </div>
+                    <div style={{ textAlign: "center", background: "transparent", padding: "0.6em 1em" }}>
+                      <Link
+                        to={`/payment?planId=${plan.id}`}
+                        style={hover ? outlineBtnHoverStyle : outlineBtnStyle}
+                        onMouseEnter={e => e.target.style.background = accentColor}
+                        onMouseLeave={e => e.target.style.background = "#fff"}
+                      >
+                        Choose Plan
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </section>
 
         {/* Trainers Section */}
-        <section id="trainers" className="mb-5">
-          <h2 className="text-center fw-bold mb-4">Meet Our Trainers</h2>
-          <div className="row">
-            {trainers.map(trainer => (
-              <div className="col-md-3 mb-4" key={trainer.id}>
-                <div className="card shadow-sm h-100 text-center">
-                  <img src={trainer.photo} className="card-img-top" alt={trainer.name} />
-                  <div className="card-body">
-                    <h5 className="card-title fw-bold">{trainer.name}</h5>
-                    <p className="card-text text-muted"><strong>Expertise:</strong> {trainer.expertise}</p>
-                    <p className="card-text"><strong>Certifications:</strong>
-                      <ul className="list-unstyled mb-0">
-                        {trainer.certifications.map((cert, i) => (
-                          <li key={i}>✅ {cert}</li>
+        <section id="trainers" style={{ marginBottom: "2.5rem" }}>
+          <h2 style={{ ...sectionTitleStyle, textAlign: "center" }}>Meet Our Trainers</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
+            {trainers.map(trainer => {
+              const [hover, setHover, scaleStyle] = useHoverScale();
+              return (
+                <div
+                  key={trainer.id}
+                  style={{
+                    flex: isMobile ? "1 1 100%" : "1 1 200px",
+                    maxWidth: isMobile ? "99%" : 220,
+                    margin: "0 1rem 1.2rem 0",
+                    minWidth: "180px",
+                    ...scaleStyle
+                  }}
+                  onMouseEnter={() => setHover(true)}
+                  onMouseLeave={() => setHover(false)}
+                >
+                  <div style={{
+                    ...cardStyle,
+                    border: `1px solid #e7e7e7`,
+                    background: "#fafafa"
+                  }}>
+                    <img
+                      src={trainer.photo}
+                      alt={trainer.name}
+                      style={{
+                        height: 160,
+                        width: "100%",
+                        objectFit: "cover",
+                        borderBottom: "2px solid #ededed",
+                        filter: "none",
+                        borderRadius: "0 0 14px 14px",
+                        marginBottom: 0
+                      }}
+                    />
+                    <div style={{ padding: "0.80em 1em 0.94em 1em", flex: 1 }}>
+                      <h5 style={{
+                        margin: 0,
+                        fontWeight: 700,
+                        color: mainFontColor,
+                        fontSize: "1em",
+                        letterSpacing: "0.3px",
+                        marginBottom: "0.38em",
+                      }}>{trainer.name}</h5>
+                      <div style={{
+                        color: "#666",
+                        fontSize: "0.98em",
+                        fontWeight: 400,
+                        marginBottom: "0.45em"
+                      }}>{trainer.expertise}</div>
+                      <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: "0.93em", color: "#333", textAlign: "left" }}>
+                        {trainer.certifications.map((cert, idx) => (
+                          <li key={idx}>✅ {cert}</li>
                         ))}
                       </ul>
-                    </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </section>
 
         {/* Why Choose Us */}
-        <div className="mb-5">
-          <h3 className="fw-bold text-dark"><FaUserShield className="me-2" />Why Choose Us?</h3>
-          <ul className="fs-5">
-            <li><FaClock className="me-2" /> 24x7 Member Access</li>
-            <li><FaLeaf className="me-2" /> Air-Conditioned, Hygienic Environment</li>
-            <li><FaHeartbeat className="me-2" /> Expert Diet & Nutrition Counseling</li>
-            <li><FaShower className="me-2" /> Smart Locker & Shower Facility</li>
-            <li><FaMobileAlt className="me-2" /> Workout Tracking via Mobile App</li>
-            <li><FaGift className="me-2" /> Referral Rewards for Members</li>
+        <div style={{ marginBottom: "2.1rem" }}>
+          <h3 style={sectionTitleStyle}>
+            <FaUserShield style={{ marginRight: 8, color: iconColor }} />
+            Why Choose Us?
+          </h3>
+          <ul style={{ fontSize: isMobile ? "1.05rem" : "1.15rem", color: "#222", margin: 0, padding: 0 }}>
+            <li style={{ padding: "0.22em 0" }}><FaClock style={{ marginRight: 8, color: iconColor }} /> 24x7 Member Access</li>
+            <li style={{ padding: "0.22em 0" }}><FaLeaf style={{ marginRight: 8, color: iconColor }} /> Air-Conditioned, Hygienic Environment</li>
+            <li style={{ padding: "0.22em 0" }}><FaHeartbeat style={{ marginRight: 8, color: iconColor }} /> Expert Diet & Nutrition Counseling</li>
+            <li style={{ padding: "0.22em 0" }}><FaShower style={{ marginRight: 8, color: iconColor }} /> Smart Locker & Shower Facility</li>
+            <li style={{ padding: "0.22em 0" }}><FaMobileAlt style={{ marginRight: 8, color: iconColor }} /> Workout Tracking via Mobile App</li>
+            <li style={{ padding: "0.22em 0" }}><FaGift style={{ marginRight: 8, color: iconColor }} /> Referral Rewards for Members</li>
           </ul>
         </div>
-          
-              {/* Contact Us Section */}
-    <section id="contact" className="mb-5">
-      <h2 className="text-center fw-bold mb-4">Contact Us</h2>
-      <div className="row justify-content-center">
-        <div className="col-md-8">
-          <p className="fs-5 text-center">
-            Have questions, suggestions, or feedback? We’d love to hear from you! Reach out to us anytime.
-          </p>
-          <ul className="list-unstyled fs-5 text-center">
-            <li><strong>📍 Address:</strong> 123 Fitness St, Health City, 400001</li>
-            <li><strong>📞 Phone:</strong> +91 98765 43210</li>
-            <li><strong>📧 Email:</strong> support@gymmate.com</li>
-          </ul>
-        </div>
-      </div>
-    </section>
 
-
+        {/* Contact Us Section */}
+        <section id="contact" style={{ marginBottom: "2.1rem" }}>
+          <h2 style={{ ...sectionTitleStyle, textAlign: "center" }}>Contact Us</h2>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ maxWidth: 620, width: "100%" }}>
+              <p style={{
+                fontSize: isMobile ? "1rem" : "1.08rem",
+                color: "#444",
+                textAlign: "center",
+                marginBottom: 8
+              }}>
+                Have questions, suggestions, or feedback? We’d love to hear from you! Reach out to us anytime.
+              </p>
+              <ul style={{
+                listStyle: "none", fontSize: isMobile ? "1.07rem" : "1.18rem",
+                color: mainFontColor, textAlign: "center", marginBottom: 0, padding: 0
+              }}>
+                <li style={{ marginBottom: 3 }}><b>📍 Address:</b> 123 Fitness St, Health City, 400001</li>
+                <li style={{ marginBottom: 3 }}><b>📞 Phone:</b> +91 98765 43210</li>
+                <li style={{ marginBottom: 3 }}><b>📧 Email:</b> support@gymmate.com</li>
+              </ul>
+            </div>
+          </div>
+        </section>
 
       </div>
     </div>

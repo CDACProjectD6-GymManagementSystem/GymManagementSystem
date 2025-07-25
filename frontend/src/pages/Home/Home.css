@@ -1,0 +1,124 @@
+.home__theme {
+  min-height: 100vh;
+  background: #111; /* or #181818 */
+  color: #fff;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+/* TITLES & SECTIONS */
+.home__title {
+  color: #fff;
+  letter-spacing: 1.5px;
+  font-size: 2.6rem;
+}
+.home__highlight {
+  color: #f7f7f7;
+  border-bottom: 3px solid #fff;
+  border-radius: 3px;
+  padding: 0 0.25em;
+  text-shadow: 0 0 8px #fff2;
+}
+.home__section-title {
+  color: #fff;
+  border-left: 5px solid #fff;
+  padding-left: 14px;
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+  margin-bottom: 2rem;
+}
+.home__subtitle {
+  color: #ccc;
+  font-weight: 500;
+}
+.home__activities {
+  background: rgba(255,255,255,0.02);
+  border-radius: 1rem;
+  padding: 1.3rem 0.7rem;
+}
+.home__activities b {
+  color: #fff;
+}
+.home__activities span {
+  color: #bbb;
+  font-weight: 400;
+}
+.home__plan-card {
+  background: rgba(34,34,34,0.91) !important;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 16px;
+  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 20px #000b;
+}
+.home__plan-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 8px 32px #000c;
+  border: 1.5px solid #fff;
+}
+.home__plan-title {
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 5px #fff3;
+}
+
+/* Button style */
+.home__btn-plan {
+  background: #fff;
+  color: #111 !important;
+  font-weight: bold;
+  border: none;
+  border-radius: 22px;
+  padding: 0.5rem 1.8rem;
+  transition: background 0.18s, color 0.18s;
+  box-shadow: 0 3px 15px #fff1;
+}
+.home__btn-plan:hover, .home__btn-plan:focus {
+  background: #191919;
+  color: #fff !important;
+  outline: none;
+}
+
+/* Trainer Card */
+.home__trainer-card {
+  background: rgba(255,255,255, 0.065) !important;
+  color: #fff;
+  border: 1px solid #4442;
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.22s, box-shadow 0.18s;
+}
+.home__trainer-card .card-img-top {
+  height: 170px;
+  object-fit: cover;
+  border-radius: 0 0 18px 18px;
+  filter: grayscale(100%);
+  border-bottom: 2px solid #333;
+}
+.home__trainer-card:hover {
+  transform: translateY(-8px) scale(1.04);
+  box-shadow: 0 7px 22px #000e;
+  border: 1.2px solid #fff;
+}
+.home__trainer-expertise {
+  color: #eee;
+  font-size: 1rem;
+  margin-bottom: .25rem;
+}
+
+/* Why Choose Us */
+.home__why-list li {
+  padding: 0.25em 0;
+  color: #eee;
+}
+
+@media (max-width: 767px) {
+  .home__section-title { font-size: 1.12rem; border-left-width: 2px;}
+  .home__plan-card, .home__trainer-card {margin-bottom: 1rem;}
+  .home__activities { font-size: 1rem;}
+}
+
+::-webkit-scrollbar-thumb { background: #444; border-radius:8px;}
+::-webkit-scrollbar { width:5px; background: #222;}
