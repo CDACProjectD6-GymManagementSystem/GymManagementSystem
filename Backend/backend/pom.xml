@@ -12,9 +12,8 @@
 	<groupId>com.example</groupId>
 	<artifactId>spring_boot_backend_template</artifactId>
 	<version>0.0.1</version>
-	<name>spring_boot_backend_template</name>
-	<description>Spring Boot Template project for developing REST APIs in a Full
-		Stack Application</description>
+	<name>GymMate</name>
+	<description> Backend for Gym Management</description>
 	<url />
 	<licenses>
 		<license />
