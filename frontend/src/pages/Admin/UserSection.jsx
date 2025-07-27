@@ -48,10 +48,11 @@ const UserSection = () => {
     firstName: "",
     lastName: "",
     email: "",
+    password: "",     // <-- Added password field here
     mobile: "",
     address: "",
     gender: "",
-    subscriptionType: "", // New dropdown field
+    subscriptionType: "",
   });
 
   const handleChange = (e) => {
@@ -71,6 +72,7 @@ const UserSection = () => {
       firstName: "",
       lastName: "",
       email: "",
+      password: "",
       mobile: "",
       address: "",
       gender: "",
@@ -111,6 +113,14 @@ const UserSection = () => {
           label="Email"
           type="email"
           value={form.email}
+          onChange={handleChange}
+          required
+        />
+        <Input
+          name="password"
+          label="Password"
+          type="password"
+          value={form.password}
           onChange={handleChange}
           required
         />
@@ -177,6 +187,7 @@ const UserSection = () => {
                 firstName: "",
                 lastName: "",
                 email: "",
+                password: "",
                 mobile: "",
                 address: "",
                 gender: "",
@@ -199,13 +210,14 @@ const UserSection = () => {
             <th>Address</th>
             <th>Gender</th>
             <th>Subscription Type</th>
+            <th>Password</th> {/* Added Password column */}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {users.length === 0 ? (
             <tr className="no-data-row">
-              <td colSpan={8}>No users found.</td>
+              <td colSpan={9}>No users found.</td>
             </tr>
           ) : (
             users.map((u, i) => (
@@ -217,6 +229,7 @@ const UserSection = () => {
                 <td>{u.address}</td>
                 <td>{u.gender}</td>
                 <td>{u.subscriptionType}</td>
+                <td>{u.password}</td> {/* Show password here; for production you might want to mask */}
                 <td>
                   <button className="admin-btn" onClick={() => handleEdit(i)}>
                     Edit
