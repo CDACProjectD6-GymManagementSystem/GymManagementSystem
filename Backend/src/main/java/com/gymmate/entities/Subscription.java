@@ -1,14 +1,10 @@
 package com.gymmate.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,8 +22,6 @@ public class Subscription extends SuperBaseEntity {
 	private GymAccess access;
 	@Column(name = "diet_consultation")
 	private boolean dietConsultation;
-	@Column(name = "group_classes")
-	private List<String> groupClasses = new ArrayList<>();
 	@Column(name = "is_sauna")
 	private boolean isSauna;
 	private int duration;
