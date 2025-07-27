@@ -1,31 +1,31 @@
 # ====================================
-# 🎯 Spring Boot (Maven backend)
+# 🎯 Spring Boot (Maven Backend)
 # ====================================
-backend/target/
-backend/.mvn/
-backend/mvnw
-backend/mvnw.cmd
-backend/pom.xml.tag
-backend/pom.xml.releaseBackup
-backend/pom.xml.versionsBackup
-backend/pom.xml.next
-backend/release.properties
-backend/dependency-reduced-pom.xml
+Backend/target/
+Backend/.mvn/
+Backend/mvnw
+Backend/mvnw.cmd
+Backend/pom.xml.tag
+Backend/pom.xml.releaseBackup
+Backend/pom.xml.versionsBackup
+Backend/pom.xml.next
+Backend/release.properties
+Backend/dependency-reduced-pom.xml
 
 # Spring Tool Suite / Eclipse
-backend/.classpath
-backend/.project
-backend/.settings/
-backend/.factorypath
-backend/.apt_generated/
-backend/.sts4-cache/
+Backend/.classpath
+Backend/.project
+Backend/.settings/
+Backend/.factorypath
+Backend/.apt_generated/
+Backend/.sts4-cache/
 
 # IntelliJ
-backend/.idea/
-backend/*.iml
+Backend/.idea/
+Backend/*.iml
 
 # Logs
-backend/*.log
+Backend/*.log
 
 # ====================================
 # ⚛️ React (Frontend)
