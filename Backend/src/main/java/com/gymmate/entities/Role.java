@@ -31,7 +31,7 @@ public class Role {
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
 
-	private enum UserRole {
+	public enum UserRole {
 		ROLE_USER, ROLE_ADMIN, ROLE_TRAINER, ROLE_RECEPTIONIST
 	}
 }
