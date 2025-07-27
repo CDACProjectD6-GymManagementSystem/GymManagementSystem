@@ -45,18 +45,10 @@ const packages = [
 ];
 
 export default function MembershipPage() {
-  // Use the index for selection (default: first package selected)
   const [selectedIdx, setSelectedIdx] = useState(0);
-
   const selected = packages[selectedIdx];
-  const durationMatch = selected.duration.match(/\d+/);
-  const monthly = durationMatch
-    ? Math.round(selected.price / Number(durationMatch[0]))
-    : selected.price;
-
-  function handleUpgrade() {
-    alert(`Upgraded to ${selected.name}!`);
-  }
+  const months = parseInt(selected.duration);
+  const monthly = months ? Math.round(selected.price / months) : selected.price;
 
   return (
     <div className="membership-bg">
@@ -65,54 +57,35 @@ export default function MembershipPage() {
         {packages.map((pkg, idx) => (
           <div
             key={pkg.id}
-            className={
-              "membership-package-card" + (idx === selectedIdx ? " selected" : "")
-            }
+            className={"membership-package-card" + (idx === selectedIdx ? " selected" : "")}
             onClick={() => setSelectedIdx(idx)}
           >
-            <div className="membership-card-title" style={{ color: "#000" }}>
+            <div className="membership-card-title">
               {pkg.icon}
               <span className="membership-card-name">{pkg.name}</span>
-              {pkg.discount !== "0%" && (
-                <span className="membership-discount">{pkg.discount}</span>
-              )}
+              {pkg.discount !== "0%" && <span className="membership-discount">{pkg.discount}</span>}
             </div>
             <div className="membership-card-duration">{pkg.duration}</div>
             <div className="membership-card-desc">{pkg.description}</div>
             <ul className="membership-feature-list">
-              <li>
-                <b>Gym Access: </b>
-                {pkg.gymAccess}
-              </li>
-              <li>
-                <b>Diet Consultation: </b>
-                {pkg.dietConsultation}
-              </li>
-              <li>
-                <b>Group Classes: </b>
-                {pkg.groupClasses.length
-                  ? pkg.groupClasses.join(", ")
-                  : "Not included"}
-              </li>
-              <li>
-                <b>Sauna/Steam/Shower: </b>
-                {pkg.saunaAccess}
-              </li>
+              <li><b>Gym Access: </b>{pkg.gymAccess}</li>
+              <li><b>Diet Consultation: </b>{pkg.dietConsultation}</li>
+              <li><b>Group Classes: </b>{pkg.groupClasses.length ? pkg.groupClasses.join(", ") : "Not included"}</li>
+              <li><b>Sauna/Steam/Shower: </b>{pkg.saunaAccess}</li>
             </ul>
             <div className="membership-card-price">₹{pkg.price}</div>
             <div className="membership-card-monthly">
               ({pkg.duration})
-              {monthly && idx === selectedIdx && (
-                <span>
-                  &nbsp;|&nbsp;₹{monthly}/mo
-                </span>
-              )}
+              {idx === selectedIdx && <span>&nbsp;|&nbsp;₹{monthly}/mo</span>}
             </div>
           </div>
         ))}
       </div>
 
-      <button className="membership-confirm-btn" onClick={handleUpgrade}>
+      <button
+        className="membership-confirm-btn"
+        onClick={() => alert(`Upgraded to ${selected.name}!`)}
+      >
         Confirm &amp; Pay for <span className="membership-btn-plan">{selected.name}</span>
       </button>
     </div>
