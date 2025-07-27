@@ -19,7 +19,7 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
- @NoArgsConstructor
+@NoArgsConstructor
 @Table(name = "trainers")
 @ToString(exclude = "userList",callSuper = true)
 public class Trainer extends BaseEntity {

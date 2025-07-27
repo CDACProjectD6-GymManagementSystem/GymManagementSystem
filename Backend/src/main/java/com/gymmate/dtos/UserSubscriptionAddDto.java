@@ -7,14 +7,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserDto {
-	private boolean isSubscribed;
-	private boolean isActive;
+public class UserSubscriptionAddDto {
 	private String firstName;
 	private String lastName;
 	private String email;
-	private String password;
 	private String address;
 	private String mobile;
 	private Gender gender;
+	private String password;
+	private String subscriptionType;
 }

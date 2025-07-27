@@ -12,4 +12,6 @@ public interface SubscriptionDao extends JpaRepository<Subscription, Long> {
 
 	List<Subscription> findByIsActiveTrue();
 
+	Subscription findByName(String subscriptionType);
+
 }

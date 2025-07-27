@@ -1,53 +1,81 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  FaUserEdit,
-  FaSave,
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaHome,
-  FaIdBadge,
+  FaUserEdit, FaSave, FaUser, FaEnvelope, FaPhone, FaHome, FaVenusMars
 } from "react-icons/fa";
-import "./ProfilePage.css";
+import './ProfilePage.css';
+import { profileService } from '../../../services/UserProfileService';
 
-// Placeholder avatar
+const GENDERS = [
+  { value: "MALE",   label: "Male" },
+  { value: "FEMALE", label: "Female" },
+  { value: "OTHER",  label: "Other" }
+];
 const AVATAR = "https://randomuser.me/api/portraits/men/75.jpg";
 
-const dummyProfile = {
-  firstName: "pratik",
-  lastName: "Pawar",
-  email: "jane@example.com",
-  mobile: "9876543210",
-  address: "123 Main St, Springfield, USA",
-  subscriptionId: "SUB-123456789",
-  photo: "",
-};
-
 const ProfilePage = () => {
-  const [form, setForm] = useState({ ...dummyProfile });
+  const [form, setForm] = useState(null);
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleEdit = (e) => {
+  useEffect(() => {
+    setLoading(true);
+    profileService.fetch()
+      .then(res => {
+        setForm(res.data);
+        setLoading(false);
+        setApiError("");
+      })
+      .catch(() => {
+        setApiError("Failed to load profile.");
+        setLoading(false);
+      });
+  }, []);
+
+  const handleChange = e =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleEdit = e => {
     e.preventDefault();
     setEditing(true);
+    setSuccessMsg("");
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    setEditing(false);
-    alert("Profile updated!\n" + JSON.stringify(form, null, 2));
+    setApiError("");
+    setSuccessMsg("");
+    try {
+      await profileService.update(form);
+      setEditing(false);
+      setSuccessMsg("Profile updated successfully!");
+    } catch {
+      setApiError("Failed to save changes!");
+    }
   };
+
+  if (loading)
+    return (
+      <div className="profilepage-bg">
+        <div style={{ textAlign: 'center', padding: '70px' }}>Loading...</div>
+      </div>
+    );
+
+  if (!form)
+    return (
+      <div className="profilepage-bg">
+        <div style={{ color: 'red', textAlign: 'center', padding: '70px' }}>{apiError || "No Profile"}</div>
+      </div>
+    );
 
   return (
     <div className="profilepage-bg">
       <div className="profilepage-root">
-        {/* LEFT: Avatar + Info */}
+        {/* Avatar & Display Info */}
         <div className="profile-avatar-panel">
           <div className="profile-avatar">
-            <img
-              src={form.photo || AVATAR}
-              alt="Profile"
-            />
+            <img src={AVATAR} alt="Profile" />
           </div>
           <div className="profile-mainname">
             {form.firstName} {form.lastName}
@@ -59,18 +87,15 @@ const ProfilePage = () => {
             <FaPhone /> {form.mobile}
           </div>
           <div className="profile-info-line">
-            <FaIdBadge /> <small>{form.subscriptionId}</small>
+            <FaVenusMars /> {(form.gender && GENDERS.find(g=>g.value === form.gender)?.label) || ""}
           </div>
-          <span className="profile-active-status">Active Member</span>
         </div>
-        {/* RIGHT: Profile Form */}
+        {/* Edit Form */}
         <div className="profile-form-panel">
           <div className="profile-form-heading">Edit Details</div>
           <form onSubmit={handleSubmit}>
             <div className="profile-form-group">
-              <label>
-                <FaUser className="profile-label-icon"/> First Name
-              </label>
+              <label><FaUser className="profile-label-icon" /> First Name</label>
               <input
                 name="firstName"
                 value={form.firstName}
@@ -81,9 +106,7 @@ const ProfilePage = () => {
               />
             </div>
             <div className="profile-form-group">
-              <label>
-                <FaUser className="profile-label-icon"/> Last Name
-              </label>
+              <label><FaUser className="profile-label-icon" /> Last Name</label>
               <input
                 name="lastName"
                 value={form.lastName}
@@ -94,9 +117,7 @@ const ProfilePage = () => {
               />
             </div>
             <div className="profile-form-group">
-              <label>
-                <FaEnvelope className="profile-label-icon"/> Email
-              </label>
+              <label><FaEnvelope className="profile-label-icon" /> Email</label>
               <input
                 type="email"
                 name="email"
@@ -108,9 +129,7 @@ const ProfilePage = () => {
               />
             </div>
             <div className="profile-form-group">
-              <label>
-                <FaPhone className="profile-label-icon"/> Mobile Number
-              </label>
+              <label><FaPhone className="profile-label-icon" /> Mobile Number</label>
               <input
                 name="mobile"
                 value={form.mobile}
@@ -121,9 +140,7 @@ const ProfilePage = () => {
               />
             </div>
             <div className="profile-form-group">
-              <label>
-                <FaHome className="profile-label-icon"/> Address
-              </label>
+              <label><FaHome className="profile-label-icon" /> Address</label>
               <input
                 name="address"
                 value={form.address}
@@ -134,25 +151,29 @@ const ProfilePage = () => {
               />
             </div>
             <div className="profile-form-group">
-              <label>
-                <FaIdBadge className="profile-label-icon"/> Subscription ID
-              </label>
-              <input
-                value={form.subscriptionId}
-                readOnly
-                disabled
-                className="profile-input disabled"
-                style={{ border: "1.5px solid #000" }} // Keep green out, pure black & white
-              />
+              <label><FaVenusMars className="profile-label-icon" /> Gender</label>
+              <select
+                name="gender"
+                value={form.gender}
+                onChange={handleChange}
+                disabled={!editing}
+                className={`profile-input ${!editing ? "readonly" : ""}`}
+              >
+                {GENDERS.map(g => (
+                  <option key={g.value} value={g.value}>{g.label}</option>
+                ))}
+              </select>
             </div>
-            <div style={{ marginTop: 12 }}>
+            {apiError && <div style={{ color: '#c00', marginBottom: 7 }}>{apiError}</div>}
+            {successMsg && <div style={{ color: 'green', marginBottom: 7 }}>{successMsg}</div>}
+            <div style={{ marginTop: 14 }}>
               {editing ? (
                 <button type="submit" className="profile-save-btn">
                   <FaSave className="profile-btn-icon" />
                   Save Changes
                 </button>
               ) : (
-                <button onClick={handleEdit} className="profile-edit-btn">
+                <button onClick={handleEdit} className="profile-edit-btn" type="button">
                   <FaUserEdit className="profile-btn-icon" />
                   Edit Profile
                 </button>
