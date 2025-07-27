@@ -1,4 +1,3 @@
-// UserManagement.jsx
 import React, { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
@@ -54,18 +53,14 @@ const membersData = [
   }
 ];
 
-// Receive onProceedToPayment prop from parent
 function UserManagement({ onProceedToPayment }) {
   const [members, setMembers] = useState(membersData);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [message, setMessage] = useState(null); // For success/error messages
-
-  // New state to track if a user was just saved (for payment option)
+  const [message, setMessage] = useState(null); 
   const [savedUserId, setSavedUserId] = useState(null);
 
-  // Form state for new/editing user
   const [currentUser, setCurrentUser] = useState({
     firstName: "",
     lastName: "",
@@ -109,15 +104,15 @@ function UserManagement({ onProceedToPayment }) {
       });
     }
     setShowModal(true);
-    setMessage(null); // Clear previous messages
-    setSavedUserId(null); // Reset saved user ID
+    setMessage(null); 
+    setSavedUserId(null); 
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingId(null);
-    setSavedUserId(null); // Clear saved user ID
-    setMessage(null); // Clear messages
+    setSavedUserId(null); 
+    setMessage(null); 
     setCurrentUser({
       firstName: "",
       lastName: "",
@@ -178,10 +173,10 @@ function UserManagement({ onProceedToPayment }) {
         subscriptionId: selectedSubscription
       };
       setMembers(prev => [...prev, userToAdd]);
-      userIdToSave = newId; // Store the ID of the newly created user
+      userIdToSave = newId; 
       setMessage({ type: "success", text: "User added successfully! You can now proceed to payment." });
     }
-    setSavedUserId(userIdToSave); // Set the ID of the user just saved/created
+    setSavedUserId(userIdToSave); 
   };
 
   const handleDeleteUser = (id) => {

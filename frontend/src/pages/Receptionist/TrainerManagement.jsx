@@ -1,4 +1,3 @@
-// TrainerManagement.jsx
 import React, { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Modal, Button, Form } from "react-bootstrap";
@@ -6,36 +5,36 @@ import { Modal, Button, Form } from "react-bootstrap";
 const trainersData = [
   {
     id: 1,
-    firstName: "Alice", //
-    lastName: "Brown", //
-    expertise: "Yoga", // Maps to 'expertise'
-    mobile: "111-222-3333", // Maps to 'mobile'
-    email: "alice@fitgym.com", //
-    gender: "FEMALE", // Added gender
-    salary: 50000.00, // Added salary
-    certifications: "RYT 200, Certified Yoga Instructor" // Added certifications
+    firstName: "Alice", 
+    lastName: "Brown", 
+    expertise: "Yoga", 
+    mobile: "111-222-3333", 
+    email: "alice@fitgym.com", 
+    gender: "FEMALE", 
+    salary: 50000.00,
+    certifications: "RYT 200, Certified Yoga Instructor" 
   },
   {
     id: 2,
     firstName: "Bob",
     lastName: "Green",
-    expertise: "Weightlifting", //
-    mobile: "444-555-6666", //
-    email: "bob@fitgym.com", //
-    gender: "MALE", //
-    salary: 60000.00, //
-    certifications: "CSCS, ACE Certified Personal Trainer" //
+    expertise: "Weightlifting", 
+    mobile: "444-555-6666", 
+    email: "bob@fitgym.com",
+    gender: "MALE", 
+    salary: 60000.00, 
+    certifications: "CSCS, ACE Certified Personal Trainer" 
   },
   {
     id: 3,
     firstName: "Cathy",
     lastName: "Blue",
-    expertise: "Cardio", //
-    mobile: "777-888-9999", //
-    email: "cathy@fitgym.com", //
-    gender: "FEMALE", //
-    salary: 55000.00, //
-    certifications: "Spin Instructor, HIIT Specialist" //
+    expertise: "Cardio", 
+    mobile: "777-888-9999", 
+    email: "cathy@fitgym.com", 
+    gender: "FEMALE", 
+    salary: 55000.00, 
+    certifications: "Spin Instructor, HIIT Specialist" 
   }
 ];
 
@@ -45,15 +44,14 @@ function TrainerManagement() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  // Form state for new/editing trainer - Updated to match BaseEntity/Trainer fields
   const [currentTrainer, setCurrentTrainer] = useState({
-    firstName: "", //
-    lastName: "", //
-    expertise: "", // Maps to 'expertise'
-    mobile: "", // Maps to 'mobile'
-    email: "", //
-    gender: "MALE", // Added gender
-    certifications: "" // Added certifications
+    firstName: "", 
+    lastName: "", 
+    expertise: "", 
+    mobile: "", 
+    email: "", 
+    gender: "MALE", 
+    certifications: "" 
   });
 
   const filtered = trainers.filter(
@@ -178,11 +176,11 @@ function TrainerManagement() {
           <tbody>
             {filtered.map(t => (
               <tr key={t.id}>
-                <td><b>{t.firstName} {t.lastName}</b></td> {/* Display first and last name */}
-                <td>{t.expertise}</td> {/* Display expertise */}
-                <td>{t.mobile}</td> {/* Display mobile */}
-                <td>{t.email}</td> {/* */}
-                <td>{t.gender}</td> {/* Display gender */}
+                <td><b>{t.firstName} {t.lastName}</b></td> 
+                <td>{t.expertise}</td> 
+                <td>{t.mobile}</td> 
+                <td>{t.email}</td> 
+                <td>{t.gender}</td>
                 <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={t.certifications}>{t.certifications}</td> {/* Display certifications */}
                 <td>
                   <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleShowModal(t)}><FaEdit /></button>

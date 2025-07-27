@@ -1,17 +1,13 @@
-// SubscriptionPlans.jsx
+
 import React, { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 
-// Field options for UI based on backend entity
-const gymAccessOptions = [ // Corresponds to Subscription.GymAccess enum
+const gymAccessOptions = [ 
   { value: "OFF_PEAK_HOURS", label: "Off-peak hours" },
   { value: "FULLTIME", label: "Full Time" }
 ];
 
-// Mismatch Note: dietConsultation is boolean in backend.
-// Frontend previously had "Once at start" / "Monthly".
-// For now, mapping boolean to a simple Yes/No, assuming 'true' means consultation is available.
 const dietConsultationOptions = [
   { value: true, label: "Yes" },
   { value: false, label: "No" }
@@ -25,7 +21,7 @@ const groupClassOptions = [ //
   { value: "Spin", label: "Spin" }
 ];
 
-const durations = Array.from({ length: 12 }, (_, i) => i + 1); // 1 to 12 months (integers)
+const durations = Array.from({ length: 12 }, (_, i) => i + 1); 
 
 // Demo data - Mapped to match Java Subscription entity fields
 const plansData = [
@@ -33,14 +29,14 @@ const plansData = [
     id: 1,
     name: "Basic Access",
     description: "Simple gym access during off-peak hours with basic facilities.",
-    access: "OFF_PEAK_HOURS", // Matches GymAccess enum
-    dietConsultation: false, // Mapped to boolean
-    groupClasses: ["Yoga"], // Maps to List<String>
-    isSauna: false, // Maps to boolean
-    duration: 1, // Number of months
-    price: 30.0, // Maps to double
-    discount: 0.0, // Maps to double
-    isActive: true // Maps to boolean
+    access: "OFF_PEAK_HOURS", 
+    dietConsultation: false, 
+    groupClasses: ["Yoga"], 
+    isSauna: false, 
+    duration: 1,
+    price: 30.0, 
+    discount: 0.0, 
+    isActive: true 
   },
   {
     id: 2,
@@ -92,14 +88,14 @@ function SubscriptionPlans() {
   const defaultPlan = {
     name: "",
     description: "",
-    access: "OFF_PEAK_HOURS", // Default GymAccess
-    dietConsultation: false, // Default boolean
-    groupClasses: [], // Default empty list
-    isSauna: false, // Default boolean
-    duration: 1, // Default to 1 month
+    access: "OFF_PEAK_HOURS", 
+    dietConsultation: false, 
+    groupClasses: [], 
+    isSauna: false, 
+    duration: 1, 
     price: "",
     discount: 0.0,
-    isActive: true // Default to active
+    isActive: true 
   };
   const [currentPlan, setCurrentPlan] = useState(defaultPlan);
 
@@ -138,9 +134,9 @@ function SubscriptionPlans() {
         };
       });
     } else if (name === "dietConsultation" || name === "isSauna" || name === "isActive") {
-        setCurrentPlan(prev => ({ // Handle boolean values from radio/checkbox
+        setCurrentPlan(prev => ({ 
             ...prev,
-            [name]: value === "true" // Convert string "true"/"false" from radio to boolean
+            [name]: value === "true" 
         }));
     } else {
       setCurrentPlan(prev => ({
@@ -166,7 +162,6 @@ function SubscriptionPlans() {
         return;
     }
 
-    // Convert price and discount to numbers before saving
     const planToSave = {
         ...currentPlan,
         price: Number(currentPlan.price),
@@ -236,16 +231,16 @@ function SubscriptionPlans() {
               <tr key={p.id}>
                 <td><b>{p.name}</b></td>
                 <td style={{whiteSpace:'pre-wrap'}}>{p.description}</td>
-                <td>{gymAccessOptions.find(opt => opt.value === p.access)?.label}</td> {/* Display label for enum */}
-                <td>{p.dietConsultation ? "Yes" : "No"}</td> {/* Display Yes/No for boolean */}
+                <td>{gymAccessOptions.find(opt => opt.value === p.access)?.label}</td> 
+                <td>{p.dietConsultation ? "Yes" : "No"}</td> 
                 <td>{Array.isArray(p.groupClasses) ? p.groupClasses.join(", ") : ""}</td>
-                <td>{p.isSauna ? "Yes" : "No"}</td> {/* Display Yes/No for boolean */}
-                <td>{p.duration} month{p.duration > 1 ? 's' : ''}</td> {/* Display duration in months */}
-                <td>${p.price.toFixed(2)}</td> {/* Display price */}
-                <td>{p.discount.toFixed(0)}%</td> {/* Display discount */}
+                <td>{p.isSauna ? "Yes" : "No"}</td> 
+                <td>{p.duration} month{p.duration > 1 ? 's' : ''}</td> 
+                <td>${p.price.toFixed(2)}</td> 
+                <td>{p.discount.toFixed(0)}%</td> 
                 <td>
                   <span className={`badge ${p.isActive ? "bg-dark" : "bg-danger"}`}>
-                    {p.isActive ? "Yes" : "No"} {/* Display isActive status */}
+                    {p.isActive ? "Yes" : "No"} 
                   </span>
                 </td>
                 <td>
@@ -265,7 +260,6 @@ function SubscriptionPlans() {
         </table>
       </div>
 
-      {/* Add/Edit Plan Modal */}
       <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>{editingId ? "Edit" : "Add New"} Subscription Plan</Modal.Title>
@@ -295,8 +289,7 @@ function SubscriptionPlans() {
                 onChange={handleChange}
               />
             </Form.Group>
-            
-            {/* Gym Access */}
+
             <Form.Group className="mb-3">
               <Form.Label>Gym Access *</Form.Label>
               <div>
@@ -316,7 +309,6 @@ function SubscriptionPlans() {
               </div>
             </Form.Group>
 
-            {/* Diet Consultation */}
             <Form.Group className="mb-3">
               <Form.Label>Diet Consultation *</Form.Label>
               <div>
@@ -327,7 +319,7 @@ function SubscriptionPlans() {
                         label={opt.label}
                         type="radio"
                         name="dietConsultation"
-                        value={opt.value.toString()} // Convert boolean to string for radio value
+                        value={opt.value.toString()} 
                         checked={currentPlan.dietConsultation === opt.value}
                         onChange={handleChange}
                         required
@@ -336,7 +328,6 @@ function SubscriptionPlans() {
               </div>
             </Form.Group>
 
-            {/* Group Classes */}
             <Form.Group className="mb-3">
               <Form.Label>Group Classes</Form.Label>
               <div>
@@ -355,7 +346,6 @@ function SubscriptionPlans() {
               </div>
             </Form.Group>
             
-            {/* Sauna Access */}
             <Form.Group className="mb-3">
               <Form.Label>Sauna Access *</Form.Label>
               <div>
@@ -381,7 +371,6 @@ function SubscriptionPlans() {
               </div>
             </Form.Group>
 
-            {/* Duration */}
             <Form.Group className="mb-3" controlId="planDuration">
               <Form.Label>Duration (Months) *</Form.Label>
               <Form.Select
@@ -396,7 +385,6 @@ function SubscriptionPlans() {
               </Form.Select>
             </Form.Group>
 
-            {/* Price */}
             <Form.Group className="mb-3" controlId="planPrice">
               <Form.Label>Price ($) *</Form.Label>
               <Form.Control
@@ -411,7 +399,6 @@ function SubscriptionPlans() {
               />
             </Form.Group>
 
-            {/* Discount */}
             <Form.Group className="mb-3" controlId="planDiscount">
               <Form.Label>Discount (%)</Form.Label>
               <Form.Control
@@ -426,16 +413,6 @@ function SubscriptionPlans() {
               />
             </Form.Group>
 
-            {/* Is Active */}
-            <Form.Group className="mb-3" controlId="planIsActive">
-              <Form.Check
-                type="checkbox"
-                label="Is Active"
-                name="isActive"
-                checked={currentPlan.isActive}
-                onChange={handleChange}
-              />
-            </Form.Group>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseModal}>

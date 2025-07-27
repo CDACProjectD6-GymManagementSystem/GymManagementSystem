@@ -1,14 +1,10 @@
-// TrainerAssignment.jsx
 import React, { useState } from "react";
-
-// Updated membersData to use firstName and lastName
 const membersData = [
   { id: 1, firstName: "John", lastName: "Doe" },
   { id: 2, firstName: "Jane", lastName: "Smith" },
   { id: 3, firstName: "Mike", lastName: "Johnson" }
 ];
 
-// Updated trainersData to use firstName and lastName
 const trainersData = [
   { id: 1, firstName: "Alice", lastName: "Brown" },
   { id: 2, firstName: "Bob", lastName: "Green" },
@@ -16,7 +12,6 @@ const trainersData = [
 ];
 
 function TrainerAssignment() {
-  // stores assignments as { memberId: trainerId }
   const [assignments, setAssignments] = useState({});
 
   const handleAssign = (memberId, trainerId) => {
@@ -39,7 +34,7 @@ function TrainerAssignment() {
           <tbody>
             {membersData.map(member => (
               <tr key={member.id}>
-                <td><b>{member.firstName} {member.lastName}</b></td> {/* Display full name */}
+                <td><b>{member.firstName} {member.lastName}</b></td> 
                 <td>
                   <select
                     className="form-select"
@@ -49,7 +44,7 @@ function TrainerAssignment() {
                     <option value="">-- Select Trainer --</option>
                     {trainersData.map(trainer => (
                       <option key={trainer.id} value={trainer.id}>
-                        {trainer.firstName} {trainer.lastName} {/* Display full name */}
+                        {trainer.firstName} {trainer.lastName} 
                       </option>
                     ))}
                   </select>
