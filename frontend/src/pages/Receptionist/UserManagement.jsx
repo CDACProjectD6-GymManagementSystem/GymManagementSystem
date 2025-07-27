@@ -1,123 +1,196 @@
 import React, { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 
-// Dummy initial members data
+// Dummy Subscription Plans data (assuming you'd fetch this from backend /api/subscriptions)
+const dummySubscriptionPlans = [
+  { id: 101, name: "Basic Access" },
+  { id: 102, name: "Standard Elite" },
+  { id: 103, name: "Family Plus" },
+  { id: 104, name: "Elite Performance" }
+];
+
+// Dummy initial members data - Updated to match UserEntity fields
 const membersData = [
   {
     id: 1,
-    name: "John Doe",
+    firstName: "John",
+    lastName: "Doe",
     email: "john@email.com",
-    phone: "123-456-7890",
-    membership: "Premium",
-    status: "Active",
+    mobile: "123-456-7890",
+    address: "Pune",
+    gender: "MALE",
+    isSubscribed: true,
+    isActive: true,
+    subscriptionId: dummySubscriptionPlans[0],
     joinDate: "2024-01-15"
   },
   {
     id: 2,
-    name: "Jane Smith",
+    firstName: "Jane",
+    lastName: "Smith",
     email: "jane@email.com",
-    phone: "098-765-4321",
-    membership: "Basic",
-    status: "Active",
+    mobile: "098-765-4321",
+    address: "Mumbai",
+    gender: "FEMALE",
+    isSubscribed: true,
+    isActive: true,
+    subscriptionId: dummySubscriptionPlans[1],
     joinDate: "2024-02-20"
   },
   {
     id: 3,
-    name: "Mike Johnson",
+    firstName: "Mike",
+    lastName: "Johnson",
     email: "mike@email.com",
-    phone: "555-123-4567",
-    membership: "Premium",
-    status: "Expired",
+    mobile: "555-123-4567",
+    address: "Goa",
+    gender: "MALE",
+    isSubscribed: false,
+    isActive: false,
+    subscriptionId: null,
     joinDate: "2023-12-10"
   }
 ];
 
-function UserManagement() {
+function UserManagement({ onProceedToPayment }) {
   const [members, setMembers] = useState(membersData);
   const [search, setSearch] = useState("");
-
-  // Modal visibility state
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [message, setMessage] = useState(null); 
+  const [savedUserId, setSavedUserId] = useState(null);
 
-  // Form state for new user
-  const [newUser, setNewUser] = useState({
-    name: "",
+  const [currentUser, setCurrentUser] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
-    phone: "",
-    membership: "Basic",
-    status: "Active",
+    mobile: "",
+    address: "",
+    gender: "MALE",
+    isSubscribed: false,
+    isActive: true,
+    subscriptionId: "",
     joinDate: ""
   });
 
-  // Filter members by search input
   const filtered = members.filter(
     m =>
-      m.name.toLowerCase().includes(search.toLowerCase()) ||
+      `${m.firstName} ${m.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
       m.email.toLowerCase().includes(search.toLowerCase()) ||
-      m.phone.includes(search)
+      m.mobile.includes(search)
   );
 
-  // Open modal
-  const handleShowModal = () => setShowModal(true);
+  const handleShowModal = (userToEdit = null) => {
+    if (userToEdit) {
+      setEditingId(userToEdit.id);
+      setCurrentUser({
+        ...userToEdit,
+        subscriptionId: userToEdit.subscriptionId ? userToEdit.subscriptionId.id : ""
+      });
+    } else {
+      setEditingId(null);
+      setCurrentUser({
+        firstName: "",
+        lastName: "",
+        email: "",
+        mobile: "",
+        address: "",
+        gender: "MALE",
+        isSubscribed: false,
+        isActive: true,
+        subscriptionId: "",
+        joinDate: ""
+      });
+    }
+    setShowModal(true);
+    setMessage(null); 
+    setSavedUserId(null); 
+  };
 
-  // Close modal and reset form
   const handleCloseModal = () => {
     setShowModal(false);
-    setNewUser({
-      name: "",
+    setEditingId(null);
+    setSavedUserId(null); 
+    setMessage(null); 
+    setCurrentUser({
+      firstName: "",
+      lastName: "",
       email: "",
-      phone: "",
-      membership: "Basic",
-      status: "Active",
+      mobile: "",
+      address: "",
+      gender: "MALE",
+      isSubscribed: false,
+      isActive: true,
+      subscriptionId: "",
       joinDate: ""
     });
   };
 
-  // Form input change handler
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewUser(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setCurrentUser(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
-  // Add new user submit handler
-  const handleAddUser = (e) => {
+  const handleSaveUser = (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (!newUser.name || !newUser.email || !newUser.phone || !newUser.joinDate) {
-      alert("Please fill in all required fields (name, email, phone, join date).");
+    if (!currentUser.firstName || !currentUser.lastName || !currentUser.email || !currentUser.mobile || !currentUser.address || !currentUser.joinDate) {
+      setMessage({ type: "danger", text: "Please fill in all required fields." });
       return;
     }
 
-    // Optional: rudimentary email format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newUser.email)) {
-      alert("Please enter a valid email address.");
+    if (!emailRegex.test(currentUser.email)) {
+      setMessage({ type: "danger", text: "Please enter a valid email address." });
       return;
     }
 
-    // Optional: rudimentary phone number check (digits and basic symbols)
-    const phoneRegex = /^[0-9-+()\s]+$/;
-    if (!phoneRegex.test(newUser.phone)) {
-      alert("Please enter a valid phone number.");
+    const mobileRegex = /^[0-9-+()\s]+$/;
+    if (!mobileRegex.test(currentUser.mobile)) {
+      setMessage({ type: "danger", text: "Please enter a valid mobile number." });
       return;
     }
 
-    // Generate unique ID for new user
-    const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
+    const selectedSubscription = dummySubscriptionPlans.find(plan => plan.id === Number(currentUser.subscriptionId));
+    let userIdToSave = editingId;
 
-    // Create new user object
-    const userToAdd = {
-      id: newId,
-      ...newUser
-    };
+    if (editingId !== null) {
+      setMembers(members.map(m => (
+        m.id === editingId
+          ? { ...currentUser, id: editingId, subscriptionId: selectedSubscription }
+          : m
+      )));
+      setMessage({ type: "success", text: "User updated successfully!" });
+    } else {
+      const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
+      const userToAdd = {
+        id: newId,
+        ...currentUser,
+        subscriptionId: selectedSubscription
+      };
+      setMembers(prev => [...prev, userToAdd]);
+      userIdToSave = newId; 
+      setMessage({ type: "success", text: "User added successfully! You can now proceed to payment." });
+    }
+    setSavedUserId(userIdToSave); 
+  };
 
-    // Add to members list
-    setMembers(prev => [...prev, userToAdd]);
+  const handleDeleteUser = (id) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      setMembers(members.filter(m => m.id !== id));
+      setMessage({ type: "success", text: "User deleted successfully!" });
+    }
+  };
 
-    // Close modal and reset form
-    handleCloseModal();
+  const handleProceedToPaymentClick = () => {
+    handleCloseModal(); // Close the UserManagement modal
+    if (onProceedToPayment && savedUserId) {
+        onProceedToPayment(savedUserId); // Call the callback to switch tab and pass user ID
+    }
   };
 
   return (
@@ -127,7 +200,7 @@ function UserManagement() {
           <h4>User Management</h4>
           <small className="text-muted">Manage gym members and their information</small>
         </div>
-        <button className="btn btn-dark" onClick={handleShowModal}>
+        <button className="btn btn-dark" onClick={() => handleShowModal()}>
           + Add User
         </button>
       </div>
@@ -146,7 +219,9 @@ function UserManagement() {
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Phone</th>
+              <th>Mobile</th>
+              <th>Address</th>
+              <th>Gender</th>
               <th>Membership</th>
               <th>Status</th>
               <th>Join Date</th>
@@ -156,45 +231,60 @@ function UserManagement() {
           <tbody>
             {filtered.map(m => (
               <tr key={m.id}>
-                <td><b>{m.name}</b></td>
+                <td><b>{m.firstName} {m.lastName}</b></td>
                 <td>{m.email}</td>
-                <td>{m.phone}</td>
-                <td>{m.membership}</td>
+                <td>{m.mobile}</td>
+                <td>{m.address}</td>
+                <td>{m.gender}</td>
+                <td>{m.subscriptionId ? m.subscriptionId.name : "N/A"}</td>
                 <td>
-                  <span className={`badge ${m.status === "Active" ? "bg-dark" : "bg-danger"}`}>
-                    {m.status}
+                  <span className={`badge ${m.isActive && m.isSubscribed ? "bg-dark" : "bg-danger"}`}>
+                    {m.isActive && m.isSubscribed ? "Active" : "Inactive/Expired"}
                   </span>
                 </td>
                 <td>{m.joinDate}</td>
                 <td>
-                  <button className="btn btn-outline-secondary btn-sm me-2"><FaEdit /></button>
-                  <button className="btn btn-outline-danger btn-sm"><FaTrash /></button>
+                  <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleShowModal(m)}><FaEdit /></button>
+                  <button className="btn btn-outline-danger btn-sm" onClick={() => handleDeleteUser(m.id)}><FaTrash /></button>
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan="7" className="text-center text-muted">No users found.</td>
+                <td colSpan="9" className="text-center text-muted">No users found.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Add User Modal */}
+      {/* Add/Edit User Modal */}
       <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Add New User</Modal.Title>
+          <Modal.Title>{editingId ? "Edit User" : "Add New User"}</Modal.Title>
         </Modal.Header>
-        <Form onSubmit={handleAddUser}>
+        <Form onSubmit={handleSaveUser}>
           <Modal.Body>
-            <Form.Group className="mb-3" controlId="userName">
-              <Form.Label>Name *</Form.Label>
+            {message && <Alert variant={message.type}>{message.text}</Alert>} {/* Display alert message */}
+
+            <Form.Group className="mb-3" controlId="userFirstName">
+              <Form.Label>First Name *</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter full name"
-                name="name"
-                value={newUser.name}
+                placeholder="Enter first name"
+                name="firstName"
+                value={currentUser.firstName}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="userLastName">
+              <Form.Label>Last Name *</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter last name"
+                name="lastName"
+                value={currentUser.lastName}
                 onChange={handleChange}
                 required
               />
@@ -206,48 +296,60 @@ function UserManagement() {
                 type="email"
                 placeholder="Enter email"
                 name="email"
-                value={newUser.email}
+                value={currentUser.email}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="userPhone">
-              <Form.Label>Phone *</Form.Label>
+            <Form.Group className="mb-3" controlId="userMobile">
+              <Form.Label>Mobile *</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter phone number"
-                name="phone"
-                value={newUser.phone}
+                placeholder="Enter mobile number"
+                name="mobile"
+                value={currentUser.mobile}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="userAddress">
+              <Form.Label>Address *</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter address"
+                name="address"
+                value={currentUser.address}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="userMembership">
-              <Form.Label>Membership Type *</Form.Label>
+            <Form.Group className="mb-3" controlId="userGender">
+              <Form.Label>Gender *</Form.Label>
               <Form.Select
-                name="membership"
-                value={newUser.membership}
+                name="gender"
+                value={currentUser.gender}
                 onChange={handleChange}
                 required
               >
-                <option value="Basic">Basic</option>
-                <option value="Standard">Standard</option>
-                <option value="Premium">Premium</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
               </Form.Select>
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="userStatus">
-              <Form.Label>Status *</Form.Label>
+            <Form.Group className="mb-3" controlId="userSubscription">
+              <Form.Label>Membership Plan</Form.Label>
               <Form.Select
-                name="status"
-                value={newUser.status}
+                name="subscriptionId"
+                value={currentUser.subscriptionId}
                 onChange={handleChange}
-                required
               >
-                <option value="Active">Active</option>
-                <option value="Expired">Expired</option>
+                <option value="">-- Select Plan --</option>
+                {dummySubscriptionPlans.map(plan => (
+                  <option key={plan.id} value={plan.id}>{plan.name}</option>
+                ))}
               </Form.Select>
             </Form.Group>
 
@@ -256,7 +358,7 @@ function UserManagement() {
               <Form.Control
                 type="date"
                 name="joinDate"
-                value={newUser.joinDate}
+                value={currentUser.joinDate}
                 onChange={handleChange}
                 required
               />
@@ -267,9 +369,14 @@ function UserManagement() {
             <Button variant="secondary" onClick={handleCloseModal}>
               Cancel
             </Button>
-            <Button variant="dark" type="submit">
-              Add User
+            <Button variant="dark" type="submit" disabled={savedUserId !== null && message?.type === "success"}>
+              {editingId ? "Update User" : "Add User"}
             </Button>
+            {savedUserId && ( // Show "Proceed to Payment" only if a user was successfully saved/updated
+                <Button variant="info" onClick={handleProceedToPaymentClick} className="ms-2">
+                    Proceed to Payment
+                </Button>
+            )}
           </Modal.Footer>
         </Form>
       </Modal>

@@ -1,19 +1,17 @@
 import React, { useState } from "react";
-
 const membersData = [
-  { id: 1, name: "John Doe" },
-  { id: 2, name: "Jane Smith" },
-  { id: 3, name: "Mike Johnson" }
+  { id: 1, firstName: "John", lastName: "Doe" },
+  { id: 2, firstName: "Jane", lastName: "Smith" },
+  { id: 3, firstName: "Mike", lastName: "Johnson" }
 ];
 
 const trainersData = [
-  { id: 1, name: "Alice Brown" },
-  { id: 2, name: "Bob Green" },
-  { id: 3, name: "Cathy Blue" }
+  { id: 1, firstName: "Alice", lastName: "Brown" },
+  { id: 2, firstName: "Bob", lastName: "Green" },
+  { id: 3, firstName: "Cathy", lastName: "Blue" }
 ];
 
 function TrainerAssignment() {
-  // stores assignments as { memberId: trainerId }
   const [assignments, setAssignments] = useState({});
 
   const handleAssign = (memberId, trainerId) => {
@@ -36,7 +34,7 @@ function TrainerAssignment() {
           <tbody>
             {membersData.map(member => (
               <tr key={member.id}>
-                <td><b>{member.name}</b></td>
+                <td><b>{member.firstName} {member.lastName}</b></td> 
                 <td>
                   <select
                     className="form-select"
@@ -46,7 +44,7 @@ function TrainerAssignment() {
                     <option value="">-- Select Trainer --</option>
                     {trainersData.map(trainer => (
                       <option key={trainer.id} value={trainer.id}>
-                        {trainer.name}
+                        {trainer.firstName} {trainer.lastName} 
                       </option>
                     ))}
                   </select>

@@ -2,78 +2,144 @@ import React, { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Modal, Button, Form } from "react-bootstrap";
 
-// Initial dummy trainers data
 const trainersData = [
-  { id: 1, name: "Alice Brown", specialty: "Yoga", phone: "111-222-3333", email: "alice@fitgym.com" },
-  { id: 2, name: "Bob Green", specialty: "Weightlifting", phone: "444-555-6666", email: "bob@fitgym.com" },
-  { id: 3, name: "Cathy Blue", specialty: "Cardio", phone: "777-888-9999", email: "cathy@fitgym.com" }
+  {
+    id: 1,
+    firstName: "Alice", 
+    lastName: "Brown", 
+    expertise: "Yoga", 
+    mobile: "111-222-3333", 
+    email: "alice@fitgym.com", 
+    gender: "FEMALE", 
+    salary: 50000.00,
+    certifications: "RYT 200, Certified Yoga Instructor" 
+  },
+  {
+    id: 2,
+    firstName: "Bob",
+    lastName: "Green",
+    expertise: "Weightlifting", 
+    mobile: "444-555-6666", 
+    email: "bob@fitgym.com",
+    gender: "MALE", 
+    salary: 60000.00, 
+    certifications: "CSCS, ACE Certified Personal Trainer" 
+  },
+  {
+    id: 3,
+    firstName: "Cathy",
+    lastName: "Blue",
+    expertise: "Cardio", 
+    mobile: "777-888-9999", 
+    email: "cathy@fitgym.com", 
+    gender: "FEMALE", 
+    salary: 55000.00, 
+    certifications: "Spin Instructor, HIIT Specialist" 
+  }
 ];
 
 function TrainerManagement() {
   const [trainers, setTrainers] = useState(trainersData);
   const [search, setSearch] = useState("");
-
-  // Modal state
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
-  // Form state for new trainer
-  const [newTrainer, setNewTrainer] = useState({
-    name: "",
-    specialty: "",
-    phone: "",
-    email: ""
+  const [currentTrainer, setCurrentTrainer] = useState({
+    firstName: "", 
+    lastName: "", 
+    expertise: "", 
+    mobile: "", 
+    email: "", 
+    gender: "MALE", 
+    certifications: "" 
   });
 
   const filtered = trainers.filter(
     t =>
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.specialty.toLowerCase().includes(search.toLowerCase()) ||
+      `${t.firstName} ${t.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
+      t.expertise.toLowerCase().includes(search.toLowerCase()) ||
       t.email.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleShowModal = () => setShowModal(true);
+  const handleShowModal = (trainerToEdit = null) => {
+    if (trainerToEdit) {
+      setEditingId(trainerToEdit.id);
+      setCurrentTrainer({ ...trainerToEdit });
+    } else {
+      setEditingId(null);
+      setCurrentTrainer({
+        firstName: "",
+        lastName: "",
+        expertise: "",
+        mobile: "",
+        email: "",
+        gender: "MALE",
+        certifications: ""
+      });
+    }
+    setShowModal(true);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
-    setNewTrainer({ name: "", specialty: "", phone: "", email: "" }); // reset form
+    setEditingId(null);
+    setCurrentTrainer({
+      firstName: "",
+      lastName: "",
+      expertise: "",
+      mobile: "",
+      email: "",
+      gender: "MALE",
+      certifications: ""
+    });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewTrainer(prev => ({ ...prev, [name]: value }));
+    setCurrentTrainer(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAddTrainer = (e) => {
+  const handleSaveTrainer = (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (!newTrainer.name || !newTrainer.specialty || !newTrainer.phone || !newTrainer.email) {
-      alert("Please fill in all fields.");
+    if (!currentTrainer.firstName || !currentTrainer.lastName || !currentTrainer.expertise || !currentTrainer.mobile || !currentTrainer.email || !currentTrainer.certifications) {
+      alert("Please fill in all required fields.");
       return;
     }
 
-    // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newTrainer.email)) {
+    if (!emailRegex.test(currentTrainer.email)) {
       alert("Please enter a valid email address.");
       return;
     }
 
-    // Phone number basic validation (digits, dashes, spaces, parentheses)
-    const phoneRegex = /^[0-9-+()\s]+$/;
-    if (!phoneRegex.test(newTrainer.phone)) {
-      alert("Please enter a valid phone number.");
+    const mobileRegex = /^[0-9-+()\s]+$/;
+    if (!mobileRegex.test(currentTrainer.mobile)) {
+      alert("Please enter a valid mobile number.");
       return;
     }
 
-    // Generate unique id (next max id + 1)
-    const newId = trainers.length > 0 ? Math.max(...trainers.map(t => t.id)) + 1 : 1;
-    const trainerToAdd = {
-      id: newId,
-      ...newTrainer
-    };
+    if (editingId !== null) {
+      setTrainers(trainers.map(t => (t.id === editingId ? { ...currentTrainer, id: editingId } : t)));
+      alert("Trainer updated successfully!");
+    } else {
+      const newId = trainers.length > 0 ? Math.max(...trainers.map(t => t.id)) + 1 : 1;
+      const trainerToAdd = {
+        id: newId,
+        ...currentTrainer
+      };
+      setTrainers(prev => [...prev, trainerToAdd]);
+      alert("Trainer added successfully!");
+    }
 
-    setTrainers(prev => [...prev, trainerToAdd]);
     handleCloseModal();
+  };
+
+  const handleDeleteTrainer = (id) => {
+    if (window.confirm("Are you sure you want to delete this trainer?")) {
+      setTrainers(trainers.filter(t => t.id !== id));
+      alert("Trainer deleted successfully!");
+    }
   };
 
   return (
@@ -83,7 +149,7 @@ function TrainerManagement() {
           <h4>Trainer Management</h4>
           <small className="text-muted">Manage your gym trainers</small>
         </div>
-        <button className="btn btn-dark" onClick={handleShowModal}>+ Add Trainer</button>
+        <button className="btn btn-dark" onClick={() => handleShowModal()}>+ Add Trainer</button>
       </div>
 
       <input
@@ -99,72 +165,87 @@ function TrainerManagement() {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Specialty</th>
-              <th>Phone</th>
+              <th>Expertise</th>
+              <th>Mobile</th>
               <th>Email</th>
+              <th>Gender</th>
+              <th>Certifications</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map(t => (
               <tr key={t.id}>
-                <td><b>{t.name}</b></td>
-                <td>{t.specialty}</td>
-                <td>{t.phone}</td>
-                <td>{t.email}</td>
+                <td><b>{t.firstName} {t.lastName}</b></td> 
+                <td>{t.expertise}</td> 
+                <td>{t.mobile}</td> 
+                <td>{t.email}</td> 
+                <td>{t.gender}</td>
+                <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={t.certifications}>{t.certifications}</td> {/* Display certifications */}
                 <td>
-                  <button className="btn btn-outline-secondary btn-sm me-2"><FaEdit /></button>
-                  <button className="btn btn-outline-danger btn-sm"><FaTrash /></button>
+                  <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleShowModal(t)}><FaEdit /></button>
+                  <button className="btn btn-outline-danger btn-sm" onClick={() => handleDeleteTrainer(t.id)}><FaTrash /></button>
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan="5" className="text-center text-muted">No trainers found.</td>
+                <td colSpan="8" className="text-center text-muted">No trainers found.</td> {/* Adjusted colspan */}
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Add Trainer Modal */}
+      {/* Add/Edit Trainer Modal */}
       <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Add New Trainer</Modal.Title>
+          <Modal.Title>{editingId ? "Edit Trainer" : "Add New Trainer"}</Modal.Title>
         </Modal.Header>
-        <Form onSubmit={handleAddTrainer}>
+        <Form onSubmit={handleSaveTrainer}>
           <Modal.Body>
-            <Form.Group className="mb-3" controlId="trainerName">
-              <Form.Label>Name *</Form.Label>
+            <Form.Group className="mb-3" controlId="trainerFirstName">
+              <Form.Label>First Name *</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter full name"
-                name="name"
-                value={newTrainer.name}
+                placeholder="Enter first name"
+                name="firstName"
+                value={currentTrainer.firstName}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="trainerLastName">
+              <Form.Label>Last Name *</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter last name"
+                name="lastName"
+                value={currentTrainer.lastName}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="trainerSpecialty">
-              <Form.Label>Specialty *</Form.Label>
+            <Form.Group className="mb-3" controlId="trainerExpertise">
+              <Form.Label>Expertise *</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter specialty (e.g. Yoga)"
-                name="specialty"
-                value={newTrainer.specialty}
+                placeholder="Enter expertise (e.g. Yoga, Weightlifting)"
+                name="expertise"
+                value={currentTrainer.expertise}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="trainerPhone">
-              <Form.Label>Phone *</Form.Label>
+            <Form.Group className="mb-3" controlId="trainerMobile">
+              <Form.Label>Mobile *</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter phone number"
-                name="phone"
-                value={newTrainer.phone}
+                placeholder="Enter mobile number"
+                name="mobile"
+                value={currentTrainer.mobile}
                 onChange={handleChange}
                 required
               />
@@ -176,7 +257,33 @@ function TrainerManagement() {
                 type="email"
                 placeholder="Enter email"
                 name="email"
-                value={newTrainer.email}
+                value={currentTrainer.email}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="trainerGender">
+              <Form.Label>Gender *</Form.Label>
+              <Form.Select
+                name="gender"
+                value={currentTrainer.gender}
+                onChange={handleChange}
+                required
+              >
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="trainerCertifications">
+              <Form.Label>Certifications *</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Comma-separated certifications (e.g., NASM, ACE)"
+                name="certifications"
+                value={currentTrainer.certifications}
                 onChange={handleChange}
                 required
               />
@@ -185,7 +292,7 @@ function TrainerManagement() {
 
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
-            <Button variant="dark" type="submit">Add Trainer</Button>
+            <Button variant="dark" type="submit">{editingId ? "Update Trainer" : "Add Trainer"}</Button>
           </Modal.Footer>
         </Form>
       </Modal>
