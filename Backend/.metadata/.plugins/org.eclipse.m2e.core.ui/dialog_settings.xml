@@ -62,6 +62,7 @@
 	</section>
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="C:\Users\papaw\OneDrive\Desktop\Project\GymManagementSystem\GymManagementSystem\Backend\backend"/>
 			<item value="C:\Users\Nehal\Desktop\sunbeam\Backend\spring_boot_backend_template"/>
 		</list>
 		<list key="projectNameTemplate">
