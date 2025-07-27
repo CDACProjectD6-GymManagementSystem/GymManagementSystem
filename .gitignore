@@ -1,94 +1,77 @@
-# Java (Spring Boot)
-target/
-*.class
-*.jar
-*.war
-*.iml
-*.log
-*.tmp
-*.bak
-*.swp
-.DS_Store
+# ====================================
+# 🎯 Spring Boot (Maven backend)
+# ====================================
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+backend/pom.xml.tag
+backend/pom.xml.releaseBackup
+backend/pom.xml.versionsBackup
+backend/pom.xml.next
+backend/release.properties
+backend/dependency-reduced-pom.xml
 
-# Maven / Gradle
-.mvn/
-.gradle/
-build/
-!gradle-wrapper.jar
+# Spring Tool Suite / Eclipse
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.factorypath
+backend/.apt_generated/
+backend/.sts4-cache/
 
-# IDE settings
-.idea/
-*.iws
-*.ipr
-*.iml
-*.vscode/
-*.classpath
-*.project
-*.settings/
-
-# OS junk
-Thumbs.db
-.DS_Store
+# IntelliJ
+backend/.idea/
+backend/*.iml
 
 # Logs
-logs/
-*.log
+backend/*.log
+
+# ====================================
+# ⚛️ React (Frontend)
+# ====================================
+frontend/node_modules/
+frontend/.cache/
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# npm/yarn lock files (optional, if using one consistently)
+# frontend/yarn.lock
+# frontend/package-lock.json
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.log
+
+# ====================================
+# 🧠 Common Ignore Rules
+# ====================================
+
+# OS generated
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+*.bak
+*~
 
 # Environment
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+*.env
 
-# Node (React frontend)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-dist/
-build/
-
-# React cache
-.cache/
-.eslintcache
-
-
-
-# VSCode
-.vscode/
-.history/
-
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
+# Logs
+*.log
+logs/
+log/
