@@ -9,8 +9,8 @@ const Input = ({ label, ...props }) => (
 );
 
 const RadioGroup = ({ label, name, options, selectedValue, onChange }) => (
-  <fieldset style={{ marginBottom: 12, border: "none", paddingLeft: 0 }}>
-    <legend style={{ fontWeight: 600, color: "#004aad", marginBottom: 6 }}>{label}:</legend>
+  <fieldset>
+    <legend>{label}:</legend>
     {options.map(({ value, label: optionLabel }) => (
       <label key={value} style={{ marginRight: 16 }}>
         <input
@@ -28,8 +28,8 @@ const RadioGroup = ({ label, name, options, selectedValue, onChange }) => (
 );
 
 const CheckboxGroup = ({ label, name, options, selectedValues, onChange }) => (
-  <fieldset style={{ marginBottom: 12, border: "none", paddingLeft: 0 }}>
-    <legend style={{ fontWeight: 600, color: "#004aad", marginBottom: 6 }}>{label}:</legend>
+  <fieldset>
+    <legend>{label}:</legend>
     {options.map(({ value, label: optionLabel }) => (
       <label key={value} style={{ marginRight: 16 }}>
         <input
@@ -51,10 +51,10 @@ const SubscriptionSection = () => {
   const [form, setForm] = useState({
     name: "",
     description: "",
-    gymAccess: "Off-peak hours",
+    access: "Off-peak hours",
     dietConsultation: "Once at start",
     groupClasses: [],
-    saunaAccess: "No",
+    isSauna: "No",
     duration: "1 month",
     price: "",
     discount: "0%"
@@ -92,10 +92,10 @@ const SubscriptionSection = () => {
     setForm({
       name: "",
       description: "",
-      gymAccess: "Off-peak hours",
+      access: "Off-peak hours",
       dietConsultation: "Once at start",
       groupClasses: [],
-      saunaAccess: "No",
+      isSauna: "No",
       duration: "1 month",
       price: "",
       discount: "0%"
@@ -113,7 +113,7 @@ const SubscriptionSection = () => {
   };
 
   return (
-    <div className="admin-card">
+    <div className="subscription-section-card">
       <h2>Manage Subscriptions</h2>
       <form className="admin-form" onSubmit={handleSubmit}>
         <Input
@@ -133,12 +133,12 @@ const SubscriptionSection = () => {
 
         <RadioGroup
           label="Gym Access"
-          name="gymAccess"
+          name="access"
           options={[
             { value: "Off-peak hours", label: "Off-peak hours" },
             { value: "Full Time", label: "Full Time" },
           ]}
-          selectedValue={form.gymAccess}
+          selectedValue={form.access}
           onChange={handleChange}
         />
 
@@ -167,12 +167,12 @@ const SubscriptionSection = () => {
 
         <RadioGroup
           label="Sauna Access"
-          name="saunaAccess"
+          name="isSauna"
           options={[
             { value: "Yes", label: "Yes" },
             { value: "No", label: "No" },
           ]}
-          selectedValue={form.saunaAccess}
+          selectedValue={form.isSauna}
           onChange={handleChange}
         />
 
@@ -224,10 +224,10 @@ const SubscriptionSection = () => {
               setForm({
                 name: "",
                 description: "",
-                gymAccess: "Off-peak hours",
+                access: "Off-peak hours",
                 dietConsultation: "Once at start",
                 groupClasses: [],
-                saunaAccess: "No",
+                isSauna: "No",
                 duration: "1 month",
                 price: "",
                 discount: "0%"
@@ -258,10 +258,10 @@ const SubscriptionSection = () => {
             <tr key={i}>
               <td>{p.name}</td>
               <td style={{ whiteSpace: "pre-wrap" }}>{p.description}</td>
-              <td>{p.gymAccess}</td>
+              <td>{p.access}</td>
               <td>{p.dietConsultation}</td>
               <td>{p.groupClasses.join(", ")}</td>
-              <td>{p.saunaAccess}</td>
+              <td>{p.isSauna}</td>
               <td>{p.duration}</td>
               <td>{p.price}</td>
               <td>{p.discount}</td>
