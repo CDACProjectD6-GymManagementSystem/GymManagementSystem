@@ -27,6 +27,9 @@ Backend/*.iml
 # Logs
 Backend/*.log
 
+# Ignore Eclipse/STS4 metadata
+Backend/.metadata/
+
 # ====================================
 # ⚛️ React (Frontend)
 # ====================================
