@@ -24,7 +24,7 @@ public class UserEntity extends BaseEntity {
 	private boolean isActive;
 	@ManyToOne
 	private Trainer trainer;
-	@OneToOne
+	@ManyToOne
 	private Subscription subscriptionId;
 	@OneToOne
 	private Diet diet;
