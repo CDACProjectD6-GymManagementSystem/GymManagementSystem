@@ -45,3 +45,13 @@ export const updateUser = async (userId, userData) => {
     throw error;
   }
 };
+
+export const getSubscriptionNames = async () => {
+  try {
+    const response = await axios.get(`http://localhost:8080/subscription/getnames`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching subscription names:", error);
+    throw error;
+  }
+};

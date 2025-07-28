@@ -1,17 +1,29 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/Admin.css";
-import { getUsers, addUser, updateUser, deleteUser } from "../../services/AdminService";  // Adjust path as needed
+import {
+  getUsers,
+  addUser,
+  updateUser,
+  deleteUser,
+  getSubscriptionNames,
+} from "../../services/AdminService"; // Ensure getSubscriptionNames is exported here
 
 const Input = ({ label, ...props }) => (
   <label style={{ display: "flex", flexDirection: "column", marginBottom: 12 }}>
-    <span style={{ fontWeight: 600, marginBottom: 6, color: "#34495e" }}>{label}:</span>
+    <span style={{ fontWeight: 600, marginBottom: 6, color: "#34495e" }}>
+      {label}:
+    </span>
     <input {...props} />
   </label>
 );
 
 const RadioGroup = ({ label, name, options, selectedValue, onChange }) => (
   <fieldset style={{ marginBottom: 16, border: "none", paddingLeft: 0 }}>
-    <legend style={{ fontWeight: 600, color: "#004aad", marginBottom: 8 }}>{label}:</legend>
+    <legend
+      style={{ fontWeight: 600, color: "#004aad", marginBottom: 8 }}
+    >
+      {label}:
+    </legend>
     {options.map(({ value, label: optionLabel }) => (
       <label
         key={value}
@@ -44,6 +56,7 @@ const RadioGroup = ({ label, name, options, selectedValue, onChange }) => (
 
 const UserSection = () => {
   const [users, setUsers] = useState([]);
+  const [subscriptionNames, setSubscriptionNames] = useState([]);
   const [editing, setEditing] = useState(null);
   const [uid, setUid] = useState(0);
   const [form, setForm] = useState({
@@ -58,17 +71,21 @@ const UserSection = () => {
     subscriptionType: "",
   });
 
-  // Fetch users once on mount
+  // Fetch users and subscription names on mount
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getUsers();
-        setUsers(data);
+        const [usersData, subscriptions] = await Promise.all([
+          getUsers(),
+          getSubscriptionNames(),
+        ]);
+        setUsers(usersData);
+        setSubscriptionNames(subscriptions);
       } catch (error) {
-        console.error("Failed to load users:", error);
+        console.error("Failed to load data:", error);
       }
     };
-    fetchUsers();
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -89,7 +106,7 @@ const UserSection = () => {
         subscriptionType: form.subscriptionType,
       };
 
-      // Only include password if adding a new user or if password is filled while editing
+      // Include password only when adding or when editing and password is non-empty
       if (!editing || (editing !== null && form.password.trim() !== "")) {
         payload.password = form.password;
       }
@@ -127,7 +144,7 @@ const UserSection = () => {
   const handleEdit = (idx) => {
     const user = users[idx];
 
-    // Normalize gender for radios (first letter uppercase, rest lowercase)
+    // Normalize gender string (first letter uppercase, rest lowercase)
     let normalizedGender = "";
     if (user.gender) {
       normalizedGender = user.gender.charAt(0).toUpperCase() + user.gender.slice(1).toLowerCase();
@@ -136,7 +153,7 @@ const UserSection = () => {
     setForm({
       ...user,
       gender: normalizedGender,
-      password: "", // clear password for edit form
+      password: "",
     });
     setUid(user.id);
     setEditing(idx);
@@ -198,8 +215,8 @@ const UserSection = () => {
           required
         />
 
-        {/* Password field only shown when adding new user or when explicitly entering password in edit */}
-        {editing === null && (
+        {/* Password input field */}
+        {editing === null ? (
           <Input
             name="password"
             label="Password"
@@ -208,8 +225,7 @@ const UserSection = () => {
             onChange={handleChange}
             required
           />
-        )}
-        {editing !== null && (
+        ) : (
           <Input
             name="password"
             label="Password"
@@ -247,7 +263,9 @@ const UserSection = () => {
           onChange={handleChange}
         />
         <label style={{ display: "flex", flexDirection: "column", marginBottom: 12 }}>
-          <span style={{ fontWeight: 600, marginBottom: 6, color: "#34495e" }}>Subscription Type:</span>
+          <span style={{ fontWeight: 600, marginBottom: 6, color: "#34495e" }}>
+            Subscription Type:
+          </span>
           <select
             name="subscriptionType"
             value={form.subscriptionType}
@@ -266,9 +284,15 @@ const UserSection = () => {
             <option value="" disabled>
               Select subscription type
             </option>
-            <option value="Basic">Basic</option>
-            <option value="Premium">Premium</option>
-            <option value="Gold">Gold</option>
+            {subscriptionNames.length === 0 ? (
+              <option disabled>Loading...</option>
+            ) : (
+              subscriptionNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))
+            )}
           </select>
         </label>
         <button type="submit" className="admin-btn">
@@ -301,16 +325,16 @@ const UserSection = () => {
               <td colSpan={9}>No users found.</td>
             </tr>
           ) : (
-            users.map((u, i) => (
-              <tr key={u.id}>
-                <td>{u.id}</td>
-                <td>{u.firstName}</td>
-                <td>{u.lastName}</td>
-                <td>{u.email}</td>
-                <td>{u.mobile}</td>
-                <td>{u.address}</td>
-                <td>{u.gender}</td>
-                <td>{u.subscriptionType}</td>
+            users.map((user, i) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.firstName}</td>
+                <td>{user.lastName}</td>
+                <td>{user.email}</td>
+                <td>{user.mobile}</td>
+                <td>{user.address}</td>
+                <td>{user.gender}</td>
+                <td>{user.subscriptionType}</td>
                 <td>
                   <button className="admin-btn" onClick={() => handleEdit(i)}>
                     Edit

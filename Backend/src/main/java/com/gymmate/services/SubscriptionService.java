@@ -12,4 +12,6 @@ public interface SubscriptionService {
 
 	List<SubscriptionRespDto> getAllSubscriptions();
 
+	List<String> getName();
+
 }
