@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../styles/Admin.css";
+import { getUsers, addUser, updateUser, deleteUser } from "../../services/AdminService";  // Adjust path as needed
 
 const Input = ({ label, ...props }) => (
   <label style={{ display: "flex", flexDirection: "column", marginBottom: 12 }}>
@@ -44,31 +45,121 @@ const RadioGroup = ({ label, name, options, selectedValue, onChange }) => (
 const UserSection = () => {
   const [users, setUsers] = useState([]);
   const [editing, setEditing] = useState(null);
+  const [uid, setUid] = useState(0);
   const [form, setForm] = useState({
+    id: "",
     firstName: "",
     lastName: "",
     email: "",
-    password: "",     // <-- Added password field here
+    password: "",
     mobile: "",
     address: "",
     gender: "",
     subscriptionType: "",
   });
 
+  // Fetch users once on mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const data = await getUsers();
+        setUsers(data);
+      } catch (error) {
+        console.error("Failed to load users:", error);
+      }
+    };
+    fetchUsers();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editing !== null) {
-      setUsers(users.map((u, idx) => (idx === editing ? form : u)));
-      setEditing(null);
-    } else {
-      setUsers([...users, form]);
+    try {
+      const payload = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        address: form.address,
+        mobile: form.mobile,
+        gender: form.gender.toUpperCase(),
+        subscriptionType: form.subscriptionType,
+      };
+
+      // Only include password if adding a new user or if password is filled while editing
+      if (!editing || (editing !== null && form.password.trim() !== "")) {
+        payload.password = form.password;
+      }
+
+      if (editing !== null) {
+        // Update existing user
+        await updateUser(uid, payload);
+        setEditing(null);
+      } else {
+        // Add new user
+        await addUser(payload);
+      }
+
+      // Refresh user list after add/update
+      const updatedUsers = await getUsers();
+      setUsers(updatedUsers);
+
+      // Reset form
+      setForm({
+        id: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        mobile: "",
+        address: "",
+        gender: "",
+        subscriptionType: "",
+      });
+    } catch (error) {
+      console.error("Failed to submit user:", error);
     }
+  };
+
+  const handleEdit = (idx) => {
+    const user = users[idx];
+
+    // Normalize gender for radios (first letter uppercase, rest lowercase)
+    let normalizedGender = "";
+    if (user.gender) {
+      normalizedGender = user.gender.charAt(0).toUpperCase() + user.gender.slice(1).toLowerCase();
+    }
+
     setForm({
+      ...user,
+      gender: normalizedGender,
+      password: "", // clear password for edit form
+    });
+    setUid(user.id);
+    setEditing(idx);
+  };
+
+  const handleDelete = async (idx) => {
+    try {
+      const userId = users[idx].id;
+      await deleteUser(userId);
+
+      const updatedUsers = await getUsers();
+      setUsers(updatedUsers);
+
+      if (editing === idx) setEditing(null);
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditing(null);
+    setForm({
+      id: "",
       firstName: "",
       lastName: "",
       email: "",
@@ -80,18 +171,8 @@ const UserSection = () => {
     });
   };
 
-  const handleEdit = (idx) => {
-    setEditing(idx);
-    setForm(users[idx]);
-  };
-
-  const handleDelete = (idx) => {
-    setUsers(users.filter((_, i) => i !== idx));
-    if (editing === idx) setEditing(null);
-  };
-
   return (
-    <div className="admin-card">
+    <div className="user-card">
       <h2>Manage Users</h2>
       <form className="admin-form" onSubmit={handleSubmit}>
         <Input
@@ -116,14 +197,30 @@ const UserSection = () => {
           onChange={handleChange}
           required
         />
-        <Input
-          name="password"
-          label="Password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
+
+        {/* Password field only shown when adding new user or when explicitly entering password in edit */}
+        {editing === null && (
+          <Input
+            name="password"
+            label="Password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        )}
+        {editing !== null && (
+          <Input
+            name="password"
+            label="Password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="Leave blank to keep unchanged"
+            required={false}
+          />
+        )}
+
         <Input
           name="mobile"
           label="Mobile"
@@ -178,23 +275,7 @@ const UserSection = () => {
           {editing !== null ? "Update" : "Add"} User
         </button>
         {editing !== null && (
-          <button
-            type="button"
-            className="admin-btn cancel"
-            onClick={() => {
-              setEditing(null);
-              setForm({
-                firstName: "",
-                lastName: "",
-                email: "",
-                password: "",
-                mobile: "",
-                address: "",
-                gender: "",
-                subscriptionType: "",
-              });
-            }}
-          >
+          <button type="button" className="admin-btn cancel" onClick={handleCancelEdit}>
             Cancel
           </button>
         )}
@@ -203,6 +284,7 @@ const UserSection = () => {
       <table className="admin-table">
         <thead>
           <tr>
+            <th>Id</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
@@ -210,7 +292,6 @@ const UserSection = () => {
             <th>Address</th>
             <th>Gender</th>
             <th>Subscription Type</th>
-            <th>Password</th> {/* Added Password column */}
             <th>Actions</th>
           </tr>
         </thead>
@@ -221,7 +302,8 @@ const UserSection = () => {
             </tr>
           ) : (
             users.map((u, i) => (
-              <tr key={i}>
+              <tr key={u.id}>
+                <td>{u.id}</td>
                 <td>{u.firstName}</td>
                 <td>{u.lastName}</td>
                 <td>{u.email}</td>
@@ -229,7 +311,6 @@ const UserSection = () => {
                 <td>{u.address}</td>
                 <td>{u.gender}</td>
                 <td>{u.subscriptionType}</td>
-                <td>{u.password}</td> {/* Show password here; for production you might want to mask */}
                 <td>
                   <button className="admin-btn" onClick={() => handleEdit(i)}>
                     Edit
