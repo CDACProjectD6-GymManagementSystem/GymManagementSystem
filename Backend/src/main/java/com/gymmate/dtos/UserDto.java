@@ -8,7 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDto {
-
 	private boolean isSubscribed;
 	private boolean isActive;
 	private String firstName;
