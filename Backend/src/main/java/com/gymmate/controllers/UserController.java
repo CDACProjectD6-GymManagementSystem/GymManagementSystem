@@ -17,6 +17,7 @@ import com.gymmate.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+
 @RestController
 @AllArgsConstructor
 @NoArgsConstructor
