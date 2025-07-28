@@ -53,6 +53,11 @@ public class AdminServiceImpl implements AdminService {
 	public ApiResponse updateUser(UserSubscriptionUpdateDto userUpdatedto, Long userId) {
 		UserEntity userEntity=userDao.findById(userId)
 								.orElseThrow(()->new ResourceNotFoundException("User Not Found"));
+		if(!userEntity.getSubscriptionId().getName().equals(userUpdatedto.getSubscriptionType()))
+		{
+			Subscription subEntity = subscriptionDao.findByName(userUpdatedto.getSubscriptionType());
+			userEntity.setSubscriptionId(subEntity);
+		}
 		mapper.map(userUpdatedto,userEntity);
 		return new ApiResponse("User Updated Successfully");
 	}
