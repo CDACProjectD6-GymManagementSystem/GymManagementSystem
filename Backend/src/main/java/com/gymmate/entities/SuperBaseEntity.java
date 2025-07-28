@@ -26,7 +26,8 @@ import lombok.ToString;
 public class SuperBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long Id;
+	@Column(name = "id")
+	private Long id;
 	@CreationTimestamp
 	@Column(name = "creation_date")
 	private LocalDate creationDate;

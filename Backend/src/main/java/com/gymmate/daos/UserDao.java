@@ -10,29 +10,11 @@ import com.gymmate.entities.UserEntity;
 public interface UserDao extends JpaRepository<UserEntity, Long>{
 
 	Optional<UserEntity> findById(Long id);
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 
 	List<UserEntity> findByTrainer_IdAndIsActiveTrue(Long trainerId);
+
+	boolean existsByEmail(String email);
 
 }
 

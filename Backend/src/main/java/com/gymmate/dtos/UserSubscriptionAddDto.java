@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserSubscriptionAddDto {
+public class UserSubscriptionAddDto{
 	private String firstName;
 	private String lastName;
 	private String email;
