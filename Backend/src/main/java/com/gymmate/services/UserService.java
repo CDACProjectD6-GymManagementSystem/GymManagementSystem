@@ -9,5 +9,22 @@ public interface UserService {
 	boolean addProfile(UserDisplayProfileDto user);
 
 	boolean updateProfile(Long id, UserDisplayProfileDto user);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
+	
+	
 }

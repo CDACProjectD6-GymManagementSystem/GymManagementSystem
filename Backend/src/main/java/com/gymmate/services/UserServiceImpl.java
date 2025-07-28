@@ -1,5 +1,7 @@
 package com.gymmate.services;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -8,7 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import com.gymmate.daos.UserDao;
+import com.gymmate.dtos.ApiResponse;
+import com.gymmate.dtos.UserDietDTO;
 import com.gymmate.dtos.UserDisplayProfileDto;
+import com.gymmate.dtos.UserForTrainerDTO;
+import com.gymmate.entities.Diet;
 import com.gymmate.entities.Role;
 import com.gymmate.entities.Role.UserRole;
 import com.gymmate.entities.UserEntity;
@@ -52,4 +58,9 @@ public class UserServiceImpl implements UserService {
 		userEnt.setMobile(user.getMobile());
 		return true;
 	}
+
+	
+	
+	
+	
 }
