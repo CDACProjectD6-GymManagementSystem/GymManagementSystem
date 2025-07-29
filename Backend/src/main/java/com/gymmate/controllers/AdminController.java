@@ -1,5 +1,7 @@
 package com.gymmate.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gymmate.dtos.SubscriptionRequestDTO;
+import com.gymmate.dtos.SubscriptionRespDto;
 import com.gymmate.dtos.UserSubscriptionAddDto;
 import com.gymmate.dtos.UserSubscriptionUpdateDto;
 import com.gymmate.entities.UserEntity;
 import com.gymmate.services.AdminService;
+import com.gymmate.services.SubscriptionService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
@@ -26,6 +31,7 @@ import lombok.AllArgsConstructor;
 @CrossOrigin(origins="*")
 public class AdminController {
 	private final AdminService adminService;
+	private final SubscriptionService subscriptionService;
 	
 	@PostMapping("/add-user")
 	@Operation(description = "Add a User by Admin")
@@ -50,5 +56,42 @@ public class AdminController {
 	@Operation(description = "Get Active Users")
 	public ResponseEntity<?> getActiveUsers(){
 		return ResponseEntity.status(HttpStatus.OK).body(adminService.getActiveUsers());
+	}
+	
+	@PostMapping("subscription/add-subscription")
+	@Operation(description = "Add a Subscription")
+	public ResponseEntity<?> addSubscription(@RequestBody SubscriptionRequestDTO subDto){
+		
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(subscriptionService.addSubscription(subDto));
+	}
+	
+	@GetMapping("/subscription")
+	@Operation(description = "Get All Subscriptions")
+	public  ResponseEntity<?> getSubscriptions(){
+		List<SubscriptionRespDto> list=subscriptionService.getAllSubscriptions();
+		if(list.isEmpty())
+			return ResponseEntity.noContent().build();
+		
+		return ResponseEntity.ok(list);
+	}
+	
+	@GetMapping("/subscription/getnames")
+	@Operation(description="Get only name of subscription")
+	public ResponseEntity<?> getNames(){
+		return ResponseEntity.ok(subscriptionService.getName());
+	}
+	
+	@DeleteMapping("/subscription/{subId}")
+	@Operation(description="Get only name of subscription")
+	public ResponseEntity<?> softDeleteSubscription(@PathVariable Long subId){
+		return ResponseEntity.ok(subscriptionService.softDelete(subId));
+	}
+	
+	@PutMapping("/subscription/{subId}")
+	@Operation(description = "Update a subscription")
+	public ResponseEntity<?> updateSubscription(@RequestBody SubscriptionRequestDTO updateDto,@PathVariable Long subId)
+	{
+		return ResponseEntity.ok(subscriptionService.updateSubscription(updateDto,subId));
 	}
 }

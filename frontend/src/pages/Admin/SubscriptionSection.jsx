@@ -12,7 +12,7 @@ const normalizeBoolean = (val) => {
   if (typeof val === "boolean") return val;
   if (typeof val === "number") return val === 1;
   if (typeof val === "string") {
-    const v = val.trim().toLowerCase(); // Defensive
+    const v = val.trim().toLowerCase();
     return v === "true" || v === "yes" || v === "1";
   }
   return false;
@@ -66,6 +66,7 @@ const SubscriptionSection = () => {
 
   const durations = [1,2,3,4,5,6,7,8,9,10,11,12];
 
+  // Always normalize booleans on every fetch
   const loadSubscriptions = async () => {
     setLoading(true);
     setError(null);
@@ -74,7 +75,6 @@ const SubscriptionSection = () => {
       if (response.status === 204) {
         setPacks([]);
       } else {
-        // Normalize booleans always
         const normalizedData = response.data.map((sub) => ({
           ...sub,
           dietConsultation: normalizeBoolean(sub.dietConsultation),
@@ -83,8 +83,10 @@ const SubscriptionSection = () => {
         setPacks(normalizedData);
       }
     } catch (err) {
-      setError("Failed to fetch subscriptions: " +
-               (err.response?.data?.message || err.message));
+      setError(
+        "Failed to fetch subscriptions: " +
+        (err.response?.data?.message || err.message)
+      );
     } finally {
       setLoading(false);
     }
@@ -97,7 +99,6 @@ const SubscriptionSection = () => {
   // Convert boolean to "true"/"false" for radio group
   const boolToString = (val) => (val ? "true" : "false");
 
-  // Handle all changes for controlled form
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     if ((name === "sauna" || name === "dietConsultation") && type === "radio") {
@@ -114,7 +115,6 @@ const SubscriptionSection = () => {
     e.preventDefault();
     setStatus(null);
 
-    // Prepare correct-typed data for API
     const finalFormData = {
       ...form,
       dietConsultation: Boolean(form.dietConsultation),
@@ -126,7 +126,9 @@ const SubscriptionSection = () => {
         await updateSubscription(form.id, finalFormData);
         setStatus("Package updated successfully!");
       } else {
-        await addSubscription(finalFormData);
+        // Prevent id from being sent on add
+        const { id, ...postData } = finalFormData;
+        await addSubscription(postData);
         setStatus("Package added successfully!");
       }
       setEditing(null);
@@ -178,7 +180,6 @@ const SubscriptionSection = () => {
   return (
     <div className="subscription-section-card">
       <h2>Manage Subscriptions</h2>
-
       {loading && <div>Loading subscriptions...</div>}
       {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
       {status && !error && (
@@ -196,14 +197,16 @@ const SubscriptionSection = () => {
       {!loading && (
         <>
           <form className="admin-form" onSubmit={handleSubmit}>
-            <Input
-              name="id"
-              label="Id"
-              value={form.id}
-              onChange={handleChange}
-              required
-              readOnly={editing !== null}
-            />
+            {editing !== null && (
+              <Input
+                name="id"
+                label="Id"
+                value={form.id}
+                onChange={handleChange}
+                required
+                readOnly
+              />
+            )}
             <Input
               name="name"
               label="Package Name"
