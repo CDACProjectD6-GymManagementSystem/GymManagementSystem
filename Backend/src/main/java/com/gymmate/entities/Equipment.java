@@ -23,7 +23,7 @@ public class Equipment extends SuperBaseEntity {
 	@Enumerated(EnumType.STRING)
 	private Category category;
 	@Column(name = "for_maintenance")
-	private boolean forMaintenance;
+	private boolean forMaintenance=false;
 	private double price;
 
 	public enum Category {

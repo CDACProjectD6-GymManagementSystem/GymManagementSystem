@@ -73,3 +73,45 @@ export const deleteSubscription = (subId) => {
 export const updateSubscription = (subId, updateData) => {
   return axios.put(`${API_BASE_URL}/subscription/${subId}`, updateData);
 };
+
+export const addEquipment = async (equipmentData) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/equipment/add`,
+      equipmentData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error adding equipment:", error);
+    throw error;
+  }
+};
+
+export const getAllEquipments = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/equipment/getall`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching equipment list:", error);
+    throw error;
+  }
+};
+
+export const deleteEquipment = async (id) => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/equipment/${id}`);
+    return response.data; 
+  } catch (error) {
+    console.error("Error deleting equipment:", error);
+    throw error;
+  }
+};
+
+export const updateEquipment = async (id, updateDto) => {
+  try {
+    return await axios.put(`${API_BASE_URL}/equipment/${id}`, updateDto);
+  } catch (error) {
+    console.error("Error updating equipment:", error);
+    throw error;
+  }
+};
