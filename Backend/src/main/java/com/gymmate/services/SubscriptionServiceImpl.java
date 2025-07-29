@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gymmate.customexception.ApiException;
+import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.SubscriptionDao;
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.SubscriptionRequestDTO;
@@ -45,6 +46,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 	public List<String> getName() {
 		
 		return subscriptionDao.findByIsActiveTrue().stream().map(sub->sub.getName()).toList();
+	}
+
+	@Override
+	public ApiResponse softDelete(Long subId) {
+		Subscription subEntity = subscriptionDao.findById(subId)
+		.orElseThrow(()-> new ResourceNotFoundException("Subscription not found"));
+		subEntity.setActive(false);
+		return new ApiResponse("Subscription Deleted Successfully");
+	}
+
+	@Override
+	public ApiResponse updateSubscription(SubscriptionRequestDTO updateDto, Long subId) {
+		Subscription entity=subscriptionDao.findById(subId).
+		orElseThrow(()->new ResourceNotFoundException("Subscription Not found"));
+		mapper.map(updateDto, entity);
+		return new ApiResponse("Subscription Updated");
 	}
 
 }

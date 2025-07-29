@@ -48,10 +48,28 @@ export const updateUser = async (userId, userData) => {
 
 export const getSubscriptionNames = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/subscription/getnames`);
+    const response = await axios.get(`${API_BASE_URL}/subscription/getnames`);
     return response.data;
   } catch (error) {
     console.error("Error fetching subscription names:", error);
     throw error;
   }
+};
+
+export const addSubscription = (data) => {
+  // Change URL as per your backend endpoint
+  return axios.post(`${API_BASE_URL}/subscription/add-subscription`, data);
+};
+
+
+export const getSubscriptions = () => {
+  return axios.get(`${API_BASE_URL}/subscription`);
+};
+
+export const deleteSubscription = (subId) => {
+  return axios.delete(`${API_BASE_URL}/subscription/${subId}`);
+};
+
+export const updateSubscription = (subId, updateData) => {
+  return axios.put(`${API_BASE_URL}/subscription/${subId}`, updateData);
 };

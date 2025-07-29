@@ -1,5 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/Admin.css";
+import {
+  addSubscription,
+  getSubscriptions,
+  deleteSubscription,
+  updateSubscription,
+} from "../../services/AdminService";
+
+// Robust boolean normalizer for database oddities
+const normalizeBoolean = (val) => {
+  if (typeof val === "boolean") return val;
+  if (typeof val === "number") return val === 1;
+  if (typeof val === "string") {
+    const v = val.trim().toLowerCase();
+    return v === "true" || v === "yes" || v === "1";
+  }
+  return false;
+};
 
 const Input = ({ label, ...props }) => (
   <label>
@@ -27,257 +44,324 @@ const RadioGroup = ({ label, name, options, selectedValue, onChange }) => (
   </fieldset>
 );
 
-const CheckboxGroup = ({ label, name, options, selectedValues, onChange }) => (
-  <fieldset>
-    <legend>{label}:</legend>
-    {options.map(({ value, label: optionLabel }) => (
-      <label key={value} style={{ marginRight: 16 }}>
-        <input
-          type="checkbox"
-          name={name}
-          value={value}
-          checked={selectedValues.includes(value)}
-          onChange={onChange}
-        />{" "}
-        {optionLabel}
-      </label>
-    ))}
-  </fieldset>
-);
+const initialFormState = {
+  id: "",
+  name: "",
+  description: "",
+  access: "OFF_PEAK_HOURS",
+  dietConsultation: false,
+  sauna: false,
+  duration: "1",
+  price: "",
+  discount: "0",
+};
 
 const SubscriptionSection = () => {
   const [packs, setPacks] = useState([]);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    access: "Off-peak hours",
-    dietConsultation: "Once at start",
-    groupClasses: [],
-    isSauna: "No",
-    duration: "1 month",
-    price: "",
-    discount: "0%"
-  });
+  const [form, setForm] = useState(initialFormState);
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const durations = [
-    "1 month", "2 months", "3 months", "4 months", "5 months", "6 months",
-    "7 months", "8 months", "9 months", "10 months", "11 months", "12 months"
-  ];
+  const durations = [1,2,3,4,5,6,7,8,9,10,11,12];
+
+  // Always normalize booleans on every fetch
+  const loadSubscriptions = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getSubscriptions();
+      if (response.status === 204) {
+        setPacks([]);
+      } else {
+        const normalizedData = response.data.map((sub) => ({
+          ...sub,
+          dietConsultation: normalizeBoolean(sub.dietConsultation),
+          sauna: normalizeBoolean(sub.sauna),
+        }));
+        setPacks(normalizedData);
+      }
+    } catch (err) {
+      setError(
+        "Failed to fetch subscriptions: " +
+        (err.response?.data?.message || err.message)
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSubscriptions();
+  }, []);
+
+  // Convert boolean to "true"/"false" for radio group
+  const boolToString = (val) => (val ? "true" : "false");
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    if (type === "checkbox") {
-      // toggle logic for checkboxes (groupClasses)
-      const checked = e.target.checked;
-      setForm((prev) => {
-        let updated = [...prev.groupClasses];
-        if (checked) updated.push(value);
-        else updated = updated.filter((v) => v !== value);
-        return { ...prev, groupClasses: updated };
-      });
+    if ((name === "sauna" || name === "dietConsultation") && type === "radio") {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value === "true",
+      }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editing !== null) {
-      setPacks(packs.map((p, idx) => (idx === editing ? form : p)));
+    setStatus(null);
+
+    const finalFormData = {
+      ...form,
+      dietConsultation: Boolean(form.dietConsultation),
+      sauna: Boolean(form.sauna),
+    };
+
+    try {
+      if (editing !== null) {
+        await updateSubscription(form.id, finalFormData);
+        setStatus("Package updated successfully!");
+      } else {
+        // Prevent id from being sent on add
+        const { id, ...postData } = finalFormData;
+        await addSubscription(postData);
+        setStatus("Package added successfully!");
+      }
       setEditing(null);
-    } else {
-      setPacks([...packs, form]);
+      setForm(initialFormState);
+      await loadSubscriptions();
+    } catch (err) {
+      setStatus(
+        (editing !== null ? "Error updating package: " : "Error adding package: ") +
+        (err.response?.data?.message || err.message)
+      );
     }
-    setForm({
-      name: "",
-      description: "",
-      access: "Off-peak hours",
-      dietConsultation: "Once at start",
-      groupClasses: [],
-      isSauna: "No",
-      duration: "1 month",
-      price: "",
-      discount: "0%"
-    });
   };
 
   const handleEdit = (idx) => {
+    const sub = packs[idx];
     setEditing(idx);
-    setForm(packs[idx]);
+    setForm({
+      ...sub,
+      dietConsultation: normalizeBoolean(sub.dietConsultation),
+      sauna: normalizeBoolean(sub.sauna),
+      duration: String(sub.duration),
+      price: String(sub.price),
+      discount: String(sub.discount),
+    });
   };
 
-  const handleDelete = (idx) => {
-    setPacks(packs.filter((_, i) => i !== idx));
-    if (editing === idx) setEditing(null);
+  const handleDelete = async (idx) => {
+    const subToDelete = packs[idx];
+    if (!window.confirm(`Are you sure you want to delete package "${subToDelete.name}"?`)) {
+      return;
+    }
+    setStatus(null);
+    try {
+      await deleteSubscription(subToDelete.id);
+      setStatus("Package deleted successfully!");
+      if (editing === idx) {
+        setEditing(null);
+        setForm(initialFormState);
+      }
+      await loadSubscriptions();
+    } catch (err) {
+      setStatus(
+        "Error deleting package: " +
+        (err.response?.data?.message || err.message)
+      );
+    }
   };
 
   return (
     <div className="subscription-section-card">
       <h2>Manage Subscriptions</h2>
-      <form className="admin-form" onSubmit={handleSubmit}>
-        <Input
-          name="name"
-          label="Package Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="description"
-          label="Description"
-          value={form.description}
-          onChange={handleChange}
-          required
-        />
+      {loading && <div>Loading subscriptions...</div>}
+      {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
+      {status && !error && (
+        <div
+          style={{
+            margin: "10px 0",
+            color: status.startsWith("Error") ? "red" : "green",
+            fontWeight: 600,
+          }}
+        >
+          {status}
+        </div>
+      )}
 
-        <RadioGroup
-          label="Gym Access"
-          name="access"
-          options={[
-            { value: "Off-peak hours", label: "Off-peak hours" },
-            { value: "Full Time", label: "Full Time" },
-          ]}
-          selectedValue={form.access}
-          onChange={handleChange}
-        />
+      {!loading && (
+        <>
+          <form className="admin-form" onSubmit={handleSubmit}>
+            {editing !== null && (
+              <Input
+                name="id"
+                label="Id"
+                value={form.id}
+                onChange={handleChange}
+                required
+                readOnly
+              />
+            )}
+            <Input
+              name="name"
+              label="Package Name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+            <Input
+              name="description"
+              label="Description"
+              value={form.description}
+              onChange={handleChange}
+              required
+            />
+            <RadioGroup
+              label="Gym Access"
+              name="access"
+              options={[
+                { value: "OFF_PEAK_HOURS", label: "Off-peak hours" },
+                { value: "FULLTIME", label: "Full Time" },
+              ]}
+              selectedValue={form.access}
+              onChange={handleChange}
+            />
+            <RadioGroup
+              label="Diet Consultation"
+              name="dietConsultation"
+              options={[
+                { value: "true", label: "Yes" },
+                { value: "false", label: "No" },
+              ]}
+              selectedValue={boolToString(form.dietConsultation)}
+              onChange={handleChange}
+            />
+            <RadioGroup
+              label="Sauna Access"
+              name="sauna"
+              options={[
+                { value: "true", label: "Yes" },
+                { value: "false", label: "No" },
+              ]}
+              selectedValue={boolToString(form.sauna)}
+              onChange={handleChange}
+            />
+            <label style={{
+              marginBottom: 12,
+              fontWeight: 600,
+              color: "#004aad",
+              display: "block",
+            }}>
+              Duration:
+              <select
+                name="duration"
+                value={form.duration}
+                onChange={handleChange}
+                required
+                style={{
+                  marginLeft: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #004aad",
+                  fontFamily: "inherit",
+                }}
+              >
+                {durations.map((dur) => (
+                  <option key={dur} value={dur}>
+                    {dur}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Input
+              name="price"
+              label="Price"
+              type="number"
+              min="0"
+              step="any"
+              value={form.price}
+              onChange={handleChange}
+              required
+            />
+            <Input
+              name="discount"
+              label="Discount"
+              value={form.discount}
+              onChange={handleChange}
+              required
+            />
+            <button type="submit" className="admin-btn">
+              {editing !== null ? "Update" : "Add"} Package
+            </button>
+            {editing !== null && (
+              <button
+                type="button"
+                className="admin-btn cancel"
+                onClick={() => {
+                  setEditing(null);
+                  setForm(initialFormState);
+                }}
+              >
+                Cancel
+              </button>
+            )}
+          </form>
 
-        <RadioGroup
-          label="Diet Consultation"
-          name="dietConsultation"
-          options={[
-            { value: "Once at start", label: "Once at start" },
-            { value: "Monthly", label: "Monthly" },
-          ]}
-          selectedValue={form.dietConsultation}
-          onChange={handleChange}
-        />
-
-        <CheckboxGroup
-          label="Group Classes"
-          name="groupClasses"
-          options={[
-            { value: "Yoga", label: "Yoga" },
-            { value: "Zumba", label: "Zumba" },
-            { value: "HIIT", label: "HIIT" },
-          ]}
-          selectedValues={form.groupClasses}
-          onChange={handleChange}
-        />
-
-        <RadioGroup
-          label="Sauna Access"
-          name="isSauna"
-          options={[
-            { value: "Yes", label: "Yes" },
-            { value: "No", label: "No" },
-          ]}
-          selectedValue={form.isSauna}
-          onChange={handleChange}
-        />
-
-        <label style={{ marginBottom: 12, fontWeight: 600, color: "#004aad", display: "block" }}>
-          Duration:
-          <select
-            name="duration"
-            value={form.duration}
-            onChange={handleChange}
-            required
-            style={{ marginLeft: 8, padding: "6px 12px", borderRadius: 4, border: "1px solid #004aad", fontFamily: "inherit" }}
-          >
-            {durations.map((dur) => (
-              <option key={dur} value={dur}>
-                {dur}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <Input
-          name="price"
-          label="Price"
-          type="number"
-          min="0"
-          step="any"
-          value={form.price}
-          onChange={handleChange}
-          required
-        />
-
-        <Input
-          name="discount"
-          label="Discount"
-          pattern="^\d+%$"
-          title="Enter discount percentage like 0% or 15%"
-          value={form.discount}
-          onChange={handleChange}
-          required
-        />
-
-        <button type="submit" className="admin-btn">{editing !== null ? "Update" : "Add"} Package</button>
-        {editing !== null && (
-          <button
-            type="button"
-            className="admin-btn cancel"
-            onClick={() => {
-              setEditing(null);
-              setForm({
-                name: "",
-                description: "",
-                access: "Off-peak hours",
-                dietConsultation: "Once at start",
-                groupClasses: [],
-                isSauna: "No",
-                duration: "1 month",
-                price: "",
-                discount: "0%"
-              });
-            }}
-          >
-            Cancel
-          </button>
-        )}
-      </form>
-      <table className="admin-table" style={{ tableLayout: "fixed" }}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Gym Access</th>
-            <th>Diet Consultation</th>
-            <th>Group Classes</th>
-            <th>Sauna Access</th>
-            <th>Duration</th>
-            <th>Price</th>
-            <th>Discount</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {packs.map((p, i) => (
-            <tr key={i}>
-              <td>{p.name}</td>
-              <td style={{ whiteSpace: "pre-wrap" }}>{p.description}</td>
-              <td>{p.access}</td>
-              <td>{p.dietConsultation}</td>
-              <td>{p.groupClasses.join(", ")}</td>
-              <td>{p.isSauna}</td>
-              <td>{p.duration}</td>
-              <td>{p.price}</td>
-              <td>{p.discount}</td>
-              <td>
-                <button className="admin-btn" onClick={() => handleEdit(i)}>Edit</button>
-                <button className="admin-btn delete" onClick={() => handleDelete(i)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-          {packs.length === 0 && (
-            <tr className="no-data-row">
-              <td colSpan={10}>No packages found.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+          <table className="admin-table" style={{ tableLayout: "fixed" }}>
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Gym Access</th>
+                <th>Diet Consultation</th>
+                <th>Sauna Access</th>
+                <th>Duration</th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {packs.length === 0 ? (
+                <tr className="no-data-row">
+                  <td colSpan={10}>No packages found.</td>
+                </tr>
+              ) : (
+                packs.map((p, i) => (
+                  <tr key={i}>
+                    <td>{p.id}</td>
+                    <td>{p.name}</td>
+                    <td style={{ whiteSpace: "pre-wrap" }}>{p.description}</td>
+                    <td>{p.access}</td>
+                    <td>{normalizeBoolean(p.dietConsultation) ? "Yes" : "No"}</td>
+                    <td>{normalizeBoolean(p.sauna) ? "Yes" : "No"}</td>
+                    <td>{p.duration}</td>
+                    <td>{p.price}</td>
+                    <td>{p.discount}</td>
+                    <td>
+                      <button className="admin-btn" onClick={() => handleEdit(i)}>
+                        Edit
+                      </button>
+                      <button
+                        className="admin-btn delete"
+                        onClick={() => handleDelete(i)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </>
+      )}
     </div>
   );
 };

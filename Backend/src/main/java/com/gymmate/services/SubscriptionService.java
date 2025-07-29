@@ -14,4 +14,8 @@ public interface SubscriptionService {
 
 	List<String> getName();
 
+	ApiResponse softDelete(Long subId);
+
+	ApiResponse updateSubscription(SubscriptionRequestDTO updateDto, Long subId);
+
 }
