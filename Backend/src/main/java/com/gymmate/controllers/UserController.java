@@ -1,6 +1,7 @@
 package com.gymmate.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,20 +11,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gymmate.daos.RoleDao;
+import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.UserDisplayProfileDto;
+import com.gymmate.dtos.UserLoginDTO;
+import com.gymmate.dtos.UserLoginResponseDTO;
+import com.gymmate.dtos.UserRegistrationDTO;
+import com.gymmate.entities.UserEntity;
 import com.gymmate.services.UserService;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@NoArgsConstructor
+
 @RequestMapping("/user")
 @CrossOrigin(origins = "*")
 public class UserController {
+
 	@Autowired
 	private UserService userService;
+	@Autowired
+	RoleDao roleDao;
 
 	@GetMapping("/profile/{Id}")
 	public ResponseEntity<?> getUserProfile(@PathVariable Long Id) {
@@ -42,9 +51,25 @@ public class UserController {
 
 		return ResponseEntity.ok().body(userService.updateProfile(Id, user));
 	}
-	
-	@GetMapping("/diet/{Id}")
-	public ResponseEntity<?>getDiet(@PathVariable Long Id){
-		return ResponseEntity.ok().body(userService.getDiet(Id));
+
+	@PostMapping("/register")
+	@CrossOrigin(origins = "*")
+	public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO) {
+		userService.registerUser(userRegistrationDTO);
+
+		return ResponseEntity.ok().build();
+
+	}
+
+	@PostMapping("/login")
+	@CrossOrigin(origins = "*")
+	public ResponseEntity<?> userLogin(@RequestBody UserLoginDTO userLoginDTO) {
+		 UserLoginResponseDTO user = userService.userLogin(userLoginDTO);
+
+		if (user != null) {
+			return ResponseEntity.ok(user);
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+		}
 	}
 }

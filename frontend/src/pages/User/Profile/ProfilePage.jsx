@@ -3,10 +3,11 @@ import {
   FaUserEdit, FaSave, FaUser, FaEnvelope, FaPhone, FaHome, FaVenusMars
 } from "react-icons/fa";
 import './ProfilePage.css';
-import { profileService } from '../../../services/UserProfileService';
+import { profileService } from "../../../services/UserProfileService";
 
+// Gender enum for select
 const GENDERS = [
-  { value: "MALE",   label: "Male" },
+  { value: "MALE", label: "Male" },
   { value: "FEMALE", label: "Female" },
   { value: "OTHER",  label: "Other" }
 ];
@@ -19,7 +20,14 @@ const ProfilePage = () => {
   const [apiError, setApiError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  // On mount, fetch the user's profile using their id from localStorage
   useEffect(() => {
+    const userId = localStorage.getItem("gymmateUserId");
+    if (!userId) {
+      setApiError("You must be logged in to view your profile.");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     profileService.fetch()
       .then(res => {
@@ -33,16 +41,16 @@ const ProfilePage = () => {
       });
   }, []);
 
-  const handleChange = e =>
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleEdit = e => {
+  const handleEdit = (e) => {
     e.preventDefault();
     setEditing(true);
     setSuccessMsg("");
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError("");
     setSuccessMsg("");
@@ -65,7 +73,9 @@ const ProfilePage = () => {
   if (!form)
     return (
       <div className="profilepage-bg">
-        <div style={{ color: 'red', textAlign: 'center', padding: '70px' }}>{apiError || "No Profile"}</div>
+        <div style={{ color: 'red', textAlign: 'center', padding: '70px' }}>
+          {apiError || "No Profile"}
+        </div>
       </div>
     );
 
@@ -87,7 +97,7 @@ const ProfilePage = () => {
             <FaPhone /> {form.mobile}
           </div>
           <div className="profile-info-line">
-            <FaVenusMars /> {(form.gender && GENDERS.find(g=>g.value === form.gender)?.label) || ""}
+            <FaVenusMars /> {(form.gender && GENDERS.find(g => g.value === form.gender)?.label) || ""}
           </div>
         </div>
         {/* Edit Form */}

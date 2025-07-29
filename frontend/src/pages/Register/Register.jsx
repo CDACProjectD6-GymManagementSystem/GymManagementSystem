@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import '../../styles/Login.css';
+import { registerUser } from '../../services/registrationService';
 
-// CAPITALIZED enum values (matches backend):
+// Enum for gender—must match backend
 const GENDERS = [
   { value: 'MALE', label: 'Male' },
   { value: 'FEMALE', label: 'Female' },
@@ -17,40 +17,37 @@ function Register() {
     address: '',
     mobile: '',
     gender: '',
-    password: '',        // needed for account creation
-    confirmPassword: '', // for validation only
+    password: '',
+    confirmPassword: '',
   });
 
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-
-    // TODO: Call API to register user with appropriate body (exclude confirmPassword)
-    // Example:
-    // await profileService.register({
-    //   firstName: ...,
-    //   lastName: ...,
-    //   email: ...,
-    //   address: ...,
-    //   mobile: ...,
-    //   gender: ...,
-    //   password: ...,
-    // });
-
-    navigate('/login');
+    const { confirmPassword, ...payload } = formData;
+    setLoading(true);
+    try {
+      await registerUser(payload);
+      alert("Registered successfully!");
+      navigate('/login');
+    } catch (err) {
+      alert("Registration failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,29 +58,28 @@ function Register() {
           <div className="row">
             <div className="col-md-6 mb-3">
               <label className="form-label fw-bold">First Name</label>
-              <input type="text" name="firstName" className="form-control" required onChange={handleChange} />
+              <input type="text" name="firstName" className="form-control" required value={formData.firstName} onChange={handleChange} />
             </div>
             <div className="col-md-6 mb-3">
               <label className="form-label fw-bold">Last Name</label>
-              <input type="text" name="lastName" className="form-control" required onChange={handleChange} />
+              <input type="text" name="lastName" className="form-control" required value={formData.lastName} onChange={handleChange} />
             </div>
           </div>
-
           <div className="mb-3">
             <label className="form-label fw-bold">Email address</label>
-            <input type="email" name="email" className="form-control" required onChange={handleChange} />
+            <input type="email" name="email" className="form-control" required value={formData.email} onChange={handleChange} />
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">Address</label>
-            <input type="text" name="address" className="form-control" required onChange={handleChange} />
+            <input type="text" name="address" className="form-control" required value={formData.address} onChange={handleChange} />
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">Mobile Number</label>
-            <input type="text" name="mobile" pattern="^[0-9]{10,15}$" title="Enter valid mobile number" className="form-control" required onChange={handleChange} />
+            <input type="text" name="mobile" pattern="^[0-9]{10,15}$" title="Enter valid mobile number" className="form-control" required value={formData.mobile} onChange={handleChange} />
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">Gender</label>
-            <select name="gender" className="form-select" required onChange={handleChange} value={formData.gender}>
+            <select name="gender" className="form-select" required value={formData.gender} onChange={handleChange}>
               <option value="">Select Gender</option>
               {GENDERS.map(g => (
                 <option value={g.value} key={g.value}>{g.label}</option>
@@ -92,13 +88,15 @@ function Register() {
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">Password</label>
-            <input type="password" name="password" className="form-control" required onChange={handleChange} />
+            <input type="password" name="password" className="form-control" required value={formData.password} onChange={handleChange} />
           </div>
           <div className="mb-4">
             <label className="form-label fw-bold">Confirm Password</label>
-            <input type="password" name="confirmPassword" className="form-control" required onChange={handleChange} />
+            <input type="password" name="confirmPassword" className="form-control" required value={formData.confirmPassword} onChange={handleChange} />
           </div>
-          <button type="submit" className="btn btn-success w-100">Register</button>
+          <button type="submit" className="btn btn-success w-100" disabled={loading}>
+            {loading ? "Registering..." : "Register"}
+          </button>
         </form>
         <p className="text-center mt-3">
           Already have an account? <Link to="/login" className="text-decoration-none">Login here</Link>

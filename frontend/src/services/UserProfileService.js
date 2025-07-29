@@ -1,11 +1,26 @@
 import axios from "axios";
-const API_BASE = "http://localhost:8080/user/profile/1";
- // Change as per your actual backend
+
+// All profile API calls use the id from localStorage set at login!
+const apiBase = "http://localhost:8080/user";
 
 export const profileService = {
-  // GET profile
-  fetch: async () => axios.get(API_BASE),
-
-  // PUT/PATCH profile (adjust as per your backend)
-  update: async (profile) => axios.post(API_BASE, profile)
+  /**
+   * Fetch the profile of the currently logged-in user.
+   * Returns a promise with Axios response object.
+   */
+  fetch: () => {
+    const userId = localStorage.getItem("gymmateUserId");
+    if (!userId) throw new Error("Not logged in, no user id!");
+    return axios.get(`${apiBase}/profile/${userId}`);
+  },
+  /**
+   * Update the profile of the currently logged-in user.
+   * @param {object} profile - The profile data to update
+   * Returns a promise with Axios response object.
+   */
+  update: (profile) => {
+    const userId = localStorage.getItem("gymmateUserId");
+    if (!userId) throw new Error("Not logged in, no user id!");
+    return axios.post(`${apiBase}/profile/${userId}`, profile);
+  },
 };
