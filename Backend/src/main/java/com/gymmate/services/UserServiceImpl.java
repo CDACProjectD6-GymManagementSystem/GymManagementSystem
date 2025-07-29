@@ -56,6 +56,7 @@ public class UserServiceImpl implements UserService {
 		return true;
 	}
 
+ 
 	@Override
 	public DietRespDTO getDiet(Long id) {
 		UserEntity user = userDao.findById(id).orElseThrow(()->new ResourceNotFoundException("user Not found"));
@@ -63,4 +64,10 @@ public class UserServiceImpl implements UserService {
 		DietRespDTO dietDto = map.map(diet,DietRespDTO.class );
 		return dietDto;
 	}
+ 
+	
+	
+	
+	
+ 
 }

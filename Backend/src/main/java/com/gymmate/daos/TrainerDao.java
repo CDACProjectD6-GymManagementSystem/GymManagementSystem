@@ -7,4 +7,5 @@ import com.gymmate.entities.Trainer;
 public interface TrainerDao extends JpaRepository<Trainer, Long> {
 
 
+
 }
