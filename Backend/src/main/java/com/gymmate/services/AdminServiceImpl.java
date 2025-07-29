@@ -39,6 +39,7 @@ public class AdminServiceImpl implements AdminService {
 		Subscription subEntity = subscriptionDao.findByName(userAddDto.getSubscriptionType());
 		userEntity.setSubscriptionId(subEntity);
 		userEntity.setActive(true);
+		userEntity.setSubscribed(true);
 		userDao.save(userEntity);
 		return new ApiResponse("User Created");
 	}
@@ -66,6 +67,8 @@ public class AdminServiceImpl implements AdminService {
 		
 		List<UserEntity> list = userDao.findByIsActiveTrue();
 		List<UserEntityResponseDto> subtypelist=new ArrayList<>();
+		if(!list.isEmpty())
+		{	
 		for(UserEntity user:list)
 		{
 			UserEntityResponseDto u1=new UserEntityResponseDto();
@@ -74,6 +77,8 @@ public class AdminServiceImpl implements AdminService {
 			subtypelist.add(u1);
 		}
 		return subtypelist;
+		}
+		return null;
 	}
 	
 }
