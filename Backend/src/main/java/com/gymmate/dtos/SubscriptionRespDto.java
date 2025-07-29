@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SubscriptionRespDto {
+public class SubscriptionRespDto extends BaseDTO{
 	private String name;
 	private String description;
 	private GymAccess access;

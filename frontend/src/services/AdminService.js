@@ -55,3 +55,21 @@ export const getSubscriptionNames = async () => {
     throw error;
   }
 };
+
+export const addSubscription = (data) => {
+  // Change URL as per your backend endpoint
+  return axios.post("http://localhost:8080/subscription", data);
+};
+
+
+export const getSubscriptions = () => {
+  return axios.get(`http://localhost:8080/subscription`);
+};
+
+export const deleteSubscription = (subId) => {
+  return axios.delete(`http://localhost:8080/subscription/${subId}`);
+};
+
+export const updateSubscription = (subId, updateData) => {
+  return axios.put(`http://localhost:8080/subscription/${subId}`, updateData);
+};
