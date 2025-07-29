@@ -1,17 +1,21 @@
 package com.gymmate.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gymmate.dtos.TrainerDTO;
+import com.gymmate.dtos.UserDietDTO;
+import com.gymmate.dtos.UserScheduleDTO;
 import com.gymmate.services.TrainerService;
+import com.gymmate.services.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
@@ -43,12 +47,59 @@ public class TrainerController {
 	}
 	
 	
-	@GetMapping("/{trainerId}")
+	@GetMapping("users/{trainerId}")
 	@Operation(description = "Get assigned users")
 	public ResponseEntity<?> getAssignedUser(@PathVariable Long trainerId){
 		System.out.println("In getting the number of users assigned");
 		return ResponseEntity.ok(trainerService.getAssignedUsers(trainerId));
 	}
 	
+	
+	
+	
+	
+	
+	@GetMapping("/user/{userId}")
+	@Operation(description = "Get user profile")
+	public ResponseEntity<?> getUserDetails(@PathVariable Long userId) {
+	    return ResponseEntity.ok(trainerService.getUserDetails(userId));
+	}
+
+	
+	
+	@GetMapping("/user/{userId}/diet")
+	@Operation(description = "Get user diet")
+	public ResponseEntity<?> getUserDiet(@PathVariable Long userId){
+		return ResponseEntity.ok(trainerService.getUserDiet(userId));
+		
+	}
+	
+	
+	
+	@PostMapping("/user/{userId}/diet")
+	@Operation(description = "Update user diet")
+	public ResponseEntity<?> updateUserDiet(@PathVariable Long userId, @RequestBody UserDietDTO dto){
+		return ResponseEntity.ok(trainerService.updateUserDiet(userId, dto));
+	}
+	
+	
+	@GetMapping("/user/{userId}/schedule")
+	@Operation(description = "Get user schedule")
+	public ResponseEntity<?> getUserSchedule(@PathVariable Long userId){
+		return ResponseEntity.ok(trainerService.getUserSchedule(userId));
+		
+	}
+	
+	
+	@PostMapping("/user/{userId}/schedule")
+	@Operation(description = "Update user diet")
+	public ResponseEntity<?> updateUserSchedule(@PathVariable Long userId, @RequestBody UserScheduleDTO dto){
+		return ResponseEntity.ok(trainerService.updateUserSchedule(userId, dto));
+	}
+	
+
+	
+	
+
 
 }

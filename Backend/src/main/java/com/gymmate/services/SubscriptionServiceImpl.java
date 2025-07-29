@@ -41,4 +41,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 				.toList();
 	}
 
+	@Override
+	public List<String> getName() {
+		
+		return subscriptionDao.findByIsActiveTrue().stream().map(sub->sub.getName()).toList();
+	}
+
 }

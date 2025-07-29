@@ -1,20 +1,19 @@
 package com.gymmate.dtos;
 
 import com.gymmate.entities.Gender;
+import com.gymmate.entities.Schedule;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 
-@NoArgsConstructor
+
 @Getter
 @Setter
-@ToString
-public class UserForTrainerDTO {
-	private Long id;
+public class UserScheduleDTO {
 	private String firstName;
-	private String lastName; 
+	private String lastName;
 	private Gender gender;
+	private Schedule schedule;
+	
 }
