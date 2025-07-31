@@ -27,14 +27,15 @@ public class AdminServiceImpl implements AdminService {
 	private final SubscriptionDao subscriptionDao;
 	private final UserDao userDao;
 	private final ModelMapper mapper;
+
 	@Override
 	public ApiResponse addUser(UserSubscriptionAddDto userAddDto) {
-		if(!subscriptionDao.existsByName(userAddDto.getSubscriptionType())) {
+		if (!subscriptionDao.existsByName(userAddDto.getSubscriptionType())) {
 			throw new ResourceNotFoundException("Subscription Type not found");
 		}
 		if (userDao.existsByEmail(userAddDto.getEmail())) {
-	        throw new RuntimeException("A user with this email already exists");
-	    }
+			throw new RuntimeException("A user with this email already exists");
+		}
 		UserEntity userEntity = mapper.map(userAddDto, UserEntity.class);
 		Subscription subEntity = subscriptionDao.findByName(userAddDto.getSubscriptionType());
 		userEntity.setSubscriptionId(subEntity);
@@ -43,42 +44,46 @@ public class AdminServiceImpl implements AdminService {
 		userDao.save(userEntity);
 		return new ApiResponse("User Created");
 	}
+
 	@Override
 	public ApiResponse softDeleteUser(Long userId) {
 		UserEntity userEntity = userDao.findById(userId)
-								.orElseThrow(()-> new ResourceNotFoundException("User Not Found"));
+				.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 		userEntity.setActive(false); // SoftDeleting the User
 		return new ApiResponse("User Deleted Successfully");
 	}
+
 	@Override
 	public ApiResponse updateUser(UserSubscriptionUpdateDto userUpdatedto, Long userId) {
-		UserEntity userEntity=userDao.findById(userId)
-								.orElseThrow(()->new ResourceNotFoundException("User Not Found"));
-		if(!userEntity.getSubscriptionId().getName().equals(userUpdatedto.getSubscriptionType()))
-		{
+		UserEntity userEntity = userDao.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		if (!userEntity.getSubscriptionId().getName().equals(userUpdatedto.getSubscriptionType())) {
 			Subscription subEntity = subscriptionDao.findByName(userUpdatedto.getSubscriptionType());
 			userEntity.setSubscriptionId(subEntity);
 		}
-		mapper.map(userUpdatedto,userEntity);
+		mapper.map(userUpdatedto, userEntity);
 		return new ApiResponse("User Updated Successfully");
 	}
+
 	@Override
 	public List<UserEntityResponseDto> getActiveUsers() {
-		
+
 		List<UserEntity> list = userDao.findByIsActiveTrue();
-		List<UserEntityResponseDto> subtypelist=new ArrayList<>();
-		if(!list.isEmpty())
-		{	
-		for(UserEntity user:list)
-		{
-			UserEntityResponseDto u1=new UserEntityResponseDto();
-			mapper.map(user, u1);
-			u1.setSubscriptionType(user.getSubscriptionId().getName());
-			subtypelist.add(u1);
+		List<UserEntityResponseDto> subtypelist = new ArrayList<>();
+		if (list!= null &&	!list.isEmpty()) {
+			for (UserEntity user : list) {
+				UserEntityResponseDto u1 = new UserEntityResponseDto();
+				mapper.map(user, u1);
+				 if (user.getSubscriptionId() != null) {
+		                u1.setSubscriptionType(user.getSubscriptionId().getName());
+		            } else {
+		               user.setSubscriptionId(subscriptionDao.findByName("Free"));
+		               u1.setSubscriptionType(user.getSubscriptionId().getName());
+		            }
+				subtypelist.add(u1);
+			}
+			
 		}
 		return subtypelist;
-		}
-		return null;
 	}
-	
 }
