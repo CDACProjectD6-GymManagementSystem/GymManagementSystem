@@ -7,16 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
-import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.RoleDao;
 import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.ApiResponse;
-import com.gymmate.dtos.DietRespDTO;
 import com.gymmate.dtos.UserDisplayProfileDto;
 import com.gymmate.dtos.UserLoginDTO;
 import com.gymmate.dtos.UserLoginResponseDTO;
 import com.gymmate.dtos.UserRegistrationDTO;
-import com.gymmate.entities.Diet;
 import com.gymmate.entities.Role;
 import com.gymmate.entities.Role.UserRole;
 import com.gymmate.entities.UserEntity;
@@ -63,13 +60,6 @@ public class UserServiceImpl implements UserService {
 		return true;
 	}
 
-	@Override
-	public DietRespDTO getDiet(Long id) {
-		UserEntity user = userDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("user Not found"));
-		Diet diet = user.getDiet();
-		DietRespDTO dietDto = map.map(diet, DietRespDTO.class);
-		return dietDto;
-	}
 
 	@Override
 	public ApiResponse registerUser(UserRegistrationDTO userRegistrationDTO) {
