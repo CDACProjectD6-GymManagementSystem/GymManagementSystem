@@ -18,8 +18,10 @@ import com.gymmate.dtos.UserLoginDTO;
 import com.gymmate.dtos.UserLoginResponseDTO;
 import com.gymmate.dtos.UserRegistrationDTO;
 import com.gymmate.entities.UserEntity;
+import com.gymmate.services.SubscriptionService;
 import com.gymmate.services.UserService;
 
+import io.micrometer.core.ipc.http.HttpSender.Response;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -64,7 +66,7 @@ public class UserController {
 	@PostMapping("/login")
 	@CrossOrigin(origins = "*")
 	public ResponseEntity<?> userLogin(@RequestBody UserLoginDTO userLoginDTO) {
-		 UserLoginResponseDTO user = userService.userLogin(userLoginDTO);
+		UserLoginResponseDTO user = userService.userLogin(userLoginDTO);
 
 		if (user != null) {
 			return ResponseEntity.ok(user);
@@ -72,4 +74,23 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
 		}
 	}
+
+	@GetMapping("/available-subscriptions")
+	public ResponseEntity<?> getAvailableSubscriptions() {
+		return ResponseEntity.ok().body(userService.getAvailableSubscriptions());
+
+	}
+
+	@GetMapping("/getdiet/{Id}")
+	public ResponseEntity<?> getDiet(@PathVariable Long Id) {
+		return ResponseEntity.ok().body(userService.getUserDiet(Id));
+
+	}
+
+	@GetMapping("/get-schedule/{Id}")
+	public ResponseEntity<?> getSchedule(@PathVariable Long Id) {
+		return ResponseEntity.ok().body(userService.getUserSchedule(Id));
+
+	}
+
 }
