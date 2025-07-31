@@ -1,15 +1,117 @@
 import React, { useEffect, useState } from "react";
+ 
+import "./DietNutritionPage.css";
+import { DietService } from "./../../../services/DietService";
+
+// HARD-CODED reference food data for nutrition table
 import {
-  FaAppleAlt, FaCarrot, FaLeaf, FaBreadSlice, FaSeedling,
-  FaEgg, FaCheese, FaGlassWhiskey, FaFish,
-  FaDrumstickBite, FaBacon, FaHamburger, FaHotdog,
+  FaAppleAlt, FaEgg, FaLeaf, FaBreadSlice, FaDrumstickBite,
+  FaFish, FaCarrot, FaCheese, FaHotdog, FaSeedling
 } from "react-icons/fa";
- import "./DietNutritionPage.css";
-import { DietService } from './../../../services/DietService';
 
-// ... (dietData as before) ...
+const dietData = [
+  {
+    item: "Apple",
+    icon: <FaAppleAlt />,
+    category: "Vegan",
+    calories: 52,
+    protein: 0.3,
+    carbs: 14,
+    fat: 0.2,
+    fiber: 2.4,
+  },
+  {
+    item: "Egg",
+    icon: <FaEgg />,
+    category: "Vegetarian",
+    calories: 78,
+    protein: 6,
+    carbs: 1,
+    fat: 5,
+    fiber: 0,
+  },
+  {
+    item: "Spinach",
+    icon: <FaLeaf />,
+    category: "Vegan",
+    calories: 23,
+    protein: 2.9,
+    carbs: 3.6,
+    fat: 0.4,
+    fiber: 2.2,
+  },
+  {
+    item: "Brown Bread",
+    icon: <FaBreadSlice />,
+    category: "Vegetarian",
+    calories: 74,
+    protein: 2.6,
+    carbs: 13.8,
+    fat: 1.1,
+    fiber: 2.2,
+  },
+  {
+    item: "Chicken Breast",
+    icon: <FaDrumstickBite />,
+    category: "Non-Vegetarian",
+    calories: 165,
+    protein: 31,
+    carbs: 0,
+    fat: 3.6,
+    fiber: 0,
+  },
+  {
+    item: "Salmon",
+    icon: <FaFish />,
+    category: "Non-Vegetarian",
+    calories: 206,
+    protein: 22,
+    carbs: 0,
+    fat: 13,
+    fiber: 0,
+  },
+  {
+    item: "Carrot",
+    icon: <FaCarrot />,
+    category: "Vegan",
+    calories: 41,
+    protein: 0.9,
+    carbs: 10,
+    fat: 0.2,
+    fiber: 2.8,
+  },
+  {
+    item: "Paneer",
+    icon: <FaCheese />,
+    category: "Vegetarian",
+    calories: 265,
+    protein: 18,
+    carbs: 1.2,
+    fat: 20.8,
+    fiber: 0,
+  },
+  {
+    item: "Tofu",
+    icon: <FaSeedling />,
+    category: "Vegan",
+    calories: 76,
+    protein: 8,
+    carbs: 1.9,
+    fat: 4.8,
+    fiber: 0.3,
+  },
+  {
+    item: "Chicken Sausage",
+    icon: <FaHotdog />,
+    category: "Non-Vegetarian",
+    calories: 150,
+    protein: 8,
+    carbs: 1,
+    fat: 13,
+    fiber: 0,
+  },
+];
 
-const dietData = [/* ... unchanged ... */];
 
 const categoryColor = (cat) =>
   cat === "Vegan"
@@ -18,10 +120,13 @@ const categoryColor = (cat) =>
     ? "#555"
     : "#999";
 
-const DietNutritionPage = ({ membershipType = "standard", userId }) => {
+const DietNutritionPage = ({ membershipType = "premium", userId: propUserId }) => {
   const [dietPlan, setDietPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
+
+  // Prefer prop or fallback to logged-in user from localStorage
+  const userId = propUserId || localStorage.getItem("gymmateUserId");
 
   useEffect(() => {
     if (!userId) return;
@@ -75,6 +180,10 @@ const DietNutritionPage = ({ membershipType = "standard", userId }) => {
               <tr>
                 <td>Dinner</td>
                 <td>{dietPlan?.dinner || "Not set"}</td>
+              </tr>
+              <tr>
+                <td>Mid Snack</td>
+                <td>{dietPlan?.midSnack || "Not set"}</td>
               </tr>
             </tbody>
           </table>
