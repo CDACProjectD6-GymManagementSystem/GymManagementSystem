@@ -16,6 +16,7 @@ import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.ReceptionistRequestDto;
 import com.gymmate.dtos.ReceptionistRespDto;
+import com.gymmate.dtos.ReceptionistUpdateDto;
 import com.gymmate.dtos.TrainerAssignmentDTO;
 import com.gymmate.dtos.TrainerNameForReceptionistDTO;
 import com.gymmate.dtos.UserNameForReceptonistDTO;
@@ -87,5 +88,24 @@ public class ReceptionistServiceImpl implements ReceptionistService {
 							.stream()
 							.map(en->mapper.map(en,ReceptionistRespDto.class)).toList();
 	}
+
+	@Override
+	public ApiResponse deleteReceptionist(Long id) {
+		Receptionist entity = receptionistDao.findById(id)
+						.orElseThrow(()-> new ResourceNotFoundException("Receptionist Not found"));
+		receptionistDao.delete(entity);
+		return new ApiResponse("Receptionist Deleted");
+	}
+
+	@Override
+	public ApiResponse updateReceptionist(ReceptionistUpdateDto updatedto, Long id) {
+		Receptionist entity = receptionistDao.findById(id)
+				.orElseThrow(()-> new ResourceNotFoundException("Receptionist Not found"));
+		mapper.map(updatedto, entity);
+		
+		return new ApiResponse("Receptionist Updated Successfully");
+	}
+
+	
 
 }

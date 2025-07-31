@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gymmate.dtos.EquipmentRequestDto;
 import com.gymmate.dtos.ReceptionistRequestDto;
+import com.gymmate.dtos.ReceptionistUpdateDto;
 import com.gymmate.dtos.SubscriptionRequestDTO;
 import com.gymmate.dtos.SubscriptionRespDto;
 import com.gymmate.dtos.UserSubscriptionAddDto;
@@ -136,4 +137,16 @@ public class AdminController {
 	public ResponseEntity<?> getAllReceptionist(){
 		return ResponseEntity.ok(receptionistService.getAllReceptionist());
 	}
+	@DeleteMapping("/receptionist/delete/{id}")
+	@Operation(description = "Delete a receptionist")
+	public ResponseEntity<?> deleteReceptionist(@PathVariable Long id){
+		return ResponseEntity.ok(receptionistService.deleteReceptionist(id));
+	}
+	
+	@PutMapping("/receptionist/update/{id}")
+	@Operation(description = "Update the receptionist")
+	public ResponseEntity<?> updateReceptionist(@RequestBody ReceptionistUpdateDto updatedto,@PathVariable Long id){
+		return ResponseEntity.ok(receptionistService.updateReceptionist(updatedto,id));
+	}
+	
 }

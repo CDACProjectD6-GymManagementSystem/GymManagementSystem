@@ -115,3 +115,32 @@ export const updateEquipment = async (id, updateDto) => {
     throw error;
   }
 };
+
+export const getAllReceptionists = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/receptionist`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching receptionists:", error);
+    throw error;
+  }
+};
+
+export const addReceptionist = async (receptionistData) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/receptionist`, receptionistData);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding receptionist:", error);
+    throw error;
+  }
+};
+
+export const deleteReceptionist = (id) => {
+  return axios.delete(`${API_BASE_URL}/receptionist/delete/${id}`);
+};
+
+export const updateReceptionist = (id, receptionistData) => {
+  const { id: _, ...dataWithoutId } = receptionistData;
+  return axios.put(`${API_BASE_URL}/receptionist/update/${id}`, dataWithoutId);
+};
