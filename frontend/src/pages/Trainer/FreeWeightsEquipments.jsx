@@ -2,14 +2,24 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
 
-const CardioEquipments = () => {
+const FreeWeightsEquipments = () => {
   const [equipments, setEquipments] = useState([]);
   const [filter, setFilter] = useState('All');
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/trainer/equipments/cardio`)
-      .then((res) => setEquipments(res.data))
-      .catch((err) => console.error('Error fetching cardio equipments:', err));
+    axios.get(`http://localhost:8080/trainer/equipments/freeweights`)
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setEquipments(res.data);
+        } else {
+          console.error('Unexpected response format:', res.data);
+          setEquipments([]);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching free weights equipments:', err);
+        setEquipments([]);
+      });
   }, []);
 
   const toggleMaintenance = (id, currentStatus) => {
@@ -21,7 +31,7 @@ const CardioEquipments = () => {
           )
         );
       })
-      .catch(err => console.error('Failed to update maintenance status:', err));
+      .catch((err) => console.error('Failed to update maintenance status:', err));
   };
 
   const uniqueCategories = ['All', ...new Set(equipments.map((e) => e.description))];
@@ -36,7 +46,7 @@ const CardioEquipments = () => {
       <TrainerNavbar />
       <div className="container mt-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h3>Cardio Equipments</h3>
+          <h3>Free Weights Equipments</h3>
           <select
             className="form-select w-auto"
             value={filter}
@@ -62,17 +72,11 @@ const CardioEquipments = () => {
                     <p className="card-text">
                       <strong>Category:</strong> {eq.description}
                     </p>
-                    <p
-                      className={`card-text ${
-                        eq.forMaintenance ? 'text-danger' : 'text-success'
-                      }`}
-                    >
-                      Status: {eq.forMaintenance ? 'Under Maintenance' : 'Active'}
+                    <p className={`card-text ${eq.forMaintenance ? 'text-danger' : 'text-success'}`}>
+                      <strong>Status:</strong> {eq.forMaintenance ? 'Under Maintenance' : 'Active'}
                     </p>
                     <button
-                      className={`btn ${
-                        eq.forMaintenance ? 'btn-success' : 'btn-warning'
-                      }`}
+                      className={`btn ${eq.forMaintenance ? 'btn-success' : 'btn-warning'}`}
                       onClick={() => toggleMaintenance(eq.id, eq.forMaintenance)}
                     >
                       {eq.forMaintenance ? 'Unmark Maintenance' : 'Mark as Maintenance'}
@@ -88,4 +92,4 @@ const CardioEquipments = () => {
   );
 };
 
-export default CardioEquipments;
+export default FreeWeightsEquipments;

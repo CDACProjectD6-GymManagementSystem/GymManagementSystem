@@ -1,42 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
 
-const initialEquipments = [
-  { id: 1, name: 'Leg Press Machine', category: 'Legs', isUnderMaintenance: false },
-  { id: 2, name: 'Chest Press Machine', category: 'Chest', isUnderMaintenance: true },
-  { id: 3, name: 'Squat Rack', category: 'Legs', isUnderMaintenance: false },
-  { id: 4, name: 'Lat Pulldown', category: 'Back', isUnderMaintenance: false },
-  { id: 5, name: 'Incline Bench Press', category: 'Chest', isUnderMaintenance: true },
-  { id: 6, name: 'Deadlift Platform', category: 'Back', isUnderMaintenance: false },
-  { id: 7, name: 'Shoulder Press Machine', category: 'Shoulders', isUnderMaintenance: false },
-  { id: 8, name: 'Lateral Raise Machine', category: 'Shoulders', isUnderMaintenance: false },
-  { id: 9, name: 'Seated Calf Raise', category: 'Calves', isUnderMaintenance: false },
-  { id: 10, name: 'Standing Calf Raise', category: 'Calves', isUnderMaintenance: true },
-  { id: 11, name: 'Dumbbell Rack', category: 'Dumbbell Rack', isUnderMaintenance: false },
-  { id: 12, name: 'Preacher Curl Bench', category: 'Arms', isUnderMaintenance: false },
-  { id: 13, name: 'Bicep Curl Machine', category: 'Arms', isUnderMaintenance: true },
-  { id: 14, name: 'Cable Crunch Station', category: 'Abs', isUnderMaintenance: false },
-  { id: 15, name: 'Decline Sit-Up Bench', category: 'Abs', isUnderMaintenance: false }
-];
-
-
 const StrengthEquipments = () => {
-  const [equipments, setEquipments] = useState(initialEquipments);
+  const [equipments, setEquipments] = useState([]);
   const [filter, setFilter] = useState('All');
 
-  const toggleMaintenance = (id) => {
-    setEquipments((prev) =>
-      prev.map((eq) =>
-        eq.id === id ? { ...eq, isUnderMaintenance: !eq.isUnderMaintenance } : eq
-      )
-    );
+  // Fetch from backend
+  useEffect(() => {
+    axios.get(`http://localhost:8080/trainer/equipments/strength`)
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setEquipments(res.data);
+        } else {
+          console.error('Unexpected response format:', res.data);
+          setEquipments([]);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching strength equipments:', err);
+        setEquipments([]);
+      });
+  }, []);
+
+  // Toggle maintenance
+  const toggleMaintenance = (id, currentStatus) => {
+    axios.put(`/api/equipments/${id}/maintenance`, { forMaintenance: !currentStatus })
+      .then(() => {
+        setEquipments((prev) =>
+          prev.map((eq) =>
+            eq.id === id ? { ...eq, forMaintenance: !currentStatus } : eq
+          )
+        );
+      })
+      .catch((err) => console.error('Failed to update maintenance status:', err));
   };
 
-  const filteredEquipments = filter === 'All'
-    ? equipments
-    : equipments.filter((eq) => eq.category === filter);
+  // Get unique subcategories from `description` field
+  const uniqueCategories = ['All', ...new Set(equipments.map((e) => e.description))];
 
-  const uniqueCategories = ['All', ...new Set(initialEquipments.map((e) => e.category))];
+  // Filter by subcategory (description)
+  const filteredEquipments =
+    filter === 'All'
+      ? equipments
+      : equipments.filter((eq) => eq.description === filter);
 
   return (
     <>
@@ -67,16 +74,16 @@ const StrengthEquipments = () => {
                   <div className="card-body">
                     <h5 className="card-title">{eq.name}</h5>
                     <p className="card-text">
-                      <strong>Category:</strong> {eq.category}
+                      <strong>Category:</strong> {eq.description}
                     </p>
-                    <p className={`card-text ${eq.isUnderMaintenance ? 'text-danger' : 'text-success'}`}>
-                      Status: {eq.isUnderMaintenance ? 'Under Maintenance' : 'Active'}
+                    <p className={`card-text ${eq.forMaintenance ? 'text-danger' : 'text-success'}`}>
+                      <strong>Status:</strong> {eq.forMaintenance ? 'Under Maintenance' : 'Active'}
                     </p>
                     <button
-                      className={`btn ${eq.isUnderMaintenance ? 'btn-success' : 'btn-warning'}`}
-                      onClick={() => toggleMaintenance(eq.id)}
+                      className={`btn ${eq.forMaintenance ? 'btn-success' : 'btn-warning'}`}
+                      onClick={() => toggleMaintenance(eq.id, eq.forMaintenance)}
                     >
-                      {eq.isUnderMaintenance ? 'Unmark Maintenance' : 'Mark as Maintenance'}
+                      {eq.forMaintenance ? 'Unmark Maintenance' : 'Mark as Maintenance'}
                     </button>
                   </div>
                 </div>

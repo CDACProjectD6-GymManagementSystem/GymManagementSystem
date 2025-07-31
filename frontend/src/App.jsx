@@ -21,19 +21,22 @@ import TrainerDashboard from "./pages/Trainer/TrainerDashboard";
 import AssignedUsers from "./pages/Trainer/AssignedUsers.jsx";
 import EquipmentsPage from "./pages/Trainer/EquipmentsPage.jsx";
 import StrengthEquipments from "./pages/Trainer/StrengthEquipments.jsx";
-import CardioEquipmentsEquipments from "./pages/Trainer/CardioEquipments.jsx";
+import CardioEquipments from "./pages/Trainer/CardioEquipments.jsx";
 import UserProfile from "./pages/Trainer/UserProfile.jsx";
 import DietPlanEditor from "./pages/Trainer/DietPlanEditor.jsx";
 import UserSchedule from "./pages/Trainer/UserSchedule.jsx";
-
+import FlexibilityEquipments from "./pages/Trainer/FlexibiltyEquipments.jsx";
+import FreeWeightsEquipments from "./pages/Trainer/FreeWeightsEquipments.jsx";
+import ResistanceMachinesEquipments from "./pages/Trainer/ResistanceMachinesEquipments.jsx";
 
 // Other dashboards & utility pages
 
 import ReceptionistDashboard from "./pages/Receptionist/ReceptionistDashboard";
 import Trainers from "./pages/Trainer/Trainer";
 import PaymentPage from './pages/Payment/PaymentPage';
-import CardioEquipments from "./pages/Trainer/CardioEquipments.jsx";
 
+
+ 
 // These are the only routes/pages handled at top-level (all else is modular inside User or Admin)
 const authPages = ["/login", "/register"];
 
@@ -72,7 +75,10 @@ function AppContent() {
         <Route path="/trainer/users" element={<AssignedUsers />} />
         <Route path="/trainer/equipments" element={<EquipmentsPage />} />
         <Route path="/trainer/equipments/strength" element={<StrengthEquipments />} />
-        <Route path="/trainer/equipments/cardio" element={<CardioEquipmentsEquipments />} />
+        <Route path="/trainer/equipments/cardio" element={<CardioEquipments />} />
+        <Route path="/trainer/equipments/flexibility" element={<FlexibilityEquipments />} />
+        <Route path="/trainer/equipments/free_weights" element={<FreeWeightsEquipments />} />
+        <Route path="/trainer/equipments/resistance_machines" element={<ResistanceMachinesEquipments/>}/>
         <Route path="/trainer/user/:userId" element={<UserProfile />} />
         <Route path="/trainer/user/:userId/diet" element={<DietPlanEditor />} />
         <Route path="/trainer/user/:userId/schedule" element={<UserSchedule />} />

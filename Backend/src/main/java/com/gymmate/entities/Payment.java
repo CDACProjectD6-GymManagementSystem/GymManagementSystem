@@ -41,7 +41,7 @@ public class Payment extends SuperBaseEntity {
 	public Payment(String paymentId, String razorPayOrderId, double amount, Status status) {
 		super();
 		this.paymentId = paymentId;
-		RazorPayOrderId = razorPayOrderId;
+		this.RazorPayOrderId = razorPayOrderId;
 		this.amount = amount;
 		this.status = status;
 	}

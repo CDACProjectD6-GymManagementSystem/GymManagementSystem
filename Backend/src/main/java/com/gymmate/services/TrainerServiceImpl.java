@@ -102,29 +102,19 @@ public class TrainerServiceImpl implements TrainerService {
 
 	    if (existingDiet == null) {
 	
-	        Diet newDiet = new Diet();
-	        newDiet.setBreakfast(dto.getDiet().getBreakfast());
-	        newDiet.setLunch(dto.getDiet().getLunch());
-	        newDiet.setDinner(dto.getDiet().getDinner());
-	        newDiet.setMidSnack(dto.getDiet().getMidSnack());
+	        Diet newDiet = modelMapper.map(dto.getDiet(), Diet.class);
 	        newDiet.setUpdatedTime(LocalDateTime.now());
 
-
 	        dietDao.save(newDiet);
-
-
 	        entity.setDiet(newDiet);
 	    } else {
 
-	        existingDiet.setBreakfast(dto.getDiet().getBreakfast());
-	        existingDiet.setLunch(dto.getDiet().getLunch());
-	        existingDiet.setDinner(dto.getDiet().getDinner());
-	        existingDiet.setMidSnack(dto.getDiet().getMidSnack());
+	        modelMapper.map(dto.getDiet(), existingDiet);
 	        existingDiet.setUpdatedTime(LocalDateTime.now());
-
 
 	        dietDao.save(existingDiet);
 	    }
+
 
 	    userDao.save(entity);
 
@@ -146,53 +136,29 @@ public class TrainerServiceImpl implements TrainerService {
 	
 	@Override
 	public ApiResponse updateUserSchedule(Long userId, UserScheduleDTO dto) {
-	    // Fetch the user
+
 	    UserEntity entity = userDao.findById(userId)
 	        .orElseThrow(() -> new ResourceAccessException("User is not present"));
 
-	    // Check if a schedule already exists
 	    Schedule existingSchedule = entity.getSchedule();
 
 	    if (existingSchedule == null) {
-	        // Create new schedule and set fields
-	        Schedule newSchedule = new Schedule();
-	        newSchedule.setMonday(dto.getSchedule().getMonday());
-	        newSchedule.setTuesday(dto.getSchedule().getTuesday());
-	        newSchedule.setWednesday(dto.getSchedule().getWednesday());
-	        newSchedule.setThursday(dto.getSchedule().getThursday());
-	        newSchedule.setFriday(dto.getSchedule().getFriday());
-	        newSchedule.setSaturday(dto.getSchedule().getSaturday());
-	        newSchedule.setSunday(dto.getSchedule().getSunday());
+	        Schedule newSchedule = modelMapper.map(dto.getSchedule(), Schedule.class);
 	        newSchedule.setUpdatedTime(LocalDateTime.now());
 
-	        // Save schedule separately
 	        scheduleDao.save(newSchedule);
-
-	        // Set schedule for user
 	        entity.setSchedule(newSchedule);
 	    } else {
-	        // Update existing schedule fields
-	        existingSchedule.setMonday(dto.getSchedule().getMonday());
-	        existingSchedule.setTuesday(dto.getSchedule().getTuesday());
-	        existingSchedule.setWednesday(dto.getSchedule().getWednesday());
-	        existingSchedule.setThursday(dto.getSchedule().getThursday());
-	        existingSchedule.setFriday(dto.getSchedule().getFriday());
-	        existingSchedule.setSaturday(dto.getSchedule().getSaturday());
-	        existingSchedule.setSunday(dto.getSchedule().getSunday());
+	        modelMapper.map(dto.getSchedule(), existingSchedule);
 	        existingSchedule.setUpdatedTime(LocalDateTime.now());
 
-	        // Save updated schedule
 	        scheduleDao.save(existingSchedule);
 	    }
 
-	    // Save user with schedule
 	    userDao.save(entity);
 
 	    return new ApiResponse("Updated user schedule");
 	}
 
-	
-
-	
-	
+		
 }

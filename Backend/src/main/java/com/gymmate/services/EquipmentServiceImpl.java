@@ -1,5 +1,6 @@
 package com.gymmate.services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.EquipmentDao;
 import com.gymmate.dtos.ApiResponse;
+import com.gymmate.dtos.EquipmentCategoryDTO;
 import com.gymmate.dtos.EquipmentRequestDto;
 import com.gymmate.dtos.EquipmentRespDto;
 import com.gymmate.entities.Equipment;
@@ -63,10 +65,55 @@ public class EquipmentServiceImpl implements EquipmentService {
 	
 	
 	
+	
 	@Override
-	public List<Category> getEquipmentCategories() {
-		// TODO Auto-generated method stub
-		return Arrays.asList(Category.values());
+	public List<EquipmentCategoryDTO> getEquipmentCategories() {
+	    List<EquipmentCategoryDTO> result = new ArrayList<>();
+
+	    for (Equipment.Category category : Equipment.Category.values()) {
+	        long active = equipmentDao.countByCategoryAndForMaintenance(category, false);
+	        long maintenance = equipmentDao.countByCategoryAndForMaintenance(category, true);
+
+	        result.add(new EquipmentCategoryDTO(category.name(), active, maintenance));
+	    }
+
+	    return result;
 	}
+
+	
+
+	@Override
+	public List<Equipment> getCardioEquipments() {
+	    return equipmentDao.findByCategory(Equipment.Category.CARDIO);
+	}
+
+
+	@Override
+	public List<Equipment> getStrengthEquipments() {
+		// TODO Auto-generated method stub
+		return equipmentDao.findByCategory(Equipment.Category.STRENGTH);
+	}
+
+
+	@Override
+	public List<Equipment> getFlexibiltyEquipments() {
+		// TODO Auto-generated method stub
+		return equipmentDao.findByCategory(Equipment.Category.FLEXIBILITY);
+	}
+
+
+	@Override
+	public List<Equipment> FreeWeightEquipments() {
+		// TODO Auto-generated method stub
+		return equipmentDao.findByCategory(Equipment.Category.FREE_WEIGHTS);
+	}
+
+
+	@Override
+	public List<Equipment> getResistanceEquipments() {
+		// TODO Auto-generated method stub
+		return equipmentDao.findByCategory(Equipment.Category.RESISTANCE_MACHINES);
+	}
+
 
 }

@@ -1,27 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
-import '../../styles/EquipmentsPage.css'; // optional: custom styling file
+import '../../styles/EquipmentsPage.css';
 
-const categories = [
-  {
-    title: 'Cardio Equipment',
-    image: '/images/Cardio.png',
-    route: 'cardio',
-    activeCount: 10,
-    maintenanceCount: 2
-  },
-  {
-    title: 'Strength Equipment',
-    image: '/images/Strength.png',
-    route: 'strength',
-    activeCount: 8,
-    maintenanceCount: 1
-  }
-];
+// Map category enum to images
+const categoryImages = {
+  CARDIO: '/images/Cardio.png',
+  STRENGTH: '/images/Strength.png',
+  FLEXIBILITY: '/images/Flexibility.png',
+  FREE_WEIGHTS: '/images/FreeWeights.png',
+  RESISTANCE_MACHINES: '/images/ResistanceMachines.png'
+};
 
 const EquipmentsPage = () => {
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get(`http://localhost:8080/trainer/equipments`)
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch equipment categories:', error);
+      });
+  }, []);
 
   return (
     <>
@@ -33,12 +37,12 @@ const EquipmentsPage = () => {
             <div className="col-md-4 mb-4" key={idx}>
               <div className="card h-100 shadow text-center">
                 <img
-                  src={cat.image}
+                  src={categoryImages[cat.category] || '/images/default.png'}
                   className="card-img-top equipment-image"
-                  alt={cat.title}
+                  alt={cat.category}
                 />
                 <div className="card-body">
-                  <h5 className="card-title">{cat.title}</h5>
+                  <h5 className="card-title">{cat.category.replace('_', ' ')} Equipment</h5>
                   <p className="card-text mb-1">
                     <strong>Active:</strong> {cat.activeCount}
                   </p>
@@ -47,7 +51,7 @@ const EquipmentsPage = () => {
                   </p>
                   <button
                     className="btn btn-primary mt-2"
-                    onClick={() => navigate(`/trainer/equipments/${cat.route}`)}
+                    onClick={() => navigate(`/trainer/equipments/${cat.category.toLowerCase()}`)}
                   >
                     View Details
                   </button>

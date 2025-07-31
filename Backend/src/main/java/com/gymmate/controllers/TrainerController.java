@@ -1,9 +1,10 @@
 package com.gymmate.controllers;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,12 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gymmate.dtos.EquipmentCategoryDTO;
 import com.gymmate.dtos.TrainerDTO;
 import com.gymmate.dtos.UserDietDTO;
 import com.gymmate.dtos.UserScheduleDTO;
+import com.gymmate.entities.Equipment;
 import com.gymmate.services.EquipmentService;
 import com.gymmate.services.TrainerService;
-import com.gymmate.services.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
@@ -101,11 +103,42 @@ public class TrainerController {
 	
 	
 	@GetMapping("/equipments")
-	@Operation(description = "Get equipment category")
-	public ResponseEntity<?> getEquipmentsCategory(){
-		return ResponseEntity.ok(equipmentService.getEquipmentCategories());
+	@Operation(description = "Get equipment category counts")
+	public ResponseEntity<List<EquipmentCategoryDTO>> getEquipmentsCategory() {
+	    return ResponseEntity.ok(equipmentService.getEquipmentCategories());
+	}
+	
+	@GetMapping("/equipments/cardio")
+	@Operation(description = "Get cardio equipments")
+	public ResponseEntity<List<Equipment>> getCardioEquipments(){
+		return ResponseEntity.ok(equipmentService.getCardioEquipments());
+	}
+		
+	@GetMapping("/equipments/strength")
+	@Operation(description = "Get strength equipments")
+	public ResponseEntity<List<Equipment>> getStrengthEquipments(){
+		return ResponseEntity.ok(equipmentService.getStrengthEquipments());
+	}
+	
+	@GetMapping("/equipments/flexibilty")
+	@Operation(description = "Get flexibilty equipments")
+	public ResponseEntity<List<Equipment>> getFlexibiltyEquipments(){
+		return ResponseEntity.ok(equipmentService.getFlexibiltyEquipments());
+	}
+	
+	@GetMapping("/equipments/freeweights")
+	@Operation(description = "Get freeweights equipments")
+	public ResponseEntity<List<Equipment>> getFreeWeightEquipments(){
+		return ResponseEntity.ok(equipmentService.FreeWeightEquipments());
 	}
 
+	
+	@GetMapping("/equipments/resistancemachines")
+	@Operation(description = "Get cardio equipments")
+	public ResponseEntity<List<Equipment>> getResistanceEquipments(){
+		return ResponseEntity.ok(equipmentService.getResistanceEquipments());
+	}
+	
 	
 	
 
