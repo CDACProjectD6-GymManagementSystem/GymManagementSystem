@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
+import com.gymmate.customexception.NonUniqueElementException;
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.DietDao;
 import com.gymmate.daos.ScheduleDao;
@@ -15,6 +16,9 @@ import com.gymmate.daos.TrainerDao;
 import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.TrainerDTO;
+import com.gymmate.dtos.TrainerRequestDto;
+import com.gymmate.dtos.TrainerRespDto;
+import com.gymmate.dtos.TrainerUpdateDto;
 import com.gymmate.dtos.UserDietDTO;
 import com.gymmate.dtos.UserForTrainerDTO;
 import com.gymmate.dtos.UserScheduleDTO;
@@ -158,6 +162,41 @@ public class TrainerServiceImpl implements TrainerService {
 	    userDao.save(entity);
 
 	    return new ApiResponse("Updated user schedule");
+	}
+
+	@Override
+	public ApiResponse addTrainer(TrainerRequestDto addDto) {
+		if(trainerDao.existsByEmail(addDto.getEmail()))
+			throw new NonUniqueElementException("Trainer already exists");
+		
+		Trainer entity = modelMapper.map(addDto, Trainer.class);
+		trainerDao.save(entity);
+		return new ApiResponse("Trainer Added Successfully");
+	}
+
+	@Override
+	public List<TrainerRespDto> getAllTrainers() {
+		
+		return trainerDao.findAll().stream()
+				.map(t->modelMapper.map(t, TrainerRespDto.class)).toList();
+	}
+
+	@Override
+	public ApiResponse deleteTrainer(Long id) {
+		Trainer entity = trainerDao.findById(id)
+		.orElseThrow(()->new ResourceNotFoundException("Trainer not found"));
+		trainerDao.delete(entity);
+		return new ApiResponse("Trainer Deleted Successfully");
+	}
+
+	@Override
+	public ApiResponse updateTrainer(Long id, TrainerUpdateDto updateDto) {
+		Trainer entity = trainerDao.findById(id)
+		.orElseThrow(()->new ResourceNotFoundException("Trainer not found"));
+		
+		modelMapper.map(updateDto, entity);
+		trainerDao.save(entity);
+		return new ApiResponse("Trainer Updated");
 	}
 
 		
