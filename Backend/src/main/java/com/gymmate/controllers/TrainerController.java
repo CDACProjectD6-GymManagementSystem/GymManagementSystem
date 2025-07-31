@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gymmate.dtos.TrainerDTO;
 import com.gymmate.dtos.UserDietDTO;
 import com.gymmate.dtos.UserScheduleDTO;
+import com.gymmate.services.EquipmentService;
 import com.gymmate.services.TrainerService;
 import com.gymmate.services.UserService;
 
@@ -26,6 +27,7 @@ import lombok.AllArgsConstructor;
 @CrossOrigin(origins = "*")
 public class TrainerController {
 	private final TrainerService trainerService;
+	private final EquipmentService equipmentService;
 	
 	
 	@GetMapping("/profile/{trainerId}")
@@ -92,11 +94,17 @@ public class TrainerController {
 	
 	
 	@PostMapping("/user/{userId}/schedule")
-	@Operation(description = "Update user diet")
+	@Operation(description = "Update user schedule")
 	public ResponseEntity<?> updateUserSchedule(@PathVariable Long userId, @RequestBody UserScheduleDTO dto){
 		return ResponseEntity.ok(trainerService.updateUserSchedule(userId, dto));
 	}
 	
+	
+	@GetMapping("/equipments")
+	@Operation(description = "Get equipment category")
+	public ResponseEntity<?> getEquipmentsCategory(){
+		return ResponseEntity.ok(equipmentService.getEquipmentCategories());
+	}
 
 	
 	
