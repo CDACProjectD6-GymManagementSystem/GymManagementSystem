@@ -7,15 +7,21 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gymmate.customexception.NonUniqueElementException;
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.AdminDao;
+import com.gymmate.daos.ReceptionistDao;
 import com.gymmate.daos.TrainerDao;
 import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.ApiResponse;
+import com.gymmate.dtos.ReceptionistRequestDto;
+import com.gymmate.dtos.ReceptionistRespDto;
+import com.gymmate.dtos.ReceptionistUpdateDto;
 import com.gymmate.dtos.TrainerAssignmentDTO;
 import com.gymmate.dtos.TrainerNameForReceptionistDTO;
 import com.gymmate.dtos.UserNameForReceptonistDTO;
 import com.gymmate.dtos.UserTrainerNameDTO;
+import com.gymmate.entities.Receptionist;
 import com.gymmate.entities.Trainer;
 import com.gymmate.entities.UserEntity;
 
@@ -32,6 +38,10 @@ public class ReceptionistServiceImpl implements ReceptionistService {
 	private TrainerDao trainerDao;
 	@Autowired
 	private ModelMapper mapper;
+	
+	@Autowired
+	private ReceptionistDao receptionistDao;
+	
 	UserTrainerNameDTO userTrainerNameDTO = new UserTrainerNameDTO();
 
 	ReceptionistServiceImpl(AdminDao adminDao) {
@@ -61,5 +71,41 @@ public class ReceptionistServiceImpl implements ReceptionistService {
 		userDao.save(userEnt);
 		return new ApiResponse("Trainer Assigned Successfully");
 	}
+
+	@Override
+	public ApiResponse addReceptionist(ReceptionistRequestDto addDto) {
+		if(receptionistDao.existsByEmail(addDto.getEmail()))
+			throw new NonUniqueElementException("Email already Exist");
+		Receptionist entity = mapper.map(addDto, Receptionist.class);
+		receptionistDao.save(entity);
+		return new ApiResponse("Receptionist added successfully");
+	}
+
+	@Override
+	public List<ReceptionistRespDto> getAllReceptionist() {
+		
+		return receptionistDao.findAll()
+							.stream()
+							.map(en->mapper.map(en,ReceptionistRespDto.class)).toList();
+	}
+
+	@Override
+	public ApiResponse deleteReceptionist(Long id) {
+		Receptionist entity = receptionistDao.findById(id)
+						.orElseThrow(()-> new ResourceNotFoundException("Receptionist Not found"));
+		receptionistDao.delete(entity);
+		return new ApiResponse("Receptionist Deleted");
+	}
+
+	@Override
+	public ApiResponse updateReceptionist(ReceptionistUpdateDto updatedto, Long id) {
+		Receptionist entity = receptionistDao.findById(id)
+				.orElseThrow(()-> new ResourceNotFoundException("Receptionist Not found"));
+		mapper.map(updatedto, entity);
+		
+		return new ApiResponse("Receptionist Updated Successfully");
+	}
+
+	
 
 }

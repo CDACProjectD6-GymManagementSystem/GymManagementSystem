@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gymmate.dtos.EquipmentRequestDto;
+import com.gymmate.dtos.ReceptionistRequestDto;
+import com.gymmate.dtos.ReceptionistUpdateDto;
 import com.gymmate.dtos.SubscriptionRequestDTO;
 import com.gymmate.dtos.SubscriptionRespDto;
 import com.gymmate.dtos.UserSubscriptionAddDto;
@@ -22,6 +24,7 @@ import com.gymmate.dtos.UserSubscriptionUpdateDto;
 import com.gymmate.entities.UserEntity;
 import com.gymmate.services.AdminService;
 import com.gymmate.services.EquipmentService;
+import com.gymmate.services.ReceptionistService;
 import com.gymmate.services.SubscriptionService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +38,7 @@ public class AdminController {
 	private final AdminService adminService;
 	private final SubscriptionService subscriptionService;
 	private final EquipmentService equipmentService;
+	private final ReceptionistService receptionistService;
 	
 	@PostMapping("/add-user")
 	@Operation(description = "Add a User by Admin")
@@ -121,4 +125,28 @@ public class AdminController {
 	public ResponseEntity<?> updateEquipment(@RequestBody EquipmentRequestDto updateDto,@PathVariable Long id){
 		return ResponseEntity.ok(equipmentService.updateEquipment(updateDto,id));
 	}
+	
+	@PostMapping("/receptionist")
+	@Operation(description = "Add a receptionist")
+	public ResponseEntity<?> addReceptionist(@RequestBody ReceptionistRequestDto addDto){
+		return ResponseEntity.ok(receptionistService.addReceptionist(addDto));
+	}
+	
+	@GetMapping("/receptionist")
+	@Operation(description = "Get all receptionists")
+	public ResponseEntity<?> getAllReceptionist(){
+		return ResponseEntity.ok(receptionistService.getAllReceptionist());
+	}
+	@DeleteMapping("/receptionist/delete/{id}")
+	@Operation(description = "Delete a receptionist")
+	public ResponseEntity<?> deleteReceptionist(@PathVariable Long id){
+		return ResponseEntity.ok(receptionistService.deleteReceptionist(id));
+	}
+	
+	@PutMapping("/receptionist/update/{id}")
+	@Operation(description = "Update the receptionist")
+	public ResponseEntity<?> updateReceptionist(@RequestBody ReceptionistUpdateDto updatedto,@PathVariable Long id){
+		return ResponseEntity.ok(receptionistService.updateReceptionist(updatedto,id));
+	}
+	
 }
