@@ -19,6 +19,8 @@ import com.gymmate.dtos.ReceptionistRequestDto;
 import com.gymmate.dtos.ReceptionistUpdateDto;
 import com.gymmate.dtos.SubscriptionRequestDTO;
 import com.gymmate.dtos.SubscriptionRespDto;
+import com.gymmate.dtos.TrainerRequestDto;
+import com.gymmate.dtos.TrainerUpdateDto;
 import com.gymmate.dtos.UserSubscriptionAddDto;
 import com.gymmate.dtos.UserSubscriptionUpdateDto;
 import com.gymmate.entities.UserEntity;
@@ -26,6 +28,7 @@ import com.gymmate.services.AdminService;
 import com.gymmate.services.EquipmentService;
 import com.gymmate.services.ReceptionistService;
 import com.gymmate.services.SubscriptionService;
+import com.gymmate.services.TrainerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
@@ -39,6 +42,7 @@ public class AdminController {
 	private final SubscriptionService subscriptionService;
 	private final EquipmentService equipmentService;
 	private final ReceptionistService receptionistService;
+	private final TrainerService trainerService;
 	
 	@PostMapping("/add-user")
 	@Operation(description = "Add a User by Admin")
@@ -149,4 +153,27 @@ public class AdminController {
 		return ResponseEntity.ok(receptionistService.updateReceptionist(updatedto,id));
 	}
 	
+	@PostMapping("/trainer")
+	@Operation(description="Add a trainer")
+	public ResponseEntity<?> addTrainer(@RequestBody TrainerRequestDto addDto){
+		return ResponseEntity.status(HttpStatus.CREATED).body(trainerService.addTrainer(addDto));
+	}
+	
+	@GetMapping("/trainer")
+	@Operation(description = "Get all trainers")
+	public ResponseEntity<?> getAllTrainers(){
+		return ResponseEntity.ok(trainerService.getAllTrainers());
+	}
+	
+	@DeleteMapping("/trainer/delete/{id}")
+	@Operation(description = "Delete a trainer")
+	public ResponseEntity<?> deleteTrainer(@PathVariable Long id){
+		return ResponseEntity.ok(trainerService.deleteTrainer(id));
+	}
+	
+	@PutMapping("/trainer/update/{id}")
+	@Operation(description = "Update Trainer")
+	public ResponseEntity<?> updateTrainer(@PathVariable Long id,@RequestBody TrainerUpdateDto updateDto){
+		return ResponseEntity.ok(trainerService.updateTrainer(id,updateDto));
+	}
 }

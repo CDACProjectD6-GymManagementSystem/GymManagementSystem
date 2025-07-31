@@ -5,7 +5,12 @@ import {
   addReceptionist,
   updateReceptionist,
   deleteReceptionist,
+  addTrainer,
+  getAllTrainers,
+  deleteTrainer,
+  updateTrainer,
 } from "../../services/AdminService";
+
 const Input = ({ label, ...props }) => (
   <label>
     {label} :
@@ -18,6 +23,7 @@ const StaffSection = () => {
   const [trainers, setTrainers] = useState([]);
   const [receps, setReceps] = useState([]);
   const [loadingReceps, setLoadingReceps] = useState(false);
+  const [loadingTrainers, setLoadingTrainers] = useState(false);
   const [form, setForm] = useState({
     id: null,
     firstName: "",
@@ -25,7 +31,7 @@ const StaffSection = () => {
     email: "",
     mobile: "",
     expertise: "",
-    certification: "",
+    certifications: "",
     salary: "",
     address: "",
     password: "",
@@ -33,57 +39,58 @@ const StaffSection = () => {
   });
   const [editing, setEditing] = useState(null);
 
-  const staffFields =
-    type === "trainer"
-      ? [
-          { name: "firstName", label: "First Name" },
-          { name: "lastName", label: "Last Name" },
-          { name: "email", label: "Email", type: "email" },
-          { name: "mobile", label: "Mobile" },
-          { name: "expertise", label: "Expertise" },
-          { name: "certification", label: "Certification" },
-          { name: "salary", label: "Salary" },
-          { name: "address", label: "Address" },
-          { name: "password", label: "Password", type: "password" },
-        ]
-      : [
-          { name: "firstName", label: "First Name" },
-          { name: "lastName", label: "Last Name" },
-          { name: "email", label: "Email", type: "email" },
-          { name: "mobile", label: "Mobile" },
-          { name: "salary", label: "Salary" },
-          { name: "address", label: "Address" },
-          { name: "password", label: "Password", type: "password" },
-        ];
+  const staffFields = type === "trainer"
+    ? [
+        { name: "firstName", label: "First Name" },
+        { name: "lastName", label: "Last Name" },
+        { name: "email", label: "Email", type: "email" },
+        { name: "mobile", label: "Mobile" },
+        { name: "expertise", label: "Expertise" },
+        { name: "certifications", label: "Certifications" },
+        { name: "salary", label: "Salary" },
+        { name: "address", label: "Address" },
+        { name: "password", label: "Password", type: "password" },
+      ]
+    : [
+        { name: "firstName", label: "First Name" },
+        { name: "lastName", label: "Last Name" },
+        { name: "email", label: "Email", type: "email" },
+        { name: "mobile", label: "Mobile" },
+        { name: "salary", label: "Salary" },
+        { name: "address", label: "Address" },
+        { name: "password", label: "Password", type: "password" },
+      ];
 
   const staffList = type === "trainer" ? trainers : receps;
   const setStaffList = type === "trainer" ? setTrainers : setReceps;
 
+  // Fetch data on type change
   useEffect(() => {
     if (type === "recep") {
       setLoadingReceps(true);
       getAllReceptionists()
-        .then((data) => {
-          setReceps(data || []);
-        })
-        .catch((err) => {
-          console.error("Failed to load receptionists:", err);
-          setReceps([]);
-        })
+        .then(setReceps)
+        .catch(() => setReceps([]))
         .finally(() => setLoadingReceps(false));
+    } else {
+      setLoadingTrainers(true);
+      getAllTrainers()
+        .then(setTrainers)
+        .catch(() => setTrainers([]))
+        .finally(() => setLoadingTrainers(false));
     }
   }, [type]);
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleGenderChange = (e) => {
-    setForm({ ...form, gender: e.target.value });
+    setForm(prev => ({ ...prev, gender: e.target.value }));
   };
 
-  const resetForm = () =>
+  const resetForm = () => {
     setForm({
       id: null,
       firstName: "",
@@ -91,28 +98,31 @@ const StaffSection = () => {
       email: "",
       mobile: "",
       expertise: "",
-      certification: "",
+      certifications: "",
       salary: "",
       address: "",
       password: "",
       gender: "MALE",
     });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const entry = { ...form };
 
     if (type === "recep") {
+      // Remove trainer-only fields
       delete entry.expertise;
-      delete entry.certification;
+      delete entry.certifications;
 
-      if (!entry.password || entry.password.trim() === "") {
+      // Exclude password if blank on update
+      if (editing !== null && (!entry.password || entry.password.trim() === "")) {
         delete entry.password;
-      } else if (!entry.id) {
-        if (!entry.password) {
-          alert("Password must be provided for new receptionist.");
-          return;
-        }
+      }
+      // Require password on add
+      if (!entry.id && (!entry.password || entry.password.trim() === "")) {
+        alert("Password is required for new receptionist.");
+        return;
       }
 
       try {
@@ -121,32 +131,54 @@ const StaffSection = () => {
         } else {
           await updateReceptionist(entry.id, entry);
         }
-
         setLoadingReceps(true);
         const updatedReceps = await getAllReceptionists();
-        setReceps(updatedReceps || []);
+        setReceps(updatedReceps);
         setEditing(null);
         resetForm();
-      } catch (error) {
-        alert("Error saving receptionist. See console for details.");
-        console.error(error);
+      } catch (err) {
+        alert("Error saving receptionist");
+        console.error(err);
       } finally {
         setLoadingReceps(false);
       }
     } else {
-      if (editing !== null) {
-        setStaffList(staffList.map((x, i) => (i === editing ? entry : x)));
-        setEditing(null);
-      } else {
-        setStaffList([...staffList, entry]);
+      // Trainer add/update
+      // Exclude password if blank on update
+      if (editing !== null && (!entry.password || entry.password.trim() === "")) {
+        delete entry.password;
       }
-      resetForm();
+      // Require password on add
+      if (!entry.id && (!entry.password || entry.password.trim() === "")) {
+        alert("Password is required for new trainer.");
+        return;
+      }
+      try {
+        if (!entry.id) {
+          await addTrainer(entry);
+          setLoadingTrainers(true);
+          const updatedTrainers = await getAllTrainers();
+          setTrainers(updatedTrainers);
+          setLoadingTrainers(false);
+        } else {
+          await updateTrainer(entry.id, entry);
+          setLoadingTrainers(true);
+          const updatedTrainers = await getAllTrainers();
+          setTrainers(updatedTrainers);
+          setLoadingTrainers(false);
+        }
+        setEditing(null);
+        resetForm();
+      } catch (err) {
+        alert("Error saving trainer");
+        console.error(err);
+      }
     }
   };
 
   const handleEdit = (i) => {
-    setEditing(i);
     const staff = staffList[i];
+    setEditing(i);
     setForm({
       id: staff.id || null,
       firstName: staff.firstName || "",
@@ -154,10 +186,10 @@ const StaffSection = () => {
       email: staff.email || "",
       mobile: staff.mobile || "",
       expertise: staff.expertise || "",
-      certification: staff.certification || "",
+      certifications: staff.certifications || "",
       salary: staff.salary || "",
       address: staff.address || "",
-      password: "", 
+      password: "", // always blank on edit for security
       gender: staff.gender || "MALE",
     });
   };
@@ -167,30 +199,42 @@ const StaffSection = () => {
 
     if (type === "recep") {
       if (!staff.id) {
-        alert("Receptionist ID missing, cannot delete.");
+        alert("Receptionist ID missing");
         return;
       }
-
-      if (!window.confirm("Are you sure you want to delete this receptionist?")) {
-        return;
-      }
+      if (!window.confirm("Are you sure you want to delete this receptionist?")) return;
 
       try {
         await deleteReceptionist(staff.id);
-        setReceps(receps.filter((_, idx) => idx !== i));
+        setReceps(prev => prev.filter((_, idx) => idx !== i));
         if (editing === i) {
           setEditing(null);
           resetForm();
         }
-      } catch (error) {
-        alert("Error deleting receptionist. See console for details.");
-        console.error(error);
+      } catch (err) {
+        alert("Error deleting receptionist");
+        console.error(err);
       }
     } else {
-      setStaffList(staffList.filter((_, idx) => idx !== i));
-      if (editing === i) {
-        setEditing(null);
-        resetForm();
+      if (!staff.id) {
+        alert("Trainer ID missing");
+        return;
+      }
+      if (!window.confirm("Are you sure you want to delete this trainer?")) return;
+
+      try {
+        await deleteTrainer(staff.id);
+        setLoadingTrainers(true);
+        const updatedTrainers = await getAllTrainers();
+        setTrainers(updatedTrainers);
+        setLoadingTrainers(false);
+        if (editing === i) {
+          setEditing(null);
+          resetForm();
+        }
+      } catch (err) {
+        alert("Error deleting trainer");
+        console.error(err);
       }
     }
   };
@@ -205,7 +249,7 @@ const StaffSection = () => {
         <select
           className="admin-select"
           value={type}
-          onChange={(e) => {
+          onChange={e => {
             setType(e.target.value);
             setEditing(null);
             resetForm();
@@ -217,56 +261,57 @@ const StaffSection = () => {
       </label>
 
       {type === "recep" && loadingReceps && <p>Loading receptionists...</p>}
+      {type === "trainer" && loadingTrainers && <p>Loading trainers...</p>}
 
       <form className="admin-form" onSubmit={handleSubmit}>
-        {staffFields.map((field) =>
-          field.name !== "gender" ? (
-            <Input
-              key={field.name}
-              name={field.name}
-              label={field.label}
-              type={field.type || "text"}
-              value={form[field.name] || ""}
-              onChange={handleFieldChange}
-              required={
-                field.name === "password"
-                  ? type === "recep" && editing === null 
-                  : true
-              }
-            />
-          ) : null
+        {staffFields.map(
+          (field) =>
+            field.name !== "gender" && (
+              <Input
+                key={field.name}
+                name={field.name}
+                label={field.label}
+                type={field.type || "text"}
+                value={form[field.name] || ""}
+                onChange={handleFieldChange}
+                required={
+                  field.name === "password"
+                    ? type === "recep" && editing === null
+                    : true
+                }
+              />
+            )
         )}
 
         <label>Gender:</label>
-        <div
-          onChange={handleGenderChange}
-          className="gender-radio-group"
-          style={{ marginBottom: "1em" }}
-        >
+        <div className="gender-radio-group" style={{ marginBottom: "1em" }}>
           <label>
             <input
               type="radio"
               name="gender"
               value="MALE"
               checked={form.gender === "MALE"}
+              onChange={handleGenderChange}
             />{" "}
             Male
           </label>
-          <label style={{ marginLeft: "1em" }}>
+          <label style={{ marginLeft: "1rem" }}>
             <input
               type="radio"
               name="gender"
               value="FEMALE"
               checked={form.gender === "FEMALE"}
+              onChange={handleGenderChange}
             />{" "}
             Female
           </label>
-          <label style={{ marginLeft: "1em" }}>
+          <label style={{ marginLeft: "1rem" }}>
             <input
               type="radio"
               name="gender"
               value="OTHER"
               checked={form.gender === "OTHER"}
+              onChange={handleGenderChange}
             />{" "}
             Other
           </label>
@@ -289,7 +334,7 @@ const StaffSection = () => {
         )}
       </form>
 
-      <table className="admin-table">
+      <table className="admin-table" style={{ marginTop: "1rem" }}>
         <thead>
           <tr>
             <th>First Name</th>
@@ -297,7 +342,7 @@ const StaffSection = () => {
             <th>Email</th>
             <th>Mobile</th>
             {type === "trainer" && <th>Expertise</th>}
-            {type === "trainer" && <th>Certification</th>}
+            {type === "trainer" && <th>Certifications</th>}
             <th>Salary</th>
             <th>Address</th>
             <th>Gender</th>
@@ -305,36 +350,37 @@ const StaffSection = () => {
           </tr>
         </thead>
         <tbody>
-          {staffList.map((s, i) => (
-            <tr key={s.id || i}>
-              <td>{s.firstName}</td>
-              <td>{s.lastName}</td>
-              <td>{s.email}</td>
-              <td>{s.mobile}</td>
-              {type === "trainer" && <td>{s.expertise}</td>}
-              {type === "trainer" && <td>{s.certification}</td>}
-              <td>{s.salary}</td>
-              <td>{s.address}</td>
-              <td>{s.gender}</td>
-              <td>
-                <button className="admin-btn" onClick={() => handleEdit(i)}>
-                  Edit
-                </button>
-                <button
-                  className="admin-btn delete"
-                  onClick={() => handleDelete(i)}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-          {staffList.length === 0 && (
+          {staffList.length === 0 ? (
             <tr className="no-data-row">
               <td colSpan={type === "trainer" ? 9 : 7}>
                 No {staffTitle.toLowerCase()}s found.
               </td>
             </tr>
+          ) : (
+            staffList.map((staff, index) => (
+              <tr key={staff.id || index}>
+                <td>{staff.firstName}</td>
+                <td>{staff.lastName}</td>
+                <td>{staff.email}</td>
+                <td>{staff.mobile}</td>
+                {type === "trainer" && <td>{staff.expertise}</td>}
+                {type === "trainer" && <td>{staff.certifications}</td>}
+                <td>{staff.salary}</td>
+                <td>{staff.address}</td>
+                <td>{staff.gender}</td>
+                <td>
+                  <button className="admin-btn" onClick={() => handleEdit(index)}>
+                    Edit
+                  </button>{" "}
+                  <button
+                    className="admin-btn delete"
+                    onClick={() => handleDelete(index)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
           )}
         </tbody>
       </table>
