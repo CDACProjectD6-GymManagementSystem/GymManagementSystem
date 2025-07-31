@@ -70,6 +70,11 @@ public class AdminServiceImpl implements AdminService {
 
 		List<UserEntity> list = userDao.findByIsActiveTrue();
 		List<UserEntityResponseDto> subtypelist = new ArrayList<>();
+		
+		Subscription freeSubscription = subscriptionDao.findByName("Free");
+	    if (freeSubscription == null) {
+	        throw new ResourceNotFoundException("'Free' subscription not found in the database!");
+	    }
 		if (list!= null &&	!list.isEmpty()) {
 			for (UserEntity user : list) {
 				UserEntityResponseDto u1 = new UserEntityResponseDto();
@@ -77,8 +82,9 @@ public class AdminServiceImpl implements AdminService {
 				 if (user.getSubscriptionId() != null) {
 		                u1.setSubscriptionType(user.getSubscriptionId().getName());
 		            } else {
-		               user.setSubscriptionId(subscriptionDao.findByName("Free"));
-		               u1.setSubscriptionType(user.getSubscriptionId().getName());
+		               user.setSubscriptionId(freeSubscription);
+		               u1.setSubscriptionType(freeSubscription.getName());
+		               userDao.save(user);
 		            }
 				subtypelist.add(u1);
 			}
