@@ -256,3 +256,6 @@ const TrainerProfile = () => {
 };
 
 export default TrainerProfile;
+
+
+
