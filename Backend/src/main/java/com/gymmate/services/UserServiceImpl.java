@@ -79,6 +79,8 @@ public class UserServiceImpl implements UserService {
 		UserEntity userBeforeActive = map.map(userRegistrationDTO, UserEntity.class);
 		userBeforeActive.setActive(true);
 		userDao.save(userBeforeActive);
+		
+		
 		Role beforeRole = map.map(userRegistrationDTO, Role.class);
 		beforeRole.setRole(UserRole.ROLE_USER);
 		roleDao.save(beforeRole);
