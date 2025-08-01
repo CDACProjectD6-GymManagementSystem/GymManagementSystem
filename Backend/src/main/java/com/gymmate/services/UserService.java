@@ -8,6 +8,7 @@ import com.gymmate.dtos.UserDietRespDTO;
 import com.gymmate.dtos.UserDisplayProfileDto;
 import com.gymmate.dtos.UserLoginDTO;
 import com.gymmate.dtos.UserLoginResponseDTO;
+import com.gymmate.dtos.UserPaymentRequestDTO;
 import com.gymmate.dtos.UserRegistrationDTO;
 import com.gymmate.dtos.UserScheduleRespDTO;
 
@@ -28,6 +29,8 @@ public interface UserService {
 	UserDietRespDTO getUserDiet(Long id);
 
 	UserScheduleRespDTO getUserSchedule(Long id);
+
+	ApiResponse buySubscription(UserPaymentRequestDTO paymentDTO, Long id);
 
 
 }

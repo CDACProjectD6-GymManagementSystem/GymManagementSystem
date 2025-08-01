@@ -1,9 +1,10 @@
+// src/pages/UserHomePage.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import {
   FaUserCircle, FaIdCard, FaHeartbeat, FaCalendarCheck, FaComments,
 } from "react-icons/fa";
- import "./UserHomePage.css";
+import "./UserHomePage.css";
 
 const cardData = [
   { path: "/user/profile", icon: <FaUserCircle size={32} color="#000" />, title: "Profile", desc: "Update your info" },
@@ -14,12 +15,10 @@ const cardData = [
 ];
 
 const UserHomePage = () => {
-  // Only use stored login info (reflects login page's storage setting)
-  const userName = localStorage.getItem("gymmateUserFirstName") || ""; // Will be empty if not set
+  const userName = localStorage.getItem("gymmateUserFirstName") || "";
 
   return (
     <div className="user-homepage-root">
-       {/* Navbar gets personalized name/photo */}
       <div className="content-container">
         <h2 className="welcome-heading">
           Welcome, <span className="username">{userName}</span>

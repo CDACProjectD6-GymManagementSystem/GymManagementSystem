@@ -11,20 +11,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gymmate.daos.MongoFeedbackDao;
 import com.gymmate.daos.RoleDao;
 import com.gymmate.dtos.FeedbackDTO;
 import com.gymmate.dtos.UserDisplayProfileDto;
 import com.gymmate.dtos.UserLoginDTO;
 import com.gymmate.dtos.UserLoginResponseDTO;
+import com.gymmate.dtos.UserPaymentRequestDTO;
 import com.gymmate.dtos.UserRegistrationDTO;
 import com.gymmate.services.MongoFeedbackService;
 import com.gymmate.services.UserService;
 
-import lombok.AllArgsConstructor;
-
 @RestController
-@AllArgsConstructor
 
 @RequestMapping("/user")
 @CrossOrigin(origins = "*")
@@ -36,6 +33,7 @@ public class UserController {
 	RoleDao roleDao;
 	@Autowired
 	private MongoFeedbackService feedbackService;
+
 	@GetMapping("/profile/{Id}")
 	public ResponseEntity<?> getUserProfile(@PathVariable Long Id) {
 
@@ -92,10 +90,16 @@ public class UserController {
 		return ResponseEntity.ok().body(userService.getUserSchedule(Id));
 
 	}
-	
+
 	@PostMapping("/feedback/{Id}")
-	public ResponseEntity<?>addFeedback(@RequestBody FeedbackDTO feedbackDTO,@PathVariable String Id){
-		return ResponseEntity.ok().body(feedbackService.addFeedback(feedbackDTO,Id));
+	public ResponseEntity<?> addFeedback(@RequestBody FeedbackDTO feedbackDTO, @PathVariable String Id) {
+		return ResponseEntity.ok().body(feedbackService.addFeedback(feedbackDTO, Id));
+	}
+
+	@PostMapping("/buy-package/{Id}")
+	public ResponseEntity<?> buySubscription(@RequestBody UserPaymentRequestDTO paymentDTO, @PathVariable Long Id) {
+
+		return ResponseEntity.ok().body(userService.buySubscription(paymentDTO, Id));
 	}
 
 }

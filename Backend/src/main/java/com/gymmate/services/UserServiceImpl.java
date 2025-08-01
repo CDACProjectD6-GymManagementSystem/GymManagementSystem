@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import com.gymmate.customexception.ResourceNotFoundException;
+import com.gymmate.daos.PaymentDAO;
 import com.gymmate.daos.RoleDao;
 import com.gymmate.daos.SubscriptionDao;
 import com.gymmate.daos.UserDao;
@@ -19,9 +20,11 @@ import com.gymmate.dtos.UserDietRespDTO;
 import com.gymmate.dtos.UserDisplayProfileDto;
 import com.gymmate.dtos.UserLoginDTO;
 import com.gymmate.dtos.UserLoginResponseDTO;
+import com.gymmate.dtos.UserPaymentRequestDTO;
 import com.gymmate.dtos.UserRegistrationDTO;
 import com.gymmate.dtos.UserScheduleRespDTO;
 import com.gymmate.entities.Diet;
+import com.gymmate.entities.Payment;
 import com.gymmate.entities.Role;
 import com.gymmate.entities.Role.UserRole;
 import com.gymmate.entities.Schedule;
@@ -44,6 +47,8 @@ public class UserServiceImpl implements UserService {
 	private RoleDao roleDao;
 	@Autowired
 	private SubscriptionDao subscriptionDao;
+	@Autowired
+	private PaymentDAO paymentDAO;
 
 	@Override
 	public UserDisplayProfileDto getProfile(Long id) {
@@ -73,14 +78,12 @@ public class UserServiceImpl implements UserService {
 		return true;
 	}
 
-
 	@Override
 	public ApiResponse registerUser(UserRegistrationDTO userRegistrationDTO) {
 		UserEntity userBeforeActive = map.map(userRegistrationDTO, UserEntity.class);
 		userBeforeActive.setActive(true);
 		userDao.save(userBeforeActive);
-		
-		
+
 		Role beforeRole = map.map(userRegistrationDTO, Role.class);
 		beforeRole.setRole(UserRole.ROLE_USER);
 		roleDao.save(beforeRole);
@@ -91,7 +94,14 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserLoginResponseDTO userLogin(UserLoginDTO userLoginDTO) {
 		UserEntity userEnt = userDao.findByEmailAndPassword(userLoginDTO.getEmail(), userLoginDTO.getPassword());
-		UserLoginResponseDTO user = map.map(userEnt, UserLoginResponseDTO.class);
+		if (userEnt == null)
+			return null;
+
+		UserLoginResponseDTO user = new UserLoginResponseDTO();
+		user.setId(userEnt.getId());
+		user.setFirstName(userEnt.getFirstName());
+		user.setEmail(userEnt.getEmail());
+		user.setSubscribed(userEnt.isSubscribed());
 		return user;
 	}
 
@@ -122,6 +132,25 @@ public class UserServiceImpl implements UserService {
 
 		}
 		return map.map(schedule, UserScheduleRespDTO.class);
+	}
+
+	@Override
+	public ApiResponse buySubscription(UserPaymentRequestDTO paymentDTO, Long id) {
+
+		Subscription sub = subscriptionDao.findByName(paymentDTO.getName());
+		UserEntity userEnt = userDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("user not found"));
+		userEnt.setSubscriptionId(sub);
+		userEnt.setSubscribed(true);
+		Payment UserPay = new Payment();
+		UserPay.setAmount(sub.getPrice());
+		UserPay.setFirstName(userEnt.getFirstName());
+		UserPay.setLastName(userEnt.getLastName());
+		UserPay.setSubscriptionName(sub.getName());
+
+		paymentDAO.save(UserPay);
+		userDao.save(userEnt);
+
+		return new ApiResponse("payment succesful");
 	}
 
 }

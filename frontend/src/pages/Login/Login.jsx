@@ -1,43 +1,58 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import '../../styles/Login.css';
-import { loginUser } from '../../services/authService'; // Backend login API
+// src/pages/Login.jsx
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "../../styles/Login.css";
+import { loginUser } from "../../services/authService";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Hardcoded staff accounts (handled without backend)
   const staff = [
-    { email: 'alice.gym@example.com', password: 'secureHash1', path: '/trainer-dashboard' },
-    { email: 'admin@gymmate.com', password: 'admin123', path: '/admin-dashboard' },
-    { email: 'reception@gymmate.com', password: 'reception123', path: '/reception-dashboard' },
+    { email: "alice.gym@example.com", password: "secureHash1", path: "/trainer-dashboard" },
+    { email: "admin@gymmate.com", password: "admin123", path: "/admin-dashboard" },
+    { email: "reception@gymmate.com", password: "reception123", path: "/reception-dashboard" },
   ];
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    // 1. Staff login: check locally
+    // Staff login
     const foundStaff = staff.find(
       (u) => u.email === email && u.password === password
     );
     if (foundStaff) {
       navigate(foundStaff.path);
+      setLoading(false);
       return;
     }
 
-    // 2. User (member) login: check with backend + store info
+    // Member login API
     try {
-      const user = await loginUser(email, password); // Expects {id, firstName, email}
-      // Store user info in localStorage for use in other pages
-      localStorage.setItem('gymmateUserId', user.id);
-      localStorage.setItem('gymmateUserFirstName', user.firstName);
-      localStorage.setItem('gymmateUserEmail', user.email);
-      // Redirect to /user (your user dashboard root)
-      navigate('/user');
+      const user = await loginUser(email, password);
+      // Accept either key (subscribed or isSubscribed, as from backend)
+      const isSubscribed = user.isSubscribed !== undefined
+        ? user.isSubscribed
+        : user.subscribed;
+
+      localStorage.setItem("gymmateUserId", user.id);
+      localStorage.setItem("gymmateUserFirstName", user.firstName);
+      localStorage.setItem("gymmateUserEmail", user.email);
+      localStorage.setItem("gymmateUserSubscribed", String(isSubscribed));
+
+      if (isSubscribed) {
+        navigate("/user");
+      } else {
+        // Only pass state on login!
+        navigate("/user/membership", { state: { fromLogin: true } });
+      }
     } catch (err) {
-      alert('Invalid credentials!');
+      alert(err.message || "Invalid credentials!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,11 +66,11 @@ export default function Login() {
             <input
               type="email"
               className="form-control"
-              id="email"
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
           <div className="mb-4">
@@ -63,20 +78,22 @@ export default function Login() {
             <input
               type="password"
               className="form-control"
-              id="password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100">Login</button>
+          <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
         <p className="text-center mt-3">
           Don't have an account? <Link to="/register" className="text-decoration-none">Register here</Link>
         </p>
         <div className="text-center mt-2">
-          <button onClick={() => navigate('/')} className="btn btn-link text-decoration-none">
+          <button onClick={() => navigate("/")} className="btn btn-link text-decoration-none">
             ← Back to Home
           </button>
         </div>
