@@ -26,6 +26,7 @@ import com.gymmate.dtos.UserSubscriptionUpdateDto;
 import com.gymmate.entities.UserEntity;
 import com.gymmate.services.AdminService;
 import com.gymmate.services.EquipmentService;
+import com.gymmate.services.MongoFeedbackService;
 import com.gymmate.services.ReceptionistService;
 import com.gymmate.services.SubscriptionService;
 import com.gymmate.services.TrainerService;
@@ -43,6 +44,7 @@ public class AdminController {
 	private final EquipmentService equipmentService;
 	private final ReceptionistService receptionistService;
 	private final TrainerService trainerService;
+	private final MongoFeedbackService feedbackService;
 	
 	@PostMapping("/add-user")
 	@Operation(description = "Add a User by Admin")
@@ -175,5 +177,11 @@ public class AdminController {
 	@Operation(description = "Update Trainer")
 	public ResponseEntity<?> updateTrainer(@PathVariable Long id,@RequestBody TrainerUpdateDto updateDto){
 		return ResponseEntity.ok(trainerService.updateTrainer(id,updateDto));
+	}
+	
+	@GetMapping("/feedback")
+	@Operation(description = "Fetch all the feedbacks")
+	public ResponseEntity<?> getFeedbacks(){
+		return ResponseEntity.ok(feedbackService.getAllFeedbacks());
 	}
 }

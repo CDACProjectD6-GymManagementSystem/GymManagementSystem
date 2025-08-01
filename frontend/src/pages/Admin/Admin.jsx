@@ -6,6 +6,7 @@ import StaffSection from "./StaffSection";
 import SubscriptionSection from "./SubscriptionSection";
 import EquipmentSection from "./EquipmentSection";
 import DashboardSection from "./DashboardSection";
+import Feedback from "./Feedback";
 
 const sections = [
   "Admin Dashboard",
@@ -13,6 +14,7 @@ const sections = [
   "Manage Staff",
   "Manage Subscription",
   "Manage Equipments",
+  "Feedback Review"
 ];
 
 export default function Admin() {
@@ -25,6 +27,8 @@ export default function Admin() {
       {current === "Manage Staff" && <StaffSection />}
       {current === "Manage Subscription" && <SubscriptionSection />}
       {current === "Manage Equipments" && <EquipmentSection />}
+      {current === "Feedback Review" && <Feedback />}
+      
     </div>
   );
 }
