@@ -1,13 +1,13 @@
 package com.gymmate.services;
 
 import java.util.List;
+import java.util.Map;
 
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.EquipmentCategoryDTO;
 import com.gymmate.dtos.EquipmentRequestDto;
 import com.gymmate.dtos.EquipmentRespDto;
 import com.gymmate.entities.Equipment;
-import com.gymmate.entities.Equipment.Category;
 
 public interface EquipmentService {
 
@@ -30,6 +30,8 @@ public interface EquipmentService {
 	List<Equipment> FreeWeightEquipments();
 
 	List<Equipment> getResistanceEquipments();
+
+	ApiResponse toggleMaintenance(Long id, Map<String, Boolean> body);
 
 
 }

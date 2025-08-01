@@ -4,76 +4,92 @@ import TrainerNavbar from '../../components/TrainerNavbar';
 
 const CardioEquipments = () => {
   const [equipments, setEquipments] = useState([]);
-  const [filter, setFilter] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState('all');
 
+  // ✅ Fetch cardio equipment list
   useEffect(() => {
-    axios.get(`http://localhost:8080/trainer/equipments/cardio`)
-      .then((res) => setEquipments(res.data))
-      .catch((err) => console.error('Error fetching cardio equipments:', err));
+    axios.get('http://localhost:8080/trainer/equipments/cardio')
+      .then(res => setEquipments(res.data))
+      .catch(err => {
+        console.error('Error fetching cardio equipments:', err);
+        alert('Failed to load equipment. Please try again later.');
+      });
   }, []);
 
-  const toggleMaintenance = (id, currentStatus) => {
-    axios.put(`/api/equipments/${id}/maintenance`, { forMaintenance: !currentStatus })
-      .then(() => {
-        setEquipments((prev) =>
-          prev.map((eq) =>
-            eq.id === id ? { ...eq, forMaintenance: !currentStatus } : eq
-          )
-        );
-      })
-      .catch(err => console.error('Failed to update maintenance status:', err));
-  };
+  // ✅ Apply search filter
+  let filtered = equipments.filter(eq =>
+    eq.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const uniqueCategories = ['All', ...new Set(equipments.map((e) => e.description))];
+  // ✅ Apply status-based filtering
+  if (sortOption === 'maintenance') {
+    filtered = filtered.filter(eq => eq.forMaintenance === true);
+  } else if (sortOption === 'available') {
+    filtered = filtered.filter(eq => eq.forMaintenance === false);
+  }
 
-  const filteredEquipments =
-    filter === 'All'
-      ? equipments
-      : equipments.filter((eq) => eq.description === filter);
+  // ✅ Apply sorting if applicable
+  if (sortOption === 'a-z') {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortOption === 'z-a') {
+    filtered.sort((a, b) => b.name.localeCompare(a.name));
+  }
 
   return (
     <>
       <TrainerNavbar />
       <div className="container mt-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h3>Cardio Equipments</h3>
+        <div className="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <select
             className="form-select w-auto"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
           >
-            {uniqueCategories.map((cat, idx) => (
-              <option key={idx} value={cat}>
-                {cat}
-              </option>
-            ))}
+            <option value="all">All</option>
+            <option value="a-z">Sort: A–Z</option>
+            <option value="z-a">Sort: Z–A</option>
+            <option value="maintenance">Only Maintenance</option>
+            <option value="available">Only Available</option>
           </select>
         </div>
 
-        {filteredEquipments.length === 0 ? (
-          <p>No equipment found for selected category.</p>
+        {filtered.length === 0 ? (
+          <p>No equipment found.</p>
         ) : (
           <div className="row">
-            {filteredEquipments.map((eq) => (
+            {filtered.map(eq => (
               <div className="col-md-4 mb-3" key={eq.id}>
                 <div className="card shadow-sm h-100">
                   <div className="card-body">
                     <h5 className="card-title">{eq.name}</h5>
-                    <p className="card-text">
-                      <strong>Category:</strong> {eq.description}
-                    </p>
-                    <p
-                      className={`card-text ${
-                        eq.forMaintenance ? 'text-danger' : 'text-success'
-                      }`}
-                    >
-                      Status: {eq.forMaintenance ? 'Under Maintenance' : 'Active'}
+                    <p><strong>Category:</strong> {eq.description}</p>
+                    <p className={eq.forMaintenance ? 'text-danger' : 'text-success'}>
+                      <strong>Status:</strong> {eq.forMaintenance ? 'Under Maintenance' : 'Available'}
                     </p>
                     <button
-                      className={`btn ${
-                        eq.forMaintenance ? 'btn-success' : 'btn-warning'
-                      }`}
-                      onClick={() => toggleMaintenance(eq.id, eq.forMaintenance)}
+                      className={`btn ${eq.forMaintenance ? 'btn-success' : 'btn-warning'}`}
+                      onClick={() =>
+                        axios.put(`http://localhost:8080/trainer/equipments/${eq.id}/maintenance`, {
+                          forMaintenance: !eq.forMaintenance
+                        }).then(() =>
+                          setEquipments(prev =>
+                            prev.map(e =>
+                              e.id === eq.id ? { ...e, forMaintenance: !eq.forMaintenance } : e
+                            )
+                          )
+                        ).catch(err => {
+                          console.error('Maintenance update failed:', err);
+                          alert("Failed to update maintenance status.");
+                        })
+                      }
                     >
                       {eq.forMaintenance ? 'Unmark Maintenance' : 'Mark as Maintenance'}
                     </button>

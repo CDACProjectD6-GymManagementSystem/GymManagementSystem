@@ -19,7 +19,6 @@ public interface TrainerService {
 
 	List<UserForTrainerDTO> getAssignedUsers(Long trainerId);
 
-
 	UserForTrainerDTO getUserDetails(Long userId);
 
 	UserDietDTO getUserDiet(Long userId);

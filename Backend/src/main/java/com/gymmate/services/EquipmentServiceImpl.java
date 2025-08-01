@@ -3,10 +3,12 @@ package com.gymmate.services;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.EquipmentDao;
@@ -113,6 +115,22 @@ public class EquipmentServiceImpl implements EquipmentService {
 	public List<Equipment> getResistanceEquipments() {
 		// TODO Auto-generated method stub
 		return equipmentDao.findByCategory(Equipment.Category.RESISTANCE_MACHINES);
+	}
+
+
+	@Override
+	public ApiResponse toggleMaintenance(Long id, Map<String, Boolean> body) {
+	    Equipment equipment = equipmentDao.findById(id)
+	        .orElseThrow(() -> new ResourceNotFoundException("Equipment not found"));
+
+	    Boolean value = body.get("forMaintenance");
+	    if (value != null) {
+	        equipment.setForMaintenance(value);
+	        equipmentDao.save(equipment);
+	        return new ApiResponse("Updated maintenance status");
+	    } else {
+	        throw new IllegalArgumentException("Missing 'forMaintenance' key");
+	    }
 	}
 
 

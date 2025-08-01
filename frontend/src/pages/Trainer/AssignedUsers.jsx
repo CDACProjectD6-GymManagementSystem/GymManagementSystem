@@ -6,6 +6,7 @@ import TrainerNavbar from '../../components/TrainerNavbar';
 const AssignedUsers = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState('a-z');
   const [loading, setLoading] = useState(true);
 
   // Replace this with dynamic trainer ID (e.g., from auth or localStorage)
@@ -26,9 +27,21 @@ const AssignedUsers = () => {
     fetchAssignedUsers();
   }, [trainerId]);
 
-  const filteredUsers = users.filter((user) =>
+  // ✅ Filter by search term
+  let filteredUsers = users.filter((user) =>
     `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // ✅ Sort by name
+  if (sortOption === 'a-z') {
+    filteredUsers.sort((a, b) =>
+      `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+    );
+  } else if (sortOption === 'z-a') {
+    filteredUsers.sort((a, b) =>
+      `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`)
+    );
+  }
 
   return (
     <>
@@ -36,8 +49,8 @@ const AssignedUsers = () => {
       <div className="container mt-4">
         <h3 className="mb-3">Assigned Users</h3>
 
-        {/* Search Input */}
-        <div className="mb-4">
+        {/* Search & Sort */}
+        <div className="d-flex flex-column flex-md-row justify-content-between gap-2 mb-4">
           <input
             type="text"
             className="form-control"
@@ -45,9 +58,17 @@ const AssignedUsers = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <select
+            className="form-select w-auto"
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+          >
+            <option value="a-z">Sort: A–Z</option>
+            <option value="z-a">Sort: Z–A</option>
+          </select>
         </div>
 
-        {/* Loading */}
+        {/* Loading or Results */}
         {loading ? (
           <p>Loading users...</p>
         ) : filteredUsers.length === 0 ? (

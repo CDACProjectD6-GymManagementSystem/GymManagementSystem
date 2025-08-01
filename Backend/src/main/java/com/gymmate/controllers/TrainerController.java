@@ -1,6 +1,7 @@
 package com.gymmate.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.EquipmentCategoryDTO;
 import com.gymmate.dtos.TrainerDTO;
 import com.gymmate.dtos.UserDietDTO;
@@ -120,7 +122,7 @@ public class TrainerController {
 		return ResponseEntity.ok(equipmentService.getStrengthEquipments());
 	}
 	
-	@GetMapping("/equipments/flexibilty")
+	@GetMapping("/equipments/flexibility")
 	@Operation(description = "Get flexibilty equipments")
 	public ResponseEntity<List<Equipment>> getFlexibiltyEquipments(){
 		return ResponseEntity.ok(equipmentService.getFlexibiltyEquipments());
@@ -140,6 +142,13 @@ public class TrainerController {
 	}
 	
 	
+	@PutMapping("/equipments/{id}/maintenance")
+	@Operation(description = "Set and unset for maintenance")
+	public ResponseEntity<ApiResponse> toggleMaintenance(@PathVariable Long id,
+	                                                     @RequestBody Map<String, Boolean> body) {
+	    return ResponseEntity.ok(equipmentService.toggleMaintenance(id, body));
+	}
+
 	
 
 
