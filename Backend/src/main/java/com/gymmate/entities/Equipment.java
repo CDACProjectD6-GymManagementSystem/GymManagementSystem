@@ -25,6 +25,9 @@ public class Equipment extends SuperBaseEntity {
 	@Column(name = "for_maintenance")
 	private boolean forMaintenance=false;
 	private double price;
+	
+	private String profilePhotoUrl;
+	private String cloudinaryPublicId;
 
 	public enum Category {
 		CARDIO, STRENGTH, FLEXIBILITY, FREE_WEIGHTS, RESISTANCE_MACHINES

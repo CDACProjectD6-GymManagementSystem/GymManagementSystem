@@ -16,5 +16,7 @@ public class TrainerDTO {
 	private String email;
 	private String mobile;
 	private String certifications;
+	private String imageUrl;        
+	private String imagePublicId; 
 	
 }

@@ -1,6 +1,10 @@
 package com.gymmate.services;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.TrainerDTO;
@@ -36,6 +40,13 @@ public interface TrainerService {
 	ApiResponse deleteTrainer(Long id);
 
 	ApiResponse updateTrainer(Long id, TrainerUpdateDto updateDto);
+
+    Map<String, String> uploadPhoto(Long id, MultipartFile file) throws IOException;
+    
+    
+    ApiResponse deletePhoto(Long id) throws IOException;
+	
+	
 	
 	
 }
