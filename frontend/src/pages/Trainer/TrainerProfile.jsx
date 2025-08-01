@@ -11,153 +11,243 @@ const TrainerProfile = () => {
     email: '',
     mobile: '',
     certifications: '',
+    imageUrl: '',
+    imagePublicId: '',
   });
 
+  const [originalProfile, setOriginalProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [apiError, setApiError] = useState("");
-  const [apiSuccess, setApiSuccess] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [apiError, setApiError] = useState('');
+  const [apiSuccess, setApiSuccess] = useState('');
 
+  // Load profile on mount
   useEffect(() => {
-    setLoading(true);
     axios.get(`http://localhost:8080/trainer/profile/${trainerId}`)
-      .then(response => {
-        console.log("✅ API Response:", response.data);
-        setProfile(response.data);
-        setApiError("");
-        setLoading(false);
+      .then(res => {
+        setProfile(res.data);
+        setOriginalProfile(res.data);
       })
-      .catch(error => {
-        console.error("❌ API Error:", error);
-        setApiError("Failed to load trainer profile.");
-        setLoading(false);
-      });
-  }, [trainerId]);
+      .catch(() => setApiError("Failed to load trainer profile"));
+  }, []);
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name]: value }));
   };
 
+  // Handle photo selection
+  const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
+
+  // Upload photo and update state
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    setUploading(true);
+
+    try {
+      const res = await axios.post(`http://localhost:8080/trainer/upload/${trainerId}`, formData);
+      setProfile(prev => ({
+        ...prev,
+        imageUrl: res.data.secure_url,
+        imagePublicId: res.data.public_id,
+      }));
+      setApiSuccess("Photo uploaded successfully");
+      setApiError('');
+    } catch {
+      setApiError("Failed to upload photo");
+      setApiSuccess('');
+    }
+
+    setUploading(false);
+    setSelectedFile(null);
+  };
+
+  // Delete photo from Cloudinary + DB
+  const handleDeletePhoto = async () => {
+    try {
+      await axios.delete(`http://localhost:8080/trainer/delete/${trainerId}`);
+      setProfile(prev => ({
+        ...prev,
+        imageUrl: '',
+        imagePublicId: ''
+      }));
+      setApiSuccess("Photo deleted successfully");
+      setApiError('');
+    } catch {
+      setApiError("Failed to delete photo");
+      setApiSuccess('');
+    }
+  };
+
+  // Save profile changes
   const handleSave = () => {
     axios.put(`http://localhost:8080/trainer/${trainerId}`, profile)
-      .then(res => {
-        console.log("✅ Profile updated:", res.data);
-        setApiSuccess("Profile updated successfully.");
-        setApiError("");
+      .then(() => {
+        setOriginalProfile(profile);
         setIsEditing(false);
+        setApiSuccess("Profile updated successfully");
+        setApiError('');
       })
-      .catch(err => {
-        console.error("❌ Failed to update profile:", err);
-        setApiError("Failed to update trainer profile.");
-        setApiSuccess("");
+      .catch(() => {
+        setApiError("Failed to update trainer profile");
+        setApiSuccess('');
       });
+  };
+
+  // Cancel editing and restore original state
+  const handleCancel = () => {
+    setProfile(originalProfile);
+    setSelectedFile(null);
+    setApiSuccess('');
+    setApiError('');
+    setIsEditing(false);
   };
 
   const certList = profile.certifications
     ? profile.certifications.split(',').map(c => c.trim()).filter(Boolean)
     : [];
 
-  if (loading) return <div className="container mt-5">Loading...</div>;
-  if (apiError) return <div className="container mt-5 text-danger">{apiError}</div>;
-
   return (
     <>
       <TrainerNavbar />
       <div className="container mt-4">
-        <h2 className="mb-4">Trainer Profile</h2>
+        <h2 className="mb-3">Trainer Profile</h2>
 
         {apiSuccess && <div className="alert alert-success">{apiSuccess}</div>}
         {apiError && <div className="alert alert-danger">{apiError}</div>}
 
-        <div className="row g-4">
-          <div className="col-md-12 col-lg-8">
+        <div className="row">
+          {/* Left: Unified Profile Photo Section */}
+          <div className="col-md-4 mb-4">
+            <h5>Profile Photo</h5>
+            {profile.imageUrl ? (
+              <>
+                <img
+                  src={profile.imageUrl}
+                  alt="Trainer"
+                  className="img-thumbnail mb-2"
+                  style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+                />
+                {isEditing && (
+                  <button className="btn btn-danger btn-sm mb-2" onClick={handleDeletePhoto}>
+                    Delete Photo
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="text-muted mb-2">No profile photo uploaded.</div>
+            )}
+
+            {isEditing && (
+              <div className="input-group">
+                <input
+                  type="file"
+                  className="form-control"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                <button
+                  className="btn btn-primary"
+                  onClick={handleUpload}
+                  disabled={uploading}
+                >
+                  {uploading ? "Uploading..." : "Upload"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Right: Form Section */}
+          <div className="col-md-8">
             <form>
-              <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">First Name</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="firstName"
-                    value={profile.firstName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Last Name</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="lastName"
-                    value={profile.lastName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Email</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    name="email"
-                    value={profile.email}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Mobile</label>
-                  <input
-                    type="tel"
-                    className="form-control"
-                    name="mobile"
-                    value={profile.mobile}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div className="col-md-12 mb-3">
-                  <label className="form-label">Certifications</label>
-                  <div className="form-control" style={{ backgroundColor: "#f8f9fa" }}>
-                    {certList.length > 0
-                      ? certList.map((cert, idx) => (
-                        <div key={idx}>{cert}</div>
-                      ))
-                      : <span className="text-muted">No certifications listed.</span>}
-                  </div>
-                </div>
+              <div className="mb-3">
+                <label className="form-label">First Name</label>
+                <input
+                  className="form-control"
+                  name="firstName"
+                  value={profile.firstName}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
               </div>
 
-              <div className="mt-3">
-                {isEditing ? (
-                  <>
-                    <button type="button" className="btn btn-success me-2" onClick={handleSave}>Save Changes</button>
-                    <button type="button" className="btn btn-secondary" onClick={() => setIsEditing(false)}>Cancel</button>
-                  </>
-                ) : (
-                  <button type="button" className="btn btn-dark" onClick={() => setIsEditing(true)}>Edit Profile</button>
-                )}
+              <div className="mb-3">
+                <label className="form-label">Last Name</label>
+                <input
+                  className="form-control"
+                  name="lastName"
+                  value={profile.lastName}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
               </div>
+
+              <div className="mb-3">
+                <label className="form-label">Email</label>
+                <input
+                  className="form-control"
+                  name="email"
+                  type="email"
+                  value={profile.email}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Mobile</label>
+                <input
+                  className="form-control"
+                  name="mobile"
+                  value={profile.mobile}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Certifications</label>
+                <textarea
+                  className="form-control"
+                  name="certifications"
+                  value={profile.certifications}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  rows={3}
+                />
+              </div>
+
+              {isEditing ? (
+                <div className="mb-3">
+                  <button className="btn btn-success me-2" type="button" onClick={handleSave}>
+                    Save Changes
+                  </button>
+                  <button className="btn btn-secondary" type="button" onClick={handleCancel}>
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button className="btn btn-dark" type="button" onClick={() => setIsEditing(true)}>
+                  Edit Profile
+                </button>
+              )}
             </form>
 
-            <hr className="my-4" />
-
-            <div>
-              <h5>Certifications</h5>
-              {certList.length > 0 ? (
-                <ul className="list-group">
-                  {certList.map((cert, idx) => (
-                    <li key={idx} className="list-group-item">
-                      {cert}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="text-muted">No certifications listed.</div>
-              )}
-            </div>
+            <hr />
+            <h5>Certifications</h5>
+            {certList.length > 0 ? (
+              <ul className="list-group">
+                {certList.map((cert, idx) => (
+                  <li key={idx} className="list-group-item">{cert}</li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-muted">No certifications listed.</div>
+            )}
           </div>
         </div>
       </div>

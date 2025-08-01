@@ -1,12 +1,16 @@
 package com.gymmate.services;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gymmate.customexception.NonUniqueElementException;
 import com.gymmate.customexception.ResourceNotFoundException;
@@ -50,6 +54,8 @@ public class TrainerServiceImpl implements TrainerService {
 	private ScheduleDao scheduleDao;
 	@Autowired
 	private RoleDao roleDao;
+	@Autowired
+	private ImageService imageService;
 	
 	@Override
 	public TrainerDTO getTrainerDetails(Long trainerId) {
@@ -209,6 +215,41 @@ public class TrainerServiceImpl implements TrainerService {
 		roleDao.save(roleEntity);
 		return new ApiResponse("Trainer Updated");
 	}
+	@Override
+	public Map<String, String> uploadPhoto(Long id, MultipartFile file) throws IOException {
+	    Trainer trainer = trainerDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trainer not found"));
+	    if (trainer.getImagePublicId() != null && !trainer.getImagePublicId().isBlank()) {
+	        imageService.delete(trainer.getImagePublicId());
+	    }
+	    Map result = imageService.upload(file);
 
-		
+	    String url = (String) result.get("secure_url");
+	    String publicId = (String) result.get("public_id");
+
+	    trainer.setImageUrl(url);
+	    trainer.setImagePublicId(publicId);
+	    trainerDao.save(trainer);
+	    Map<String, String> response = new HashMap<>();
+	    response.put("secure_url", url);
+	    response.put("public_id", publicId);
+	    return response;
+	}
+
+
+    @Override
+    public ApiResponse deletePhoto(Long id) throws IOException {
+        Trainer trainer = trainerDao.findById(id).orElseThrow(() -> new RuntimeException("Trainer not found"));
+
+        if (trainer.getImagePublicId() != null) {
+            imageService.delete(trainer.getImagePublicId());
+            trainer.setImageUrl(null);
+            trainer.setImagePublicId(null);
+            trainerDao.save(trainer);
+            return new ApiResponse("Image deleted successfully");
+        }
+
+        return new ApiResponse("No image found to delete");
+    }
+
+
 }

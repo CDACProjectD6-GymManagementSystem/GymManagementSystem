@@ -29,6 +29,14 @@ public class UserEntity extends BaseEntity {
 	private Diet diet;
 	@OneToOne
 	private Schedule schedule;
+	
+	@Column(name = "image_url")
+	private String imageUrl;
+
+	@Column(name = "image_public_id")
+	private String imagePublicId;
+
+	
 	public UserEntity(boolean isSubscribed, boolean isActive) {
 		super();
 		this.isSubscribed = isSubscribed;

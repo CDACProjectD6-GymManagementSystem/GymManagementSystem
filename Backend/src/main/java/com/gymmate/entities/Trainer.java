@@ -39,6 +39,14 @@ public class Trainer extends BaseEntity {
 		userList.remove(u);
 		u.setTrainer(null);
 	}
+	
+	@Column(name = "image_url")
+	private String imageUrl;
+
+	@Column(name = "image_public_id")
+	private String imagePublicId;
+
+	
 
 	public Trainer(double salary, String certifications, String expertise) {
 		super();
