@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "../../styles/Admin.css";
 import {
   addEquipment,
   getAllEquipments,
   deleteEquipment,
-  updateEquipment, // Import here
+  updateEquipment,
 } from "../../services/AdminService";
 
 const CATEGORY_OPTIONS = [
@@ -14,29 +13,6 @@ const CATEGORY_OPTIONS = [
   "FREE_WEIGHTS",
   "RESISTANCE_MACHINES",
 ];
-
-const Input = ({ label, ...props }) => (
-  <label>
-    {label} :
-    <input {...props} />
-  </label>
-);
-
-const Select = ({ label, options, ...props }) => (
-  <label>
-    {label} :
-    <select {...props}>
-      <option value="" disabled>
-        Select Category
-      </option>
-      {options.map((cat) => (
-        <option key={cat} value={cat}>
-          {cat.replace(/_/g, " ")}
-        </option>
-      ))}
-    </select>
-  </label>
-);
 
 const EquipmentSection = () => {
   const [emps, setEmps] = useState([]);
@@ -53,7 +29,6 @@ const EquipmentSection = () => {
 
   useEffect(() => {
     fetchEquipment();
-    // eslint-disable-next-line
   }, []);
 
   const fetchEquipment = async () => {
@@ -77,10 +52,9 @@ const EquipmentSection = () => {
     setLoading(true);
     try {
       if (editing !== null) {
-        // UPDATE: send PUT/PATCH to backend
         const { id, ...dto } = form;
         await updateEquipment(id, dto);
-        await fetchEquipment(); // refresh
+        await fetchEquipment();
         setEditing(null);
       } else {
         await addEquipment(form);
@@ -137,109 +111,152 @@ const EquipmentSection = () => {
     setLoading(false);
   };
 
+  const handleCancelEdit = () => {
+    setEditing(null);
+    setForm({
+      id: "",
+      name: "",
+      description: "",
+      price: "",
+      category: "",
+    });
+  };
+
   return (
-    <div className="admin-card">
-      <h2>Manage Equipment</h2>
-      <form className="admin-form" onSubmit={handleSubmit}>
-        <Input
-          name="name"
-          label="Equipment Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="description"
-          label="Description"
-          value={form.description}
-          onChange={handleChange}
-          required
-        />
-        <Input
-          name="price"
-          label="Price"
-          type="number"
-          value={form.price}
-          onChange={handleChange}
-          required
-        />
-        <Select
-          name="category"
-          label="Category"
-          options={CATEGORY_OPTIONS}
-          value={form.category}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit" className="admin-btn" disabled={loading}>
-          {loading
-            ? "Saving..."
-            : editing !== null
-            ? "Update"
-            : "Add"} Equipment
-        </button>
-        {editing !== null && (
-          <button
-            type="button"
-            className="admin-btn cancel"
-            onClick={() => {
-              setEditing(null);
-              setForm({
-                id: "",
-                name: "",
-                description: "",
-                price: "",
-                category: "",
-              });
-            }}
-          >
-            Cancel
-          </button>
+    <div className="container my-5">
+      <div className="mx-auto p-4 bg-white rounded-4 shadow" style={{maxWidth: 900}}>
+        <h2 className="fw-bold text-center mb-4">Manage Equipment</h2>
+
+        <form className="row g-3 mb-4" onSubmit={handleSubmit}>
+          <div className="col-md-4">
+            <label className="form-label fw-semibold">Equipment Name</label>
+            <input
+              name="name"
+              className="form-control"
+              value={form.name}
+              onChange={handleChange}
+              required
+              placeholder="Name"
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="form-label fw-semibold">Description</label>
+            <input
+              name="description"
+              className="form-control"
+              value={form.description}
+              onChange={handleChange}
+              required
+              placeholder="Description"
+            />
+          </div>
+          <div className="col-md-2">
+            <label className="form-label fw-semibold">Price</label>
+            <input
+              name="price"
+              className="form-control"
+              type="number"
+              min="0"
+              value={form.price}
+              onChange={handleChange}
+              required
+              placeholder="₹"
+            />
+          </div>
+          <div className="col-md-2">
+            <label className="form-label fw-semibold">Category</label>
+            <select
+              name="category"
+              className="form-select"
+              value={form.category}
+              onChange={handleChange}
+              required
+            >
+              <option value="" disabled>
+                Select Category
+              </option>
+              {CATEGORY_OPTIONS.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat.replace(/_/g, " ")}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col-12 d-flex gap-2">
+            <button type="submit" className="btn btn-primary fw-semibold" disabled={loading}>
+              {loading
+                ? "Saving..."
+                : editing !== null
+                ? "Update"
+                : "Add"} Equipment
+            </button>
+            {editing !== null && (
+              <button
+                type="button"
+                className="btn btn-secondary fw-semibold"
+                onClick={handleCancelEdit}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+
+        {error && (
+          <div className="alert alert-danger py-2 mb-3">{error}</div>
         )}
-      </form>
-      {error && <div className="error-message">{error}</div>}
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Category</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {emps.map((e, i) => (
-            <tr key={e.id ?? i}>
-              <td>{e.id}</td>
-              <td>{e.name}</td>
-              <td>{e.description}</td>
-              <td>{e.price}</td>
-              <td>
-                {e.category ? e.category.toString().replace(/_/g, " ") : ""}
-              </td>
-              <td>
-                <button className="admin-btn" onClick={() => handleEdit(i)}>
-                  Edit
-                </button>
-                <button
-                  className="admin-btn delete"
-                  onClick={() => handleDelete(i)}
-                  disabled={loading}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-          {emps.length === 0 && (
-            <tr className="no-data-row">
-              <td colSpan={6}>No equipment found.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+
+        <div className="table-responsive rounded-4 shadow-sm bg-light">
+          <table className="table align-middle mb-0">
+            <thead className="table-primary text-white">
+              <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {emps.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center fst-italic py-4 text-secondary bg-white">
+                    No equipment found.
+                  </td>
+                </tr>
+              ) : (
+                emps.map((e, i) => (
+                  <tr key={e.id ?? i}>
+                    <td>{e.id}</td>
+                    <td>{e.name}</td>
+                    <td>{e.description}</td>
+                    <td>₹{e.price}</td>
+                    <td>
+                      {e.category ? e.category.toString().replace(/_/g, " ") : ""}
+                    </td>
+                    <td>
+                      <button className="btn btn-info btn-sm me-2 fw-semibold text-white"
+                        onClick={() => handleEdit(i)}
+                        disabled={loading}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm fw-semibold"
+                        onClick={() => handleDelete(i)}
+                        disabled={loading}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

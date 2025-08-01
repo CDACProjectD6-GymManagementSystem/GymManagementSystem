@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "../../styles/Admin.css";
 import {
   getAllReceptionists,
   addReceptionist,
@@ -10,13 +9,6 @@ import {
   deleteTrainer,
   updateTrainer,
 } from "../../services/AdminService";
-
-const Input = ({ label, ...props }) => (
-  <label>
-    {label} :
-    <input {...props} />
-  </label>
-);
 
 const StaffSection = () => {
   const [type, setType] = useState("trainer");
@@ -39,27 +31,28 @@ const StaffSection = () => {
   });
   const [editing, setEditing] = useState(null);
 
-  const staffFields = type === "trainer"
-    ? [
-        { name: "firstName", label: "First Name" },
-        { name: "lastName", label: "Last Name" },
-        { name: "email", label: "Email", type: "email" },
-        { name: "mobile", label: "Mobile" },
-        { name: "expertise", label: "Expertise" },
-        { name: "certifications", label: "Certifications" },
-        { name: "salary", label: "Salary" },
-        { name: "address", label: "Address" },
-        { name: "password", label: "Password", type: "password" },
-      ]
-    : [
-        { name: "firstName", label: "First Name" },
-        { name: "lastName", label: "Last Name" },
-        { name: "email", label: "Email", type: "email" },
-        { name: "mobile", label: "Mobile" },
-        { name: "salary", label: "Salary" },
-        { name: "address", label: "Address" },
-        { name: "password", label: "Password", type: "password" },
-      ];
+  const staffFields =
+    type === "trainer"
+      ? [
+          { name: "firstName", label: "First Name" },
+          { name: "lastName", label: "Last Name" },
+          { name: "email", label: "Email", type: "email" },
+          { name: "mobile", label: "Mobile" },
+          { name: "expertise", label: "Expertise" },
+          { name: "certifications", label: "Certifications" },
+          { name: "salary", label: "Salary" },
+          { name: "address", label: "Address" },
+          { name: "password", label: "Password", type: "password" },
+        ]
+      : [
+          { name: "firstName", label: "First Name" },
+          { name: "lastName", label: "Last Name" },
+          { name: "email", label: "Email", type: "email" },
+          { name: "mobile", label: "Mobile" },
+          { name: "salary", label: "Salary" },
+          { name: "address", label: "Address" },
+          { name: "password", label: "Password", type: "password" },
+        ];
 
   const staffList = type === "trainer" ? trainers : receps;
   const setStaffList = type === "trainer" ? setTrainers : setReceps;
@@ -83,11 +76,11 @@ const StaffSection = () => {
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleGenderChange = (e) => {
-    setForm(prev => ({ ...prev, gender: e.target.value }));
+    setForm((prev) => ({ ...prev, gender: e.target.value }));
   };
 
   const resetForm = () => {
@@ -148,7 +141,6 @@ const StaffSection = () => {
       if (editing !== null && (!entry.password || entry.password.trim() === "")) {
         delete entry.password;
       }
-      // Require password on add
       if (!entry.id && (!entry.password || entry.password.trim() === "")) {
         alert("Password is required for new trainer.");
         return;
@@ -206,7 +198,7 @@ const StaffSection = () => {
 
       try {
         await deleteReceptionist(staff.id);
-        setReceps(prev => prev.filter((_, idx) => idx !== i));
+        setReceps((prev) => prev.filter((_, idx) => idx !== i));
         if (editing === i) {
           setEditing(null);
           resetForm();
@@ -242,148 +234,139 @@ const StaffSection = () => {
   const staffTitle = type === "trainer" ? "Trainer" : "Receptionist";
 
   return (
-    <div className="admin-card">
-      <h2>Manage Staff</h2>
-      <label className="admin-select-label">
-        Staff Type:
-        <select
-          className="admin-select"
-          value={type}
-          onChange={e => {
-            setType(e.target.value);
-            setEditing(null);
-            resetForm();
-          }}
-        >
-          <option value="trainer">Trainer</option>
-          <option value="recep">Receptionist</option>
-        </select>
-      </label>
-
-      {type === "recep" && loadingReceps && <p>Loading receptionists...</p>}
-      {type === "trainer" && loadingTrainers && <p>Loading trainers...</p>}
-
-      <form className="admin-form" onSubmit={handleSubmit}>
-        {staffFields.map(
-          (field) =>
-            field.name !== "gender" && (
-              <Input
-                key={field.name}
-                name={field.name}
-                label={field.label}
-                type={field.type || "text"}
-                value={form[field.name] || ""}
-                onChange={handleFieldChange}
-                required={
-                  field.name === "password"
-                    ? type === "recep" && editing === null
-                    : true
-                }
-              />
-            )
-        )}
-
-        <label>Gender:</label>
-        <div className="gender-radio-group" style={{ marginBottom: "1em" }}>
-          <label>
-            <input
-              type="radio"
-              name="gender"
-              value="MALE"
-              checked={form.gender === "MALE"}
-              onChange={handleGenderChange}
-            />{" "}
-            Male
-          </label>
-          <label style={{ marginLeft: "1rem" }}>
-            <input
-              type="radio"
-              name="gender"
-              value="FEMALE"
-              checked={form.gender === "FEMALE"}
-              onChange={handleGenderChange}
-            />{" "}
-            Female
-          </label>
-          <label style={{ marginLeft: "1rem" }}>
-            <input
-              type="radio"
-              name="gender"
-              value="OTHER"
-              checked={form.gender === "OTHER"}
-              onChange={handleGenderChange}
-            />{" "}
-            Other
-          </label>
-        </div>
-
-        <button type="submit" className="admin-btn">
-          {editing !== null ? "Update" : "Add"} {staffTitle}
-        </button>
-        {editing !== null && (
-          <button
-            type="button"
-            className="admin-btn cancel"
-            onClick={() => {
+    <div className="container my-5">
+      <div className="mx-auto bg-white shadow p-4 rounded-4" style={{ maxWidth: 1000 }}>
+        <h2 className="text-center fw-bold mb-3">Manage Staff</h2>
+        {/* Staff Type Switcher */}
+        <div className="mb-4 d-flex align-items-center justify-content-center gap-3">
+          <label className="fw-semibold">Staff Type:</label>
+          <select
+            className="form-select w-auto"
+            value={type}
+            onChange={e => {
+              setType(e.target.value);
               setEditing(null);
               resetForm();
             }}
           >
-            Cancel
-          </button>
-        )}
-      </form>
+            <option value="trainer">Trainer</option>
+            <option value="recep">Receptionist</option>
+          </select>
+        </div>
 
-      <table className="admin-table" style={{ marginTop: "1rem" }}>
-        <thead>
-          <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Mobile</th>
-            {type === "trainer" && <th>Expertise</th>}
-            {type === "trainer" && <th>Certifications</th>}
-            <th>Salary</th>
-            <th>Address</th>
-            <th>Gender</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staffList.length === 0 ? (
-            <tr className="no-data-row">
-              <td colSpan={type === "trainer" ? 9 : 7}>
-                No {staffTitle.toLowerCase()}s found.
-              </td>
-            </tr>
-          ) : (
-            staffList.map((staff, index) => (
-              <tr key={staff.id || index}>
-                <td>{staff.firstName}</td>
-                <td>{staff.lastName}</td>
-                <td>{staff.email}</td>
-                <td>{staff.mobile}</td>
-                {type === "trainer" && <td>{staff.expertise}</td>}
-                {type === "trainer" && <td>{staff.certifications}</td>}
-                <td>{staff.salary}</td>
-                <td>{staff.address}</td>
-                <td>{staff.gender}</td>
-                <td>
-                  <button className="admin-btn" onClick={() => handleEdit(index)}>
-                    Edit
-                  </button>{" "}
-                  <button
-                    className="admin-btn delete"
-                    onClick={() => handleDelete(index)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
+        {type === "recep" && loadingReceps && (
+          <p className="text-center py-2 fw-semibold text-secondary">Loading receptionists...</p>
+        )}
+        {type === "trainer" && loadingTrainers && (
+          <p className="text-center py-2 fw-semibold text-secondary">Loading trainers...</p>
+        )}
+
+        {/* Form */}
+        <form className="row g-3 mb-4" onSubmit={handleSubmit}>
+          {staffFields.map(field =>
+            field.name !== "gender" && (
+              <div className="col-12 col-md-6 col-lg-4" key={field.name}>
+                <label className="form-label fw-semibold">
+                  {field.label}
+                </label>
+                <input
+                  className="form-control"
+                  name={field.name}
+                  type={field.type || "text"}
+                  value={form[field.name] || ""}
+                  onChange={handleFieldChange}
+                  required={field.name === "password" ? editing === null : true}
+                  placeholder={field.label}
+                />
+              </div>
+            )
           )}
-        </tbody>
-      </table>
+          {/* Gender radio group */}
+          <div className="col-12 col-md-6 col-lg-4">
+            <label className="form-label fw-semibold">Gender</label>
+            <div>
+              {["MALE", "FEMALE", "OTHER"].map(g => (
+                <div className="form-check form-check-inline" key={g}>
+                  <input className="form-check-input" type="radio" name="gender" id={`gender-${g}`}
+                    value={g} checked={form.gender === g} onChange={handleGenderChange} required
+                  />
+                  <label className="form-check-label" htmlFor={`gender-${g}`}>
+                    {g.charAt(0) + g.slice(1).toLowerCase()}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Form actions */}
+          <div className="col-12 d-flex gap-2">
+            <button type="submit" className="btn btn-primary fw-semibold">
+              {editing !== null ? "Update" : "Add"} {staffTitle}
+            </button>
+            {editing !== null && (
+              <button type="button" className="btn btn-secondary fw-semibold" onClick={() => { setEditing(null); resetForm(); }}>
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+        {/* Table */}
+        <div className="table-responsive rounded-4 shadow-sm bg-light">
+          <table className="table align-middle mb-0">
+            <thead className="table-primary text-white">
+              <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                {type === "trainer" && <th>Expertise</th>}
+                {type === "trainer" && <th>Certifications</th>}
+                <th>Salary</th>
+                <th>Address</th>
+                <th>Gender</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {staffList.length === 0 ? (
+                <tr>
+                  <td colSpan={type === "trainer" ? 9 : 7}
+                    className="text-center fst-italic py-4 text-secondary bg-white">
+                    No {staffTitle.toLowerCase()}s found.
+                  </td>
+                </tr>
+              ) : (
+                staffList.map((staff, index) => (
+                  <tr key={staff.id || index}>
+                    <td>{staff.firstName}</td>
+                    <td>{staff.lastName}</td>
+                    <td>{staff.email}</td>
+                    <td>{staff.mobile}</td>
+                    {type === "trainer" && <td>{staff.expertise}</td>}
+                    {type === "trainer" && <td>{staff.certifications}</td>}
+                    <td>{staff.salary}</td>
+                    <td>{staff.address}</td>
+                    <td>{staff.gender}</td>
+                    <td>
+                      <button
+                        className="btn btn-info btn-sm me-2 fw-semibold text-white"
+                        onClick={() => handleEdit(index)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm fw-semibold"
+                        onClick={() => handleDelete(index)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
