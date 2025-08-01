@@ -4,11 +4,12 @@ import TrainerNavbar from '../../components/TrainerNavbar';
 
 const StrengthEquipments = () => {
   const [equipments, setEquipments] = useState([]);
-  const [filter, setFilter] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState('all');
 
-  // Fetch from backend
+  // ✅ Fetch strength equipment list
   useEffect(() => {
-    axios.get(`http://localhost:8080/trainer/equipments/strength`)
+    axios.get('http://localhost:8080/trainer/equipments/strength')
       .then((res) => {
         if (Array.isArray(res.data)) {
           setEquipments(res.data);
@@ -23,9 +24,11 @@ const StrengthEquipments = () => {
       });
   }, []);
 
-  // Toggle maintenance
+  // ✅ Toggle maintenance status
   const toggleMaintenance = (id, currentStatus) => {
-    axios.put(`/api/equipments/${id}/maintenance`, { forMaintenance: !currentStatus })
+    axios.put(`http://localhost:8080/trainer/equipments/${id}/maintenance`, {
+      forMaintenance: !currentStatus
+    })
       .then(() => {
         setEquipments((prev) =>
           prev.map((eq) =>
@@ -33,42 +36,61 @@ const StrengthEquipments = () => {
           )
         );
       })
-      .catch((err) => console.error('Failed to update maintenance status:', err));
+      .catch((err) => {
+        console.error('Failed to update maintenance status:', err);
+        alert("Maintenance update failed.");
+      });
   };
 
-  // Get unique subcategories from `description` field
-  const uniqueCategories = ['All', ...new Set(equipments.map((e) => e.description))];
+  // ✅ Filtering by name
+  let filtered = equipments.filter(eq =>
+    eq.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // Filter by subcategory (description)
-  const filteredEquipments =
-    filter === 'All'
-      ? equipments
-      : equipments.filter((eq) => eq.description === filter);
+  // ✅ Apply status filtering
+  if (sortOption === 'maintenance') {
+    filtered = filtered.filter(eq => eq.forMaintenance === true);
+  } else if (sortOption === 'available') {
+    filtered = filtered.filter(eq => eq.forMaintenance === false);
+  }
+
+  // ✅ Apply sorting
+  if (sortOption === 'a-z') {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortOption === 'z-a') {
+    filtered.sort((a, b) => b.name.localeCompare(a.name));
+  }
 
   return (
     <>
       <TrainerNavbar />
       <div className="container mt-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h3>Strength Equipments</h3>
+        <div className="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <select
             className="form-select w-auto"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
           >
-            {uniqueCategories.map((cat, idx) => (
-              <option key={idx} value={cat}>
-                {cat}
-              </option>
-            ))}
+            <option value="all">All</option>
+            <option value="a-z">Sort: A–Z</option>
+            <option value="z-a">Sort: Z–A</option>
+            <option value="maintenance">Only Maintenance</option>
+            <option value="available">Only Available</option>
           </select>
         </div>
 
-        {filteredEquipments.length === 0 ? (
-          <p>No equipment found for selected category.</p>
+        {filtered.length === 0 ? (
+          <p>No equipment found.</p>
         ) : (
           <div className="row">
-            {filteredEquipments.map((eq) => (
+            {filtered.map((eq) => (
               <div className="col-md-4 mb-3" key={eq.id}>
                 <div className="card shadow-sm h-100">
                   <div className="card-body">
@@ -77,7 +99,7 @@ const StrengthEquipments = () => {
                       <strong>Category:</strong> {eq.description}
                     </p>
                     <p className={`card-text ${eq.forMaintenance ? 'text-danger' : 'text-success'}`}>
-                      <strong>Status:</strong> {eq.forMaintenance ? 'Under Maintenance' : 'Active'}
+                      <strong>Status:</strong> {eq.forMaintenance ? 'Under Maintenance' : 'Available'}
                     </p>
                     <button
                       className={`btn ${eq.forMaintenance ? 'btn-success' : 'btn-warning'}`}
