@@ -4,6 +4,9 @@ import java.util.List;
 
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.TrainerDTO;
+import com.gymmate.dtos.TrainerRequestDto;
+import com.gymmate.dtos.TrainerRespDto;
+import com.gymmate.dtos.TrainerUpdateDto;
 import com.gymmate.dtos.UserDietDTO;
 import com.gymmate.dtos.UserForTrainerDTO;
 import com.gymmate.dtos.UserScheduleDTO;
@@ -26,6 +29,14 @@ public interface TrainerService {
 	UserScheduleDTO getUserSchedule(Long userId);
 
 	ApiResponse updateUserSchedule(Long userId, UserScheduleDTO dto);
+
+	ApiResponse addTrainer(TrainerRequestDto addDto);
+
+	List<TrainerRespDto> getAllTrainers();
+
+	ApiResponse deleteTrainer(Long id);
+
+	ApiResponse updateTrainer(Long id, TrainerUpdateDto updateDto);
 	
 	
 }

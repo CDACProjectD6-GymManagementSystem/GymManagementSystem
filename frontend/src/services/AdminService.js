@@ -144,3 +144,28 @@ export const updateReceptionist = (id, receptionistData) => {
   const { id: _, ...dataWithoutId } = receptionistData;
   return axios.put(`${API_BASE_URL}/receptionist/update/${id}`, dataWithoutId);
 };
+
+export const addTrainer = (trainerData) => {
+  return axios.post(`${API_BASE_URL}/trainer`, trainerData).then((res) => res.data);
+};
+
+export const getAllTrainers=async()=>{
+  try{
+  const response=await axios.get(`${API_BASE_URL}/trainer`);
+  return response.data;
+  }
+  catch(error)
+  {
+    console.error("Error fetching Trainers");
+    throw error;
+  }
+};
+
+export const deleteTrainer = (id) => {
+  return axios.delete(`${API_BASE_URL}/trainer/delete/${id}`);
+};
+
+export const updateTrainer = (id, trainerData) => {
+  const { id: _, ...data } = trainerData;
+  return axios.put(`${API_BASE_URL}/trainer/update/${id}`, data).then(res => res.data);
+};
