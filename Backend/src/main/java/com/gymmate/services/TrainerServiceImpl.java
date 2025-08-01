@@ -11,6 +11,7 @@ import org.springframework.web.client.ResourceAccessException;
 import com.gymmate.customexception.NonUniqueElementException;
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.DietDao;
+import com.gymmate.daos.RoleDao;
 import com.gymmate.daos.ScheduleDao;
 import com.gymmate.daos.TrainerDao;
 import com.gymmate.daos.UserDao;
@@ -23,6 +24,8 @@ import com.gymmate.dtos.UserDietDTO;
 import com.gymmate.dtos.UserForTrainerDTO;
 import com.gymmate.dtos.UserScheduleDTO;
 import com.gymmate.entities.Diet;
+import com.gymmate.entities.Role;
+import com.gymmate.entities.Role.UserRole;
 import com.gymmate.entities.Schedule;
 import com.gymmate.entities.Trainer;
 import com.gymmate.entities.UserEntity;
@@ -45,7 +48,8 @@ public class TrainerServiceImpl implements TrainerService {
 	private DietDao dietDao;
 	@Autowired
 	private ScheduleDao scheduleDao;
-	
+	@Autowired
+	private RoleDao roleDao;
 	
 	@Override
 	public TrainerDTO getTrainerDetails(Long trainerId) {
@@ -170,7 +174,10 @@ public class TrainerServiceImpl implements TrainerService {
 			throw new NonUniqueElementException("Trainer already exists");
 		
 		Trainer entity = modelMapper.map(addDto, Trainer.class);
+		Role r=modelMapper.map(addDto, Role.class);
+		r.setRole(UserRole.ROLE_TRAINER);
 		trainerDao.save(entity);
+		roleDao.save(r);
 		return new ApiResponse("Trainer Added Successfully");
 	}
 
@@ -185,7 +192,9 @@ public class TrainerServiceImpl implements TrainerService {
 	public ApiResponse deleteTrainer(Long id) {
 		Trainer entity = trainerDao.findById(id)
 		.orElseThrow(()->new ResourceNotFoundException("Trainer not found"));
+		Role roleEntity = roleDao.findByEmail(entity.getEmail());
 		trainerDao.delete(entity);
+		roleDao.delete(roleEntity);
 		return new ApiResponse("Trainer Deleted Successfully");
 	}
 
@@ -193,9 +202,11 @@ public class TrainerServiceImpl implements TrainerService {
 	public ApiResponse updateTrainer(Long id, TrainerUpdateDto updateDto) {
 		Trainer entity = trainerDao.findById(id)
 		.orElseThrow(()->new ResourceNotFoundException("Trainer not found"));
-		
+		Role roleEntity = roleDao.findByEmail(entity.getEmail());
 		modelMapper.map(updateDto, entity);
+		modelMapper.map(updateDto, roleEntity);
 		trainerDao.save(entity);
+		roleDao.save(roleEntity);
 		return new ApiResponse("Trainer Updated");
 	}
 

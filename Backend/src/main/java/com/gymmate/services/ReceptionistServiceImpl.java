@@ -11,6 +11,7 @@ import com.gymmate.customexception.NonUniqueElementException;
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.AdminDao;
 import com.gymmate.daos.ReceptionistDao;
+import com.gymmate.daos.RoleDao;
 import com.gymmate.daos.TrainerDao;
 import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.ApiResponse;
@@ -22,6 +23,8 @@ import com.gymmate.dtos.TrainerNameForReceptionistDTO;
 import com.gymmate.dtos.UserNameForReceptonistDTO;
 import com.gymmate.dtos.UserTrainerNameDTO;
 import com.gymmate.entities.Receptionist;
+import com.gymmate.entities.Role;
+import com.gymmate.entities.Role.UserRole;
 import com.gymmate.entities.Trainer;
 import com.gymmate.entities.UserEntity;
 
@@ -41,6 +44,9 @@ public class ReceptionistServiceImpl implements ReceptionistService {
 	
 	@Autowired
 	private ReceptionistDao receptionistDao;
+	
+	@Autowired
+	private RoleDao roledao;
 	
 	UserTrainerNameDTO userTrainerNameDTO = new UserTrainerNameDTO();
 
@@ -78,6 +84,9 @@ public class ReceptionistServiceImpl implements ReceptionistService {
 			throw new NonUniqueElementException("Email already Exist");
 		Receptionist entity = mapper.map(addDto, Receptionist.class);
 		receptionistDao.save(entity);
+		Role r=mapper.map(addDto, Role.class);
+		r.setRole(UserRole.ROLE_RECEPTIONIST);
+		roledao.save(r);
 		return new ApiResponse("Receptionist added successfully");
 	}
 
@@ -93,7 +102,9 @@ public class ReceptionistServiceImpl implements ReceptionistService {
 	public ApiResponse deleteReceptionist(Long id) {
 		Receptionist entity = receptionistDao.findById(id)
 						.orElseThrow(()-> new ResourceNotFoundException("Receptionist Not found"));
+		Role role = roledao.findByEmail(entity.getEmail());
 		receptionistDao.delete(entity);
+		roledao.delete(role);
 		return new ApiResponse("Receptionist Deleted");
 	}
 
@@ -101,8 +112,9 @@ public class ReceptionistServiceImpl implements ReceptionistService {
 	public ApiResponse updateReceptionist(ReceptionistUpdateDto updatedto, Long id) {
 		Receptionist entity = receptionistDao.findById(id)
 				.orElseThrow(()-> new ResourceNotFoundException("Receptionist Not found"));
+		Role role = roledao.findByEmail(entity.getEmail());
 		mapper.map(updatedto, entity);
-		
+		mapper.map(updatedto, role);
 		return new ApiResponse("Receptionist Updated Successfully");
 	}
 
