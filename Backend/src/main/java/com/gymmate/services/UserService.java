@@ -1,6 +1,10 @@
 package com.gymmate.services;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.SubscriptionResponseForUserDTO;
@@ -19,7 +23,7 @@ public interface UserService {
 	boolean addProfile(UserDisplayProfileDto user);
 
 	boolean updateProfile(Long id, UserDisplayProfileDto user);
-	
+
 	ApiResponse registerUser(UserRegistrationDTO userRegistrationDTO);
 
 	UserLoginResponseDTO userLogin(UserLoginDTO userLoginDTO);
@@ -32,5 +36,8 @@ public interface UserService {
 
 	ApiResponse buySubscription(UserPaymentRequestDTO paymentDTO, Long id);
 
+	Map<String, String> uploadPhoto(Long userId, MultipartFile file) throws IOException;
+
+	ApiResponse deletePhoto(Long userId) throws IOException;
 
 }

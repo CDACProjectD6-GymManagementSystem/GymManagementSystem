@@ -18,14 +18,16 @@ public class MongoFeedbackServiceImpl implements MongoFeedbackService {
 	private MongoFeedbackDao feedbackDao;
 	@Autowired
 	private ModelMapper mapper;
-	
 
 	@Override
 	public ApiResponse addFeedback(FeedbackDTO feedbackDTO, String Id) {
 
-		Feedback fdd = mapper.map(feedbackDTO, Feedback.class);
-		fdd.setId(Id.toString());
-		feedbackDao.save(fdd);
+		Feedback newFeedback = new Feedback();
+		newFeedback.setUserId(Id);
+		newFeedback.setMessage(feedbackDTO.getMessage());
+		newFeedback.setRating(feedbackDTO.getRating());
+
+		feedbackDao.save(newFeedback);
 		return new ApiResponse("Feedback Added Successfully");
 	}
 

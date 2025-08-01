@@ -1,6 +1,9 @@
 package com.gymmate.services;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -8,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.PaymentDAO;
@@ -49,6 +53,8 @@ public class UserServiceImpl implements UserService {
 	private SubscriptionDao subscriptionDao;
 	@Autowired
 	private PaymentDAO paymentDAO;
+	@Autowired
+	private ImageService imageService;
 
 	@Override
 	public UserDisplayProfileDto getProfile(Long id) {
@@ -153,4 +159,37 @@ public class UserServiceImpl implements UserService {
 		return new ApiResponse("payment succesful");
 	}
 
+	@Override
+	public Map<String, String> uploadPhoto(Long id, MultipartFile file) throws IOException {
+		UserEntity user = userDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		if (user.getImagePublicId() != null && !user.getImagePublicId().isBlank()) {
+			imageService.delete(user.getImagePublicId());
+		}
+		Map result = imageService.upload(file);
+
+		String url = (String) result.get("secure_url");
+		String publicId = (String) result.get("public_id");
+
+		user.setImageUrl(url);
+		user.setImagePublicId(publicId);
+		userDao.save(user);
+
+		Map<String, String> response = new HashMap<>();
+		response.put("secure_url", url);
+		response.put("public_id", publicId);
+		return response;
+	}
+
+	@Override
+	public ApiResponse deletePhoto(Long id) throws IOException {
+		UserEntity user = userDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		if (user.getImagePublicId() != null && !user.getImagePublicId().isBlank()) {
+			imageService.delete(user.getImagePublicId());
+			user.setImageUrl(null);
+			user.setImagePublicId(null);
+			userDao.save(user);
+			return new ApiResponse("Image deleted successfully");
+		}
+		return new ApiResponse("No image found to delete");
+	}
 }
