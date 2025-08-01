@@ -8,12 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gymmate.customexception.ResourceNotFoundException;
+import com.gymmate.daos.EquipmentDao;
+import com.gymmate.daos.RoleDao;
 import com.gymmate.daos.SubscriptionDao;
 import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.UserEntityResponseDto;
 import com.gymmate.dtos.UserSubscriptionAddDto;
 import com.gymmate.dtos.UserSubscriptionUpdateDto;
+import com.gymmate.entities.Role;
+import com.gymmate.entities.Role.UserRole;
 import com.gymmate.entities.Subscription;
 import com.gymmate.entities.UserEntity;
 
@@ -24,11 +28,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
+    private final EquipmentDao equipmentDao;
 	private final SubscriptionDao subscriptionDao;
 	private final UserDao userDao;
 	private final ModelMapper mapper;
+	private final RoleDao rdao;
 
-	@Override
+    @Override
 	public ApiResponse addUser(UserSubscriptionAddDto userAddDto) {
 		if (!subscriptionDao.existsByName(userAddDto.getSubscriptionType())) {
 			throw new ResourceNotFoundException("Subscription Type not found");
@@ -41,7 +47,10 @@ public class AdminServiceImpl implements AdminService {
 		userEntity.setSubscriptionId(subEntity);
 		userEntity.setActive(true);
 		userEntity.setSubscribed(true);
+		Role r=mapper.map(userAddDto, Role.class);
+		r.setRole(UserRole.ROLE_USER);
 		userDao.save(userEntity);
+		rdao.save(r);
 		return new ApiResponse("User Created");
 	}
 
@@ -49,6 +58,8 @@ public class AdminServiceImpl implements AdminService {
 	public ApiResponse softDeleteUser(Long userId) {
 		UserEntity userEntity = userDao.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		Role r=rdao.findByEmail(userEntity.getEmail());
+		rdao.delete(r);
 		userEntity.setActive(false); // SoftDeleting the User
 		return new ApiResponse("User Deleted Successfully");
 	}
@@ -61,7 +72,9 @@ public class AdminServiceImpl implements AdminService {
 			Subscription subEntity = subscriptionDao.findByName(userUpdatedto.getSubscriptionType());
 			userEntity.setSubscriptionId(subEntity);
 		}
+		Role r=rdao.findByEmail(userEntity.getEmail());
 		mapper.map(userUpdatedto, userEntity);
+		mapper.map(userUpdatedto, r);
 		return new ApiResponse("User Updated Successfully");
 	}
 
