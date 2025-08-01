@@ -6,4 +6,7 @@ import com.gymmate.entities.Role;
 
 public interface RoleDao extends JpaRepository<Role, Long> {
 
+	Role findByEmail(String email);
+
+	
 }
