@@ -6,10 +6,32 @@ export default function FeedbackPage() {
   const [rating, setRating] = useState(0);
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = e => {
+  // Helper: get logged-in user id (from login flow)
+  const userId = localStorage.getItem("gymmateUserId");
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    setSent(true);
+    if (!userId) {
+      alert("You must be logged in to submit feedback.");
+      return;
+    }
+    setLoading(true);
+    const payload = { message: msg, rating, userId };
+    try {
+      const res = await fetch("http://localhost:8080/user/feedback/{userId}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Failed to send feedback");
+      setSent(true);
+    } catch (err) {
+      alert("Submission failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,10 +50,8 @@ export default function FeedbackPage() {
           <form className="feedback-form" onSubmit={handleSubmit}>
             {/* Rating */}
             <div>
-              <label className="feedback-label">
-                Rate Your Experience
-              </label>
-              <div>
+              <label className="feedback-label">Rate Your Experience</label>
+              <div className="feedback-stars-row">
                 {[1, 2, 3, 4, 5].map(n =>
                   <FaStar
                     key={n}
@@ -44,9 +64,7 @@ export default function FeedbackPage() {
             </div>
             {/* Message */}
             <div>
-              <label className="feedback-label">
-                Your Feedback
-              </label>
+              <label className="feedback-label">Your Feedback</label>
               <textarea
                 rows={5}
                 className="feedback-msg"
@@ -56,9 +74,12 @@ export default function FeedbackPage() {
                 required
               />
             </div>
-            <button className="feedback-submitbtn">
+            <button
+              className="feedback-submitbtn"
+              disabled={loading || !msg || !rating}
+            >
               <FaCommentDots className="feedback-submiticon" />
-              Send Feedback
+              {loading ? "Sending..." : "Send Feedback"}
             </button>
           </form>
         ) : (

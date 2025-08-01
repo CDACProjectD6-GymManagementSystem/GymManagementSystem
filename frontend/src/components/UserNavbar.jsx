@@ -1,41 +1,25 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  FaHome,
-  FaDumbbell,
-  FaUserCircle,
-  FaAppleAlt,
-  FaSignOutAlt,
+  FaHome, FaDumbbell, FaAppleAlt, FaSignOutAlt, FaUserCircle,
 } from "react-icons/fa";
- 
+
 const navLinks = [
-  {
-    label: "Dashboard",
-    path: "/user",
-    icon: <FaHome className="me-1" />,
-  },
-  {
-    label: "Workouts",
-    path: "/user/workout",
-    icon: <FaDumbbell className="me-1" />,
-  },
-  {
-    label: "Diet & Nutrition",
-    path: "/user/diet-nutrition",
-    icon: <FaAppleAlt className="me-1" />,
-  },
-  {
-    label: "Profile",
-    path: "/user/profile",
-    icon: <FaUserCircle className="me-1" />,
-  },
+  { label: "Dashboard", path: "/user", icon: <FaHome className="me-1" /> },
+  { label: "Workouts", path: "/user/workout", icon: <FaDumbbell className="me-1" /> },
+  { label: "Diet & Nutrition", path: "/user/diet-nutrition", icon: <FaAppleAlt className="me-1" /> },
+  // No "Profile" here
 ];
 
 const UserNavbar = () => {
   const navigate = useNavigate();
+  const userName = localStorage.getItem("gymmateUserFirstName") || "";
 
   const handleLogout = () => {
-    // localStorage.removeItem("userLoggedIn");
+    localStorage.removeItem("gymmateUserId");
+    localStorage.removeItem("gymmateUserFirstName");
+    localStorage.removeItem("gymmateUserEmail");
+    localStorage.removeItem("gymmateUserPhoto");
     navigate("/");
   };
 
@@ -53,27 +37,33 @@ const UserNavbar = () => {
       >
         <span className="navbar-toggler-icon"></span>
       </button>
-
       <div className="collapse navbar-collapse" id="userNavbarNav">
         <ul className="navbar-nav ms-auto gap-2">
           {navLinks.map(({ label, path, icon }) => (
             <li className="nav-item" key={label}>
-              <Link
-                className="nav-link user-navlink"
-                to={path}
-              >
-                {icon}
-                {label}
+              <Link className="nav-link user-navlink" to={path}>
+                {icon}{label}
               </Link>
             </li>
           ))}
         </ul>
-        <button
-          className="btn btn-outline-warning ms-4 user-logout-btn"
-          onClick={handleLogout}
-        >
-          <FaSignOutAlt className="mb-1 me-1" /> Logout
-        </button>
+        <div className="d-flex align-items-center ms-4">
+          <Link
+            to="/user/profile"
+            className="d-flex align-items-center text-white fw-semibold me-4 text-decoration-none"
+            style={{ fontWeight: "600", fontSize: "16px" }}
+            title="Profile"
+          >
+            <FaUserCircle size={22} className="me-2" />
+            {userName}
+          </Link>
+          <button
+            className="btn btn-outline-warning user-logout-btn"
+            onClick={handleLogout}
+          >
+            <FaSignOutAlt className="mb-1 me-1" /> Logout
+          </button>
+        </div>
       </div>
     </nav>
   );
