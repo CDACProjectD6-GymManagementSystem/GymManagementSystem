@@ -23,6 +23,13 @@
   border-right: 1.5px solid #222;
   min-width: 165px;
   color: #111;
+  position: relative;
+}
+
+.profile-avatar {
+  position: relative;
+  margin-bottom: 10px;
+  /* for upload button positioning */
 }
 
 .profile-avatar img {
@@ -32,6 +39,64 @@
   margin-bottom: 15px;
   background: #efefef;
   border: 2.5px solid #111;
+  object-fit: cover;
+}
+
+/* Upload button styling (appears over image when editing) */
+.profile-avatar-upload-btn {
+  position: absolute;
+  left: 55%;
+  bottom: 23px;
+  background: #fff;
+  border: 1.5px solid #111;
+  padding: 7px 8px 6px 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 7px #e6eaf1;
+  cursor: pointer;
+  font-size: 1.13rem;
+  color: #111;
+  z-index: 3;
+  transition: background 0.17s, color 0.17s, border-color 0.16s;
+}
+.profile-avatar-upload-btn:hover {
+  background: #292929;
+  color: #fff;
+  border-color: #111;
+}
+
+.profile-avatar-upload-action {
+  display: block;
+  margin: 7px auto 0 auto;
+  background: #357fea;
+  color: #fff;
+  border-radius: 5px;
+  padding: 2px 17px;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background .19s;
+}
+.profile-avatar-upload-action:disabled {
+  background: #acc4e6;
+}
+
+.profile-avatar-delete-btn {
+  display: inline-block;
+  margin-left: 10px;
+  margin-top: 8px;
+  background: #e53d3d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 2px 15px;
+  font-size: 0.97rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background .13s;
+}
+.profile-avatar-delete-btn:hover {
+  background: #ba1717;
 }
 
 .profile-mainname {
@@ -49,7 +114,6 @@
   align-items: center;
   justify-content: center;
 }
-
 .profile-info-line svg {
   color: #111;
   margin-right: 7px;
@@ -90,7 +154,6 @@
   font-family: inherit;
   transition: border-color 0.2s;
 }
-
 .profile-input:focus {
   border-color: #111;
 }
@@ -113,18 +176,15 @@
   font-weight: 600;
   transition: background 0.22s, color 0.22s;
 }
-
 .profile-save-btn {
   background: #111;
   color: #fff;
 }
-
 .profile-edit-btn {
   background: #fff;
   color: #111;
   border: 1.5px solid #111;
 }
-
 .profile-edit-btn:hover,
 .profile-save-btn:hover {
   background: #222;
@@ -136,6 +196,7 @@
   font-size: 1.09em;
 }
 
+/* Responsive styles */
 @media (max-width: 780px) {
   .profilepage-root { flex-direction: column; max-width: 99vw; }
   .profile-avatar-panel { border-right: none; border-bottom: 1.5px solid #111; padding: 27px 10px 15px 10px; }

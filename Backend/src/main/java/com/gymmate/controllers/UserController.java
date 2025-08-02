@@ -1,17 +1,24 @@
 package com.gymmate.controllers;
 
+import java.io.IOException;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gymmate.daos.RoleDao;
+import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.FeedbackDTO;
 import com.gymmate.dtos.UserDisplayProfileDto;
 import com.gymmate.dtos.UserLoginDTO;
@@ -100,6 +107,21 @@ public class UserController {
 	public ResponseEntity<?> buySubscription(@RequestBody UserPaymentRequestDTO paymentDTO, @PathVariable Long Id) {
 
 		return ResponseEntity.ok().body(userService.buySubscription(paymentDTO, Id));
+	}
+	
+	
+	@PostMapping("/upload-photo/{id}")
+	public ResponseEntity<?> uploadProfilePhoto(
+	        @PathVariable Long id,
+	        @RequestParam("file") MultipartFile file) throws IOException {
+	    Map<String, String> result = userService.uploadPhoto(id, file);
+	    return ResponseEntity.ok(result);
+	}
+
+	@DeleteMapping("/delete-photo/{id}")
+	public ResponseEntity<?> deleteProfilePhoto(@PathVariable Long id) throws IOException {
+	    ApiResponse resp = userService.deletePhoto(id);
+	    return ResponseEntity.ok(resp);
 	}
 
 }

@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
-  FaUserEdit, FaSave, FaUser, FaEnvelope, FaPhone, FaHome, FaVenusMars
+  FaUserEdit, FaSave, FaUser, FaEnvelope, FaPhone, FaHome, FaVenusMars, FaCamera, FaTrash
 } from "react-icons/fa";
 import './ProfilePage.css';
-import { profileService } from "../../../services/UserProfileService";
+import { profileService } from "../../../services/UserProfileService"; // Your custom service
 
-// Gender enum for select
 const GENDERS = [
   { value: "MALE", label: "Male" },
   { value: "FEMALE", label: "Female" },
-  { value: "OTHER",  label: "Other" }
+  { value: "OTHER", label: "Other" }
 ];
-const AVATAR = "https://randomuser.me/api/portraits/men/75.jpg";
 
 const ProfilePage = () => {
   const [form, setForm] = useState(null);
@@ -19,27 +17,34 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [imgLoading, setImgLoading] = useState(false);
+  const [fileInput, setFileInput] = useState(null);
 
-  // On mount, fetch the user's profile using their id from localStorage
+  const userId = localStorage.getItem("gymmateUserId");
+
+  // Fetches full profile (fields + image) after any change
+  const fetchProfile = async () => {
+    setLoading(true);
+    setApiError("");
+    try {
+      const res = await profileService.fetch();
+      setForm(res.data);
+      setLoading(false);
+    } catch {
+      setApiError("Failed to load profile.");
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const userId = localStorage.getItem("gymmateUserId");
     if (!userId) {
       setApiError("You must be logged in to view your profile.");
       setLoading(false);
       return;
     }
-    setLoading(true);
-    profileService.fetch()
-      .then(res => {
-        setForm(res.data);
-        setLoading(false);
-        setApiError("");
-      })
-      .catch(() => {
-        setApiError("Failed to load profile.");
-        setLoading(false);
-      });
-  }, []);
+    fetchProfile();
+    // eslint-disable-next-line
+  }, [userId]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -52,15 +57,57 @@ const ProfilePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setApiError("");
-    setSuccessMsg("");
+    setApiError(""); setSuccessMsg("");
     try {
       await profileService.update(form);
       setEditing(false);
       setSuccessMsg("Profile updated successfully!");
+      await fetchProfile();
     } catch {
       setApiError("Failed to save changes!");
     }
+  };
+
+  // --- IMAGE UPLOAD/REMOVE ---
+  const handleFileChange = (e) => setFileInput(e.target.files[0]);
+
+  const handleImageUpload = async () => {
+    if (!fileInput || !userId) return;
+    setImgLoading(true); setApiError(""); setSuccessMsg("");
+    const data = new FormData();
+    data.append("file", fileInput);
+
+    try {
+      // Call the backend
+      const res = await fetch(
+        `http://localhost:8080/user/upload-photo/${userId}`,
+        { method: "POST", body: data }
+      );
+      if (!res.ok) throw new Error();
+      setSuccessMsg("Profile photo updated!");
+      setFileInput(null);
+      await fetchProfile();
+    } catch {
+      setApiError("Failed to upload image.");
+    }
+    setImgLoading(false);
+  };
+
+  const handleRemoveImage = async () => {
+    if (!userId) return;
+    setImgLoading(true); setApiError(""); setSuccessMsg("");
+    try {
+      const res = await fetch(
+        `http://localhost:8080/user/delete-photo/${userId}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error();
+      setSuccessMsg("Profile photo removed.");
+      await fetchProfile();
+    } catch {
+      setApiError("Failed to remove image!");
+    }
+    setImgLoading(false);
   };
 
   if (loading)
@@ -69,7 +116,6 @@ const ProfilePage = () => {
         <div style={{ textAlign: 'center', padding: '70px' }}>Loading...</div>
       </div>
     );
-
   if (!form)
     return (
       <div className="profilepage-bg">
@@ -82,33 +128,63 @@ const ProfilePage = () => {
   return (
     <div className="profilepage-bg">
       <div className="profilepage-root">
-        {/* Avatar & Display Info */}
+        {/* Avatar */}
         <div className="profile-avatar-panel">
-          <div className="profile-avatar">
-            <img src={AVATAR} alt="Profile" />
-          </div>
-          <div className="profile-mainname">
-            {form.firstName} {form.lastName}
-          </div>
-          <div className="profile-info-line">
-            <FaEnvelope /> {form.email}
-          </div>
-          <div className="profile-info-line">
-            <FaPhone /> {form.mobile}
-          </div>
-          <div className="profile-info-line">
-            <FaVenusMars /> {(form.gender && GENDERS.find(g => g.value === form.gender)?.label) || ""}
+          <div className="profile-avatar" style={{ position: "relative" }}>
+            <img
+              src={
+                form.imageUrl
+                  ? form.imageUrl
+                  : "https://ui-avatars.com/api/?name=" +
+                    encodeURIComponent((form.firstName || "") + " " + (form.lastName || "")) +
+                    "&background=eee&color=222&size=98"
+              }
+              alt="Profile"
+              style={{ objectFit: "cover" }}
+            />
+            {editing && (
+              <>
+                <label className="profile-avatar-upload-btn">
+                  <FaCamera />
+                  <input
+                    type="file"
+                    style={{ display: "none" }}
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </label>
+                {fileInput && (
+                  <button
+                    className="profile-avatar-upload-action"
+                    onClick={handleImageUpload}
+                    disabled={imgLoading}
+                  >
+                    {imgLoading ? "Uploading..." : "Upload"}
+                  </button>
+                )}
+                {form.imageUrl &&
+                  <button
+                    onClick={handleRemoveImage}
+                    className="profile-avatar-delete-btn"
+                    disabled={imgLoading}
+                  >
+                    <FaTrash /> Remove
+                  </button>
+                }
+              </>
+            )}
           </div>
         </div>
-        {/* Edit Form */}
-        <div className="profile-form-panel">
-          <div className="profile-form-heading">Edit Details</div>
+
+        {/* Form */}
+        <div className="profile-form-panel" style={{ margin: "0 auto" }}>
+          <div className="profile-form-heading">Profile Details</div>
           <form onSubmit={handleSubmit}>
             <div className="profile-form-group">
               <label><FaUser className="profile-label-icon" /> First Name</label>
               <input
                 name="firstName"
-                value={form.firstName}
+                value={form.firstName || ""}
                 onChange={handleChange}
                 required
                 readOnly={!editing}
@@ -119,7 +195,7 @@ const ProfilePage = () => {
               <label><FaUser className="profile-label-icon" /> Last Name</label>
               <input
                 name="lastName"
-                value={form.lastName}
+                value={form.lastName || ""}
                 onChange={handleChange}
                 required
                 readOnly={!editing}
@@ -131,18 +207,7 @@ const ProfilePage = () => {
               <input
                 type="email"
                 name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                readOnly={!editing}
-                className={`profile-input ${!editing ? "readonly" : ""}`}
-              />
-            </div>
-            <div className="profile-form-group">
-              <label><FaPhone className="profile-label-icon" /> Mobile Number</label>
-              <input
-                name="mobile"
-                value={form.mobile}
+                value={form.email || ""}
                 onChange={handleChange}
                 required
                 readOnly={!editing}
@@ -153,7 +218,18 @@ const ProfilePage = () => {
               <label><FaHome className="profile-label-icon" /> Address</label>
               <input
                 name="address"
-                value={form.address}
+                value={form.address || ""}
+                onChange={handleChange}
+                required
+                readOnly={!editing}
+                className={`profile-input ${!editing ? "readonly" : ""}`}
+              />
+            </div>
+            <div className="profile-form-group">
+              <label><FaPhone className="profile-label-icon" /> Mobile Number</label>
+              <input
+                name="mobile"
+                value={form.mobile || ""}
                 onChange={handleChange}
                 required
                 readOnly={!editing}
@@ -164,7 +240,7 @@ const ProfilePage = () => {
               <label><FaVenusMars className="profile-label-icon" /> Gender</label>
               <select
                 name="gender"
-                value={form.gender}
+                value={form.gender || ""}
                 onChange={handleChange}
                 disabled={!editing}
                 className={`profile-input ${!editing ? "readonly" : ""}`}

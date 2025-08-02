@@ -38,7 +38,6 @@ const SubscriptionSection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Load subscriptions on mount
   const loadSubscriptions = async () => {
     setLoading(true);
     setError(null);
@@ -67,7 +66,6 @@ const SubscriptionSection = () => {
     loadSubscriptions();
   }, []);
 
-  // Convert boolean to "true"/"false" for radio group
   const boolToString = (val) => (val ? "true" : "false");
 
   const handleChange = (e) => {

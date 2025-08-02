@@ -16,7 +16,7 @@ const CATEGORY_OPTIONS = [
 
 const EquipmentSection = () => {
   const [emps, setEmps] = useState([]);
-  const [editing, setEditing] = useState(null); // holds row index if editing
+  const [editing, setEditing] = useState(null); 
   const [form, setForm] = useState({
     id: "",
     name: "",

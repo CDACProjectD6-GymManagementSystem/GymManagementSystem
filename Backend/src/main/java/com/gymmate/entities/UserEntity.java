@@ -1,5 +1,7 @@
 package com.gymmate.entities;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -29,7 +31,8 @@ public class UserEntity extends BaseEntity {
 	private Diet diet;
 	@OneToOne
 	private Schedule schedule;
-	
+	private LocalDateTime subscriptionStartDate;
+    private LocalDateTime subscriptionEndDate;
 	@Column(name = "image_url")
 	private String imageUrl;
 
