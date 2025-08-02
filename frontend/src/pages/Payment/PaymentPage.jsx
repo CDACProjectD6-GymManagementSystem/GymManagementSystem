@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
-import {plans} from "../Home/Home";
-
 
 const PaymentPage = () => {
   const [searchParams] = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [allPlans, setAllPlans] = useState([]);
   const [paymentInfo, setPaymentInfo] = useState({
     name: '',
     email: '',
@@ -18,21 +17,28 @@ const PaymentPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Fetch selected plan from URL parameter
+  // Fetch all plans from backend and find the selected one
   useEffect(() => {
     const planId = searchParams.get('planId');
-    const plan = plans.find(p => p.id === Number(planId));
-    
-    if (plan) {
-      setSelectedPlan(plan);
-      setErrorMessage(''); // Clear previous errors
-    } else {
-      setErrorMessage('No valid plan selected!');
-      setSelectedPlan(null);
-    }
-  }, [searchParams]); // Re-run when planId changes
 
-  // Handle payment form submission
+    axios.get("http://localhost:8080/subscriptions")
+      .then(res => {
+        setAllPlans(res.data);
+        const plan = res.data.find(p => p.id === Number(planId));
+        if (plan) {
+          setSelectedPlan(plan);
+          setErrorMessage('');
+        } else {
+          setErrorMessage('No valid plan selected!');
+          setSelectedPlan(null);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching subscriptions:", err);
+        setErrorMessage("Failed to fetch plan data.");
+      });
+  }, [searchParams]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedPlan) return;
@@ -46,7 +52,7 @@ const PaymentPage = () => {
       };
 
       const response = await axios.post('/api/payments', paymentData);
-      
+
       if (response.data.success) {
         setSuccessMessage('Payment successful! Receipt sent to your email.');
         setPaymentInfo({ name: '', email: '', cardNumber: '', expiry: '', cvc: '' });
@@ -58,21 +64,15 @@ const PaymentPage = () => {
     }
   };
 
-  // Handle form fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setPaymentInfo({
-      ...paymentInfo,
-      [name]: value
-    });
+    setPaymentInfo({ ...paymentInfo, [name]: value });
   };
 
   if (!selectedPlan) {
     return (
       <div className="container mt-5">
-        <Alert variant="danger">
-          {errorMessage || 'Invalid or expired plan selection!'}
-        </Alert>
+        <Alert variant="danger">{errorMessage || 'Invalid or expired plan selection!'}</Alert>
       </div>
     );
   }
@@ -81,20 +81,17 @@ const PaymentPage = () => {
     <div className="container mt-5">
       <h2 className="text-center mb-4">Complete Your Payment for {selectedPlan.name} Plan</h2>
 
-      {/* Success/Error Alerts */}
       {successMessage && <Alert variant="success">{successMessage}</Alert>}
       {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
 
-      {/* Payment Form */}
       <Form onSubmit={handleSubmit} className="shadow-sm p-4">
-        {/* Selected Plan Summary */}
         <div className="mb-4 bg-light p-3 rounded">
           <h5>{selectedPlan.name} Plan</h5>
-          <p>Duration: {selectedPlan.duration}</p>
+          <p>Duration: {selectedPlan.duration} month(s)</p>
           <p>Total Amount: ₹{selectedPlan.price}</p>
+          <p>Discount: {selectedPlan.discount}%</p>
         </div>
 
-        {/* Form Fields */}
         <Row className="g-3">
           <Col md={6}>
             <Form.Group controlId="name">

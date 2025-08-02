@@ -221,7 +221,7 @@ public class TrainerServiceImpl implements TrainerService {
 	    if (trainer.getImagePublicId() != null && !trainer.getImagePublicId().isBlank()) {
 	        imageService.delete(trainer.getImagePublicId());
 	    }
-	    Map result = imageService.upload(file);
+	    Map<?, ?> result = imageService.upload(file);
 
 	    String url = (String) result.get("secure_url");
 	    String publicId = (String) result.get("public_id");
@@ -235,7 +235,10 @@ public class TrainerServiceImpl implements TrainerService {
 	    return response;
 	}
 
+	
+	
 
+	
     @Override
     public ApiResponse deletePhoto(Long id) throws IOException {
         Trainer trainer = trainerDao.findById(id).orElseThrow(() -> new RuntimeException("Trainer not found"));

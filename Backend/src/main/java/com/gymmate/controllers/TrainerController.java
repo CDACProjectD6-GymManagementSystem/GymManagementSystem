@@ -163,6 +163,7 @@ public class TrainerController {
 	}
 
 
+	
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) throws IOException {
         return ResponseEntity.ok(trainerService.deletePhoto(id));
