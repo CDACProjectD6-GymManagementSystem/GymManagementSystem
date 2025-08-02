@@ -34,7 +34,7 @@ const UserSection = () => {
         setUsers(usersData);
         setSubscriptionNames(subscriptions);
       } catch (error) {
-        // Optionally: Add user-facing alert
+        
       }
     };
     fetchData();
@@ -80,8 +80,7 @@ const UserSection = () => {
         subscriptionType: "",
       });
     } catch (error) {
-      // Optionally: alert or toast error message
-    }
+      }
   };
 
   const handleEdit = (idx) => {
@@ -108,8 +107,7 @@ const UserSection = () => {
       setUsers(updatedUsers);
       if (editing === idx) setEditing(null);
     } catch (error) {
-      // Optionally: alert or toast error message
-    }
+      }
   };
 
   const handleCancelEdit = () => {

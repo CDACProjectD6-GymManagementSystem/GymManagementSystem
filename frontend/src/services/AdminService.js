@@ -1,13 +1,11 @@
-// src/services/userService.js
+
 import axios from "axios";
 
-// Configure your base URL here
 const API_BASE_URL = "http://localhost:8080/admin";
 
 export const getUsers = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/get-users`);
-    // Assuming response data is an array of users matching UserEntityResponseDto
     return response.data;
   } catch (error) {
     console.error("Error fetching users", error);
@@ -17,7 +15,6 @@ export const getUsers = async () => {
 
 export const addUser = async (userData) => {
   try {
-    // userData should match your backend DTO structure
     const response = await axios.post(`${API_BASE_URL}/add-user`, userData);
     return response.data;
   } catch (error) {
@@ -57,7 +54,6 @@ export const getSubscriptionNames = async () => {
 };
 
 export const addSubscription = (data) => {
-  // Change URL as per your backend endpoint
   return axios.post(`${API_BASE_URL}/subscription/add-subscription`, data);
 };
 
