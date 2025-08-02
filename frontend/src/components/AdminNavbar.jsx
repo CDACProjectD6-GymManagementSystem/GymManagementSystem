@@ -2,13 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 
-// Example usage: <AdminNavbar items={["Admin Dashboard","Manage Users",...]} current="Manage Users" onNav={()=>{}} />
 
 const AdminNavbar = ({ items, current, onNav }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // localStorage.removeItem("adminLoggedIn");
     navigate("/");
   };
 

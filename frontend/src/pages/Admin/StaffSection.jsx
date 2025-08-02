@@ -57,7 +57,6 @@ const StaffSection = () => {
   const staffList = type === "trainer" ? trainers : receps;
   const setStaffList = type === "trainer" ? setTrainers : setReceps;
 
-  // Fetch data on type change
   useEffect(() => {
     if (type === "recep") {
       setLoadingReceps(true);
@@ -104,15 +103,12 @@ const StaffSection = () => {
     const entry = { ...form };
 
     if (type === "recep") {
-      // Remove trainer-only fields
       delete entry.expertise;
       delete entry.certifications;
 
-      // Exclude password if blank on update
       if (editing !== null && (!entry.password || entry.password.trim() === "")) {
         delete entry.password;
       }
-      // Require password on add
       if (!entry.id && (!entry.password || entry.password.trim() === "")) {
         alert("Password is required for new receptionist.");
         return;
@@ -136,8 +132,6 @@ const StaffSection = () => {
         setLoadingReceps(false);
       }
     } else {
-      // Trainer add/update
-      // Exclude password if blank on update
       if (editing !== null && (!entry.password || entry.password.trim() === "")) {
         delete entry.password;
       }
@@ -181,7 +175,7 @@ const StaffSection = () => {
       certifications: staff.certifications || "",
       salary: staff.salary || "",
       address: staff.address || "",
-      password: "", // always blank on edit for security
+      password: "", 
       gender: staff.gender || "MALE",
     });
   };
@@ -237,7 +231,6 @@ const StaffSection = () => {
     <div className="container my-5">
       <div className="mx-auto bg-white shadow p-4 rounded-4" style={{ maxWidth: 1000 }}>
         <h2 className="text-center fw-bold mb-3">Manage Staff</h2>
-        {/* Staff Type Switcher */}
         <div className="mb-4 d-flex align-items-center justify-content-center gap-3">
           <label className="fw-semibold">Staff Type:</label>
           <select
@@ -261,7 +254,6 @@ const StaffSection = () => {
           <p className="text-center py-2 fw-semibold text-secondary">Loading trainers...</p>
         )}
 
-        {/* Form */}
         <form className="row g-3 mb-4" onSubmit={handleSubmit}>
           {staffFields.map(field =>
             field.name !== "gender" && (
@@ -281,7 +273,6 @@ const StaffSection = () => {
               </div>
             )
           )}
-          {/* Gender radio group */}
           <div className="col-12 col-md-6 col-lg-4">
             <label className="form-label fw-semibold">Gender</label>
             <div>
@@ -297,7 +288,6 @@ const StaffSection = () => {
               ))}
             </div>
           </div>
-          {/* Form actions */}
           <div className="col-12 d-flex gap-2">
             <button type="submit" className="btn btn-primary fw-semibold">
               {editing !== null ? "Update" : "Add"} {staffTitle}
@@ -309,7 +299,6 @@ const StaffSection = () => {
             )}
           </div>
         </form>
-        {/* Table */}
         <div className="table-responsive rounded-4 shadow-sm bg-light">
           <table className="table align-middle mb-0">
             <thead className="table-primary text-white">
