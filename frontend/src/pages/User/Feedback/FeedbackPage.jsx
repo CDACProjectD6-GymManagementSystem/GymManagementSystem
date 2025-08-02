@@ -18,9 +18,9 @@ export default function FeedbackPage() {
       return;
     }
     setLoading(true);
-    const payload = { message: msg, rating, userId };
+    const payload = { message: msg, rating};
     try {
-      const res = await fetch("http://localhost:8080/user/feedback/{userId}", {
+      const res = await fetch(`http://localhost:8080/user/feedback/${userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
