@@ -1,6 +1,9 @@
 package com.gymmate.services;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +12,11 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.PaymentDAO;
@@ -141,22 +146,61 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ApiResponse buySubscription(UserPaymentRequestDTO paymentDTO, Long id) {
-
+	public ApiResponse buySubscription(UserPaymentRequestDTO paymentDTO, Long userId) {
+		// 1. Fetch subscription/package
 		Subscription sub = subscriptionDao.findByName(paymentDTO.getName());
-		UserEntity userEnt = userDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("user not found"));
-		userEnt.setSubscriptionId(sub);
-		userEnt.setSubscribed(true);
-		Payment UserPay = new Payment();
-		UserPay.setAmount(sub.getPrice());
-		UserPay.setFirstName(userEnt.getFirstName());
-		UserPay.setLastName(userEnt.getLastName());
-		UserPay.setSubscriptionName(sub.getName());
+		if (sub == null) {
+			throw new ResourceNotFoundException("Subscription package not found");
+		}
 
-		paymentDAO.save(UserPay);
+		// 2. Fetch user
+		UserEntity userEnt = userDao.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		LocalDateTime now = LocalDateTime.now();
+
+		// 3. Check if user has active subscription
+		if (Boolean.TRUE.equals(userEnt.isSubscribed()) && userEnt.getSubscriptionEndDate() != null) {
+			if (userEnt.getSubscriptionEndDate().isAfter(now)) {
+				long daysRemaining = getDaysRemaining(userEnt.getSubscriptionEndDate(), now);
+				throw new ResponseStatusException(
+			            HttpStatus.CONFLICT, // 409
+			            "You already have an active subscription. It expires on " +
+			            userEnt.getSubscriptionEndDate() + ". Days remaining: " + daysRemaining
+			        );
+			}
+		}
+
+		// 4. Set new subscription info
+		userEnt.setSubscriptionId(sub); // or setSubscription(sub)
+		userEnt.setSubscribed(true);
+		userEnt.setSubscriptionStartDate(now);
+
+		LocalDateTime endDate = now.plusDays(sub.getDurationInDays());
+		userEnt.setSubscriptionEndDate(endDate);
+
+		// 5. Optionally, calculate days remaining for response
+		long daysRemaining = getDaysRemaining(endDate, now);
+
+		// 6. Save payment record
+		Payment userPay = new Payment();
+		userPay.setAmount(sub.getPrice());
+		userPay.setFirstName(userEnt.getFirstName());
+		userPay.setLastName(userEnt.getLastName());
+		userPay.setSubscriptionName(sub.getName());
+
+		paymentDAO.save(userPay);
 		userDao.save(userEnt);
 
-		return new ApiResponse("payment succesful");
+		// 7. Craft custom success response
+		String msg = "Payment successful! Subscription active till " + endDate + " (Days remaining: " + daysRemaining
+				+ ")";
+		return new ApiResponse(msg);
+
+	}
+
+	public long getDaysRemaining(LocalDateTime endDate, LocalDateTime asOf) {
+		return ChronoUnit.DAYS.between(asOf.toLocalDate(), endDate.toLocalDate());
 	}
 
 	@Override

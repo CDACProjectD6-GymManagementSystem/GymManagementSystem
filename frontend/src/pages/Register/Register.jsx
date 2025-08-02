@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { registerUser } from '../../services/registrationService';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import './RegisterPage.css';
+import { registerUser } from "../../services/registrationService";
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaLock, FaVenusMars } from "react-icons/fa";
 
-// Enum for gender—must match backend
 const GENDERS = [
   { value: 'MALE', label: 'Male' },
   { value: 'FEMALE', label: 'Female' },
   { value: 'OTHER', label: 'Other' }
 ];
 
-function Register() {
+export default function Register() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -51,59 +52,167 @@ function Register() {
   };
 
   return (
-    <div className="login-container d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="login-card bg-white shadow p-4 p-md-5 rounded" style={{ width: '100%', maxWidth: '600px' }}>
-        <h2 className="text-center mb-4 text-success">Register for GymMate</h2>
-        <form onSubmit={handleRegister}>
-          <div className="row">
-            <div className="col-md-6 mb-3">
-              <label className="form-label fw-bold">First Name</label>
-              <input type="text" name="firstName" className="form-control" required value={formData.firstName} onChange={handleChange} />
+    <div className="register-root">
+      <div className="register-card-wide">
+        <div className="register-header">
+          <span className="register-brand">GymMate</span>
+          <span className="register-header-sub">Create your account</span>
+        </div>
+        <form onSubmit={handleRegister} className="register-form-wide">
+          <div className="register-row">
+            <div className="register-col">
+              <label>First Name</label>
+              <div className="input-wrapper">
+                <FaUser className="input-icon" />
+                <input
+                  type="text"
+                  name="firstName"
+                  className="register-input"
+                  required
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  placeholder="First Name"
+                />
+              </div>
             </div>
-            <div className="col-md-6 mb-3">
-              <label className="form-label fw-bold">Last Name</label>
-              <input type="text" name="lastName" className="form-control" required value={formData.lastName} onChange={handleChange} />
+            <div className="register-col">
+              <label>Last Name</label>
+              <div className="input-wrapper">
+                <FaUser className="input-icon" />
+                <input
+                  type="text"
+                  name="lastName"
+                  className="register-input"
+                  required
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  placeholder="Last Name"
+                />
+              </div>
             </div>
           </div>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Email address</label>
-            <input type="email" name="email" className="form-control" required value={formData.email} onChange={handleChange} />
+          <div className="register-row">
+            <div className="register-col">
+              <label>Email Address</label>
+              <div className="input-wrapper">
+                <FaEnvelope className="input-icon" />
+                <input
+                  type="email"
+                  name="email"
+                  className="register-input"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
+            <div className="register-col">
+              <label>Address</label>
+              <div className="input-wrapper">
+                <FaMapMarkerAlt className="input-icon" />
+                <input
+                  type="text"
+                  name="address"
+                  className="register-input"
+                  required
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="Address"
+                />
+              </div>
+            </div>
           </div>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Address</label>
-            <input type="text" name="address" className="form-control" required value={formData.address} onChange={handleChange} />
+          <div className="register-row">
+            <div className="register-col">
+              <label>Mobile Number</label>
+              <div className="input-wrapper">
+                <FaPhone className="input-icon" />
+                <input
+                  type="text"
+                  name="mobile"
+                  pattern="^[0-9]{10,15}$"
+                  title="Enter valid mobile number"
+                  className="register-input"
+                  required
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  placeholder="Mobile Number"
+                />
+              </div>
+            </div>
+            <div className="register-col">
+              <label>Gender</label>
+              <div className="input-wrapper">
+                <FaVenusMars className="input-icon" />
+                <select
+                  name="gender"
+                  className="register-input"
+                  required
+                  value={formData.gender}
+                  onChange={handleChange}
+                  style={{ paddingLeft: "40px" }}
+                >
+                  <option value="">Select Gender</option>
+                  {GENDERS.map(g => (
+                    <option value={g.value} key={g.value}>{g.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Mobile Number</label>
-            <input type="text" name="mobile" pattern="^[0-9]{10,15}$" title="Enter valid mobile number" className="form-control" required value={formData.mobile} onChange={handleChange} />
+          <div className="register-row">
+            <div className="register-col">
+              <label>Password</label>
+              <div className="input-wrapper">
+                <FaLock className="input-icon" />
+                <input
+                  type="password"
+                  name="password"
+                  className="register-input"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                />
+              </div>
+            </div>
+            <div className="register-col">
+              <label>Confirm Password</label>
+              <div className="input-wrapper">
+                <FaLock className="input-icon" />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  className="register-input"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
+                />
+              </div>
+            </div>
           </div>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Gender</label>
-            <select name="gender" className="form-select" required value={formData.gender} onChange={handleChange}>
-              <option value="">Select Gender</option>
-              {GENDERS.map(g => (
-                <option value={g.value} key={g.value}>{g.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Password</label>
-            <input type="password" name="password" className="form-control" required value={formData.password} onChange={handleChange} />
-          </div>
-          <div className="mb-4">
-            <label className="form-label fw-bold">Confirm Password</label>
-            <input type="password" name="confirmPassword" className="form-control" required value={formData.confirmPassword} onChange={handleChange} />
-          </div>
-          <button type="submit" className="btn btn-success w-100" disabled={loading}>
+          <button type="submit" className="register-btn" disabled={loading}>
             {loading ? "Registering..." : "Register"}
           </button>
         </form>
-        <p className="text-center mt-3">
-          Already have an account? <Link to="/login" className="text-decoration-none">Login here</Link>
+        <p className="register-footer-link">
+          Already have an account?{" "}
+          <Link to="/login" className="brand-link">
+            Login here
+          </Link>
         </p>
+        <div style={{ textAlign: "center", marginTop: "16px" }}>
+          <button
+            onClick={() => navigate("/")}
+            className="btn btn-link back-home-btn"
+            type="button"
+          >
+            ← Back to Home
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
-export default Register;

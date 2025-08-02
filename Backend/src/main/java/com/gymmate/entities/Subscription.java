@@ -29,6 +29,7 @@ public class Subscription extends SuperBaseEntity {
 	private double discount;
 	@Column(name = "is_active")
 	private boolean isActive;
+	private int durationInDays;
 	public enum GymAccess {
 		OFF_PEAK_HOURS, FULLTIME
 	}

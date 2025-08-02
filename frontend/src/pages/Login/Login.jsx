@@ -1,12 +1,13 @@
-// src/pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "../../styles/Login.css";
+import './LoginPage.css';
 import { loginUser } from "../../services/authService";
+import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -33,7 +34,6 @@ export default function Login() {
     // Member login API
     try {
       const user = await loginUser(email, password);
-      // Accept either key (subscribed or isSubscribed, as from backend)
       const isSubscribed = user.isSubscribed !== undefined
         ? user.isSubscribed
         : user.subscribed;
@@ -46,7 +46,6 @@ export default function Login() {
       if (isSubscribed) {
         navigate("/user");
       } else {
-        // Only pass state on login!
         navigate("/user/membership", { state: { fromLogin: true } });
       }
     } catch (err) {
@@ -57,43 +56,77 @@ export default function Login() {
   };
 
   return (
-    <div className="login-container d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="login-card p-5 bg-white shadow rounded">
-        <h2 className="text-center mb-4 text-primary">Login to GymMate</h2>
-        <form onSubmit={handleLogin}>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Email address</label>
-            <input
-              type="email"
-              className="form-control"
-              autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
+    <div className="login-root">
+      <div className="login-card">
+        <div className="login-header">
+          <span className="brand-highlight">GymMate</span>
+          <span className="login-header-sub">Sign in to your account</span>
+        </div>
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="form-group mb-3">
+            <label className="form-label">Email address</label>
+            <div className="input-wrapper">
+              <FaUser className="input-icon" />
+              <input
+                type="email"
+                className="form-control login-input"
+                autoComplete="username"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="form-label fw-bold">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-            />
+          <div className="form-group mb-4">
+            <label className="form-label">Password</label>
+            <div className="input-wrapper">
+              <FaLock className="input-icon" />
+              <input
+                type={showPwd ? "text" : "password"}
+                className="form-control login-input"
+                autoComplete="current-password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                style={{ paddingRight: 40 }}
+              />
+              <button
+                tabIndex={-1}
+                type="button"
+                className="show-pwd-btn"
+                onClick={() => setShowPwd((v) => !v)}
+                aria-label={showPwd ? "Hide password" : "Show password"}
+                disabled={loading}
+              >
+                {showPwd ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
-          <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+          <button
+            type="submit"
+            className="btn login-btn w-100"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        <p className="text-center mt-3">
-          Don't have an account? <Link to="/register" className="text-decoration-none">Register here</Link>
+        <p className="text-center mt-4 login-link">
+          New to GymMate?
+          {" "}
+          <Link to="/register">
+            <span className="brand-link">Register here</span>
+          </Link>
         </p>
-        <div className="text-center mt-2">
-          <button onClick={() => navigate("/")} className="btn btn-link text-decoration-none">
+        <div className="text-center mt-3">
+          <button
+            onClick={() => navigate("/")}
+            className="btn btn-link back-home-btn"
+            type="button"
+          >
             ← Back to Home
           </button>
         </div>
