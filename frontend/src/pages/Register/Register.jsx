@@ -21,31 +21,38 @@ export default function Register() {
     password: '',
     confirmPassword: '',
   });
-
+  const [msg, setMsg] = useState("");         
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
+  // Only clear (not set) message when users edit fields
   const handleChange = (e) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+    setMsg("");
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setMsg(""); // Clear previous messages
+
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setMsg("Passwords do not match!");
       return;
     }
     const { confirmPassword, ...payload } = formData;
     setLoading(true);
     try {
-      await registerUser(payload);
-      alert("Registered successfully!");
-      navigate('/login');
+      const resp = await registerUser(payload); // Should return { message, ... }
+      if (resp && resp.message) {
+        setMsg(resp.message);
+        // DO NOT auto-navigate or set colors here!
+      } else {
+        setMsg("Unexpected server response.");
+      }
     } catch (err) {
-      alert("Registration failed.");
+      setMsg("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -58,7 +65,24 @@ export default function Register() {
           <span className="register-brand">GymMate</span>
           <span className="register-header-sub">Create your account</span>
         </div>
+
+        {/* Always show backend message */}
+        {msg && (
+          <div
+            style={{
+              marginBottom: 15,
+              fontWeight: 550,
+              textAlign: "center",
+              // No color, just the default! (You can remove "color" if you want.)
+            }}
+            aria-live="polite"
+          >
+            {msg}
+          </div>
+        )}
+
         <form onSubmit={handleRegister} className="register-form-wide">
+          {/* ... all your input fields as before ... */}
           <div className="register-row">
             <div className="register-col">
               <label>First Name</label>

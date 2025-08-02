@@ -62,9 +62,15 @@ public class UserController {
 	@PostMapping("/register")
 	@CrossOrigin(origins = "*")
 	public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO) {
-		userService.registerUser(userRegistrationDTO);
+		ApiResponse response = userService.registerUser(userRegistrationDTO);
 
-		return ResponseEntity.ok().build();
+		if (response.getMessage().toLowerCase().contains("email is already")) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+		} else if (response.getMessage().toLowerCase().contains("user added")) {
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		} else {
+			return ResponseEntity.badRequest().body(response);
+		}
 
 	}
 
@@ -108,20 +114,18 @@ public class UserController {
 
 		return ResponseEntity.ok().body(userService.buySubscription(paymentDTO, Id));
 	}
-	
-	
+
 	@PostMapping("/upload-photo/{id}")
-	public ResponseEntity<?> uploadProfilePhoto(
-	        @PathVariable Long id,
-	        @RequestParam("file") MultipartFile file) throws IOException {
-	    Map<String, String> result = userService.uploadPhoto(id, file);
-	    return ResponseEntity.ok(result);
+	public ResponseEntity<?> uploadProfilePhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file)
+			throws IOException {
+		Map<String, String> result = userService.uploadPhoto(id, file);
+		return ResponseEntity.ok(result);
 	}
 
 	@DeleteMapping("/delete-photo/{id}")
 	public ResponseEntity<?> deleteProfilePhoto(@PathVariable Long id) throws IOException {
-	    ApiResponse resp = userService.deletePhoto(id);
-	    return ResponseEntity.ok(resp);
+		ApiResponse resp = userService.deletePhoto(id);
+		return ResponseEntity.ok(resp);
 	}
 
 }

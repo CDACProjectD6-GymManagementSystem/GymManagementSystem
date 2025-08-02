@@ -1,7 +1,6 @@
 package com.gymmate.services;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -91,15 +90,21 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ApiResponse registerUser(UserRegistrationDTO userRegistrationDTO) {
-		UserEntity userBeforeActive = map.map(userRegistrationDTO, UserEntity.class);
-		userBeforeActive.setActive(true);
-		userDao.save(userBeforeActive);
 
-		Role beforeRole = map.map(userRegistrationDTO, Role.class);
-		beforeRole.setRole(UserRole.ROLE_USER);
-		roleDao.save(beforeRole);
+		UserEntity existingUser = userDao.findByEmail(userRegistrationDTO.getEmail());
+		if (existingUser != null) {
+			return new ApiResponse("Email is already registered!");
+		} else {
+			UserEntity userBeforeActive = map.map(userRegistrationDTO, UserEntity.class);
+			userBeforeActive.setActive(true);
+			userDao.save(userBeforeActive);
 
-		return new ApiResponse("user added successfully");
+			Role beforeRole = map.map(userRegistrationDTO, Role.class);
+			beforeRole.setRole(UserRole.ROLE_USER);
+			roleDao.save(beforeRole);
+
+			return new ApiResponse("user added successfully");
+		}
 	}
 
 	@Override
@@ -163,11 +168,9 @@ public class UserServiceImpl implements UserService {
 		if (Boolean.TRUE.equals(userEnt.isSubscribed()) && userEnt.getSubscriptionEndDate() != null) {
 			if (userEnt.getSubscriptionEndDate().isAfter(now)) {
 				long daysRemaining = getDaysRemaining(userEnt.getSubscriptionEndDate(), now);
-				throw new ResponseStatusException(
-			            HttpStatus.CONFLICT, // 409
-			            "You already have an active subscription. It expires on " +
-			            userEnt.getSubscriptionEndDate() + ". Days remaining: " + daysRemaining
-			        );
+				throw new ResponseStatusException(HttpStatus.CONFLICT, // 409
+						"You already have an active subscription. It expires on " + userEnt.getSubscriptionEndDate()
+								+ ". Days remaining: " + daysRemaining);
 			}
 		}
 
