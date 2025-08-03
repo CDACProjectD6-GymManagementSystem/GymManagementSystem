@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import './LoginPage.css';
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import "./LoginPage.css";
 import { loginUser } from "../../services/authService";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,43 +11,47 @@ export default function Login() {
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const staff = [
-    { email: "alice.gym@example.com", password: "secureHash1", path: "/trainer-dashboard" },
-    { email: "admin@gymmate.com", password: "admin123", path: "/admin-dashboard" },
-    { email: "reception@gymmate.com", password: "reception123", path: "/reception-dashboard" },
-  ];
+  // Extract any optional message from navigation state (e.g., sent from MembershipPage)
+  const msg = location.state?.msg;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Staff login
-    const foundStaff = staff.find(
-      (u) => u.email === email && u.password === password
-    );
-    if (foundStaff) {
-      navigate(foundStaff.path);
-      setLoading(false);
-      return;
-    }
-
-    // Member login API
     try {
-      const user = await loginUser(email, password);
-      const isSubscribed = user.isSubscribed !== undefined
-        ? user.isSubscribed
-        : user.subscribed;
+      const resp = await loginUser(email, password);
+      const token = resp.jwt;
+      if (!token) throw new Error("Login failed: No token from server!");
 
-      localStorage.setItem("gymmateUserId", user.id);
-      localStorage.setItem("gymmateUserFirstName", user.firstName);
-      localStorage.setItem("gymmateUserEmail", user.email);
-      localStorage.setItem("gymmateUserSubscribed", String(isSubscribed));
+      // Save token for use in API/authenticated requests ONLY.
+      sessionStorage.setItem("gymmateAccessToken", token);
 
-      if (isSubscribed) {
-        navigate("/user");
+      // Decode the JWT for claims on-the-fly, instead of storing decoded user object.
+      const decoded = jwtDecode(token);
+      const userRole =
+        decoded.authorities && decoded.authorities.length > 0
+          ? decoded.authorities[0]
+          : null;
+
+      // Routing logic:
+      if (!userRole) {
+        alert("Login Error: Role not found in token.");
+      } else if (userRole === "ROLE_ADMIN") {
+        navigate("/admin-dashboard");
+      } else if (userRole === "ROLE_TRAINER") {
+        navigate("/trainer-dashboard");
+      } else if (userRole === "ROLE_RECEPTIONIST") {
+        navigate("/reception-dashboard");
+      } else if (userRole === "ROLE_USER") {
+        if (decoded.isSubscribed) {
+          navigate("/user");
+        } else {
+          navigate("/user/membership", { state: { fromLogin: true } });
+        }
       } else {
-        navigate("/user/membership", { state: { fromLogin: true } });
+        navigate("/");
       }
     } catch (err) {
       alert(err.message || "Invalid credentials!");
@@ -62,6 +67,11 @@ export default function Login() {
           <span className="brand-highlight">GymMate</span>
           <span className="login-header-sub">Sign in to your account</span>
         </div>
+        {msg && (
+          <div style={{ color: "#669900", marginBottom: 12, fontWeight: 500 }}>
+            {msg}
+          </div>
+        )}
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group mb-3">
             <label className="form-label">Email address</label>
@@ -115,8 +125,7 @@ export default function Login() {
           </button>
         </form>
         <p className="text-center mt-4 login-link">
-          New to GymMate?
-          {" "}
+          New to GymMate?{" "}
           <Link to="/register">
             <span className="brand-link">Register here</span>
           </Link>

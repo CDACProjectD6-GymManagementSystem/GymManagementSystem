@@ -56,7 +56,7 @@ function AppContent() {
       {!hideNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/auth/signin" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
         {/* User dashboard (all features now modular in User.jsx) */}

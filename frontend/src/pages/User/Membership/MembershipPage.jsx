@@ -1,17 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaStar, FaMedal, FaCrown } from "react-icons/fa";
-import UserService from "../../../services/UserService";
+import { UserService } from "../../../services/UserService";
+import { jwtDecode } from "jwt-decode";
 import "./MembershipPage.css";
 
-// Icon for membership card
-function getIcon(idx) {
-  switch (idx % 3) {
-    case 0: return <FaStar size={26} color="#000" />;
-    case 1: return <FaMedal size={26} color="#000" />;
-    default: return <FaCrown size={26} color="#000" />;
+// Helper: safely decode user from token in sessionStorage
+function getDecodedUser() {
+  const token = sessionStorage.getItem("gymmateAccessToken");
+  if (!token) return {};
+  try {
+    return jwtDecode(token);
+  } catch (e) {
+    return {};
   }
 }
+
+function getIcon(idx) {
+  switch (idx % 3) {
+    case 0:
+      return <FaStar size={26} color="#000" />;
+    case 1:
+      return <FaMedal size={26} color="#000" />;
+    default:
+      return <FaCrown size={26} color="#000" />;
+  }
+}
+
 function getAccessDisplay(access) {
   if (access === "FULLTIME") return "Full-time";
   if (access === "OFF_PEAK_HOURS") return "Off-peak hours";
@@ -25,25 +40,38 @@ export default function MembershipPage() {
   const [error, setError] = useState("");
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [localIsSubscribed, setLocalIsSubscribed] = useState(
-    localStorage.getItem("gymmateUserSubscribed") === "true"
-  );
+
+  // Always decode fresh from the JWT token on render
+  const [tokenVersion, setTokenVersion] = useState(0);
+  const user = getDecodedUser();
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Redirect if just logged in and already subscribed
+  // Watch for sessionStorage token changes (e.g., login/logout in other tab)
+  useEffect(() => {
+    function handler(e) {
+      if (e.key === "gymmateAccessToken") {
+        setTokenVersion((v) => v + 1);
+      }
+    }
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, []);
+
+  // After login: if user is already subscribed, redirect.
   useEffect(() => {
     if (
       location.state &&
       location.state.fromLogin &&
-      localStorage.getItem("gymmateUserSubscribed") === "true"
+      user.isSubscribed
     ) {
       navigate("/user", { replace: true });
     }
-  }, [navigate, location.state]);
+    // eslint-disable-next-line
+  }, [navigate, location.state, user.isSubscribed]);
 
-  // Fetch memberships
+  // Fetch available membership packages (from UserService)
   useEffect(() => {
     setLoading(true);
     UserService.getMembershipPackages()
@@ -55,15 +83,6 @@ export default function MembershipPage() {
         setError(String(err));
         setLoading(false);
       });
-  }, []);
-
-  // Listen for localStorage changes (e.g., if user logs in/out in another tab)
-  useEffect(() => {
-    function handler() {
-      setLocalIsSubscribed(localStorage.getItem("gymmateUserSubscribed") === "true");
-    }
-    window.addEventListener("storage", handler);
-    return () => window.removeEventListener("storage", handler);
   }, []);
 
   if (loading) return <div>Loading memberships...</div>;
@@ -82,14 +101,20 @@ export default function MembershipPage() {
       ? Math.round(selected.price / selected.duration)
       : selected?.price || 0;
 
-  // From localStorage only
-  const alreadySubscribed = localIsSubscribed;
+  const alreadySubscribed = !!user.isSubscribed;
+  const userId = user.id || user.sub || user.email;
 
+  // Only calls UserService now
   const handleConfirm = async () => {
     setApiError("");
-    const userId = localStorage.getItem("gymmateUserId");
     if (!userId) {
-      setApiError("You must be logged in to subscribe.");
+      // Redirect to login page and show a message if not logged in
+      navigate("/auth/signin", {
+        state: {
+          msg:
+            "To view your purchased subscription, please log in again.",
+        },
+      });
       return;
     }
     if (!selected || !selected.name) {
@@ -97,31 +122,24 @@ export default function MembershipPage() {
       return;
     }
     if (alreadySubscribed) {
-      setApiError(
-        `You already have an active subscription .`
-      );
+      setApiError("You already have an active subscription.");
       return;
     }
     setSubmitting(true);
-    const payload = { name: selected.name };
     try {
-      const res = await fetch(
-        `http://localhost:8080/user/buy-package/${userId}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
+      await UserService.buyMembershipPackage(userId, selected.name);
+
+      // After successful subscription, log user out to force fresh re-login
+      sessionStorage.removeItem("gymmateAccessToken");
+      alert(
+        "Successfully subscribed! Please log in again to view your subscription."
       );
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.message || "Subscription failed. Try again.");
-      }
-      // Update memory after successful subscribe
-      localStorage.setItem("gymmateUserSubscribed", "true");
-      setLocalIsSubscribed(true);
-      alert(`Successfully subscribed to ${selected.name}!`);
-      navigate("/user");
+      navigate("/auth/login", {
+        state: {
+          msg:
+            "Subscription successful! Please log in again to view your purchased subscription.",
+        },
+      });
     } catch (err) {
       setApiError(err.message || "Subscription error.");
     } finally {
@@ -133,13 +151,17 @@ export default function MembershipPage() {
     <div className="membership-bg">
       <h2 className="membership-heading">Membership Packages</h2>
 
-      {/* Message if subscribed */}
       {alreadySubscribed && (
-        <div style={{ color: "#669900", marginBottom: 12, fontWeight: 500 }}>
+        <div
+          style={{
+            color: "#669900",
+            marginBottom: 12,
+            fontWeight: 500,
+          }}
+        >
           You have an active subscription.
         </div>
       )}
-
       {apiError && (
         <div style={{ color: "red", marginBottom: 12 }}>{apiError}</div>
       )}
@@ -148,7 +170,9 @@ export default function MembershipPage() {
         {packages.map((pkg, idx) => (
           <div
             key={pkg.id || pkg.name}
-            className={`membership-package-card${idx === selectedIdx ? " selected" : ""}`}
+            className={`membership-package-card${
+              idx === selectedIdx ? " selected" : ""
+            }`}
             onClick={() => setSelectedIdx(idx)}
           >
             <div className="membership-card-title">
@@ -166,13 +190,15 @@ export default function MembershipPage() {
                 <b>Gym Access:</b> {getAccessDisplay(pkg.access)}
               </li>
               <li>
-                <b>Diet Consultation:</b> {pkg.dietConsultation ? "Yes" : "No"}
+                <b>Diet Consultation:</b>{" "}
+                {pkg.dietConsultation ? "Yes" : "No"}
               </li>
               <li>
                 <b>Sauna Access:</b> {pkg.isSauna ? "Yes" : "No"}
               </li>
               <li>
-                <b>Duration:</b> {pkg.duration} month{pkg.duration > 1 ? "s" : ""}
+                <b>Duration:</b> {pkg.duration} month
+                {pkg.duration > 1 ? "s" : ""}
               </li>
               <li>
                 <b>Price:</b> ₹{pkg.price}
@@ -199,7 +225,9 @@ export default function MembershipPage() {
           ) : (
             <>
               Confirm &amp; Pay for{" "}
-              <span className="membership-btn-plan">{selected.name}</span>
+              <span className="membership-btn-plan">
+                {selected.name}
+              </span>
             </>
           )}
         </button>

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
   FaUserCircle, FaIdCard, FaHeartbeat, FaCalendarCheck, FaComments,
 } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
 import "./UserHomePage.css";
 
 const cardData = [
@@ -14,8 +15,24 @@ const cardData = [
   { path: "/user/feedback", icon: <FaComments size={32} color="#000" />, title: "Feedback", desc: "Help & support" },
 ];
 
+// Helper: decode the current user's display name from token
+function getUserDisplayNameFromToken() {
+  const token = sessionStorage.getItem("gymmateAccessToken");
+  if (!token) return "";
+  try {
+    const decoded = jwtDecode(token);
+    // Prefer firstName, else use username/email, else fallback to ""
+    return decoded.firstName
+      || (decoded.sub && String(decoded.sub).split("@")[0])
+      || decoded.email
+      || "";
+  } catch {
+    return "";
+  }
+}
+
 const UserHomePage = () => {
-  const userName = localStorage.getItem("gymmateUserFirstName") || "";
+  const userName = getUserDisplayNameFromToken();
 
   return (
     <div className="user-homepage-root">

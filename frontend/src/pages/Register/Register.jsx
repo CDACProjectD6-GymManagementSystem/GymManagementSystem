@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import './RegisterPage.css';
-import { registerUser } from "../../services/registrationService";
+import { UserService } from "../../services/UserService";
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaLock, FaVenusMars } from "react-icons/fa";
 
 const GENDERS = [
@@ -21,10 +21,10 @@ export default function Register() {
     password: '',
     confirmPassword: '',
   });
-  const [msg, setMsg] = useState("");         
+  const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Only clear (not set) message when users edit fields
   const handleChange = (e) => {
     setFormData(prev => ({
       ...prev,
@@ -35,8 +35,7 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setMsg(""); // Clear previous messages
-
+    setMsg("");
     if (formData.password !== formData.confirmPassword) {
       setMsg("Passwords do not match!");
       return;
@@ -44,10 +43,9 @@ export default function Register() {
     const { confirmPassword, ...payload } = formData;
     setLoading(true);
     try {
-      const resp = await registerUser(payload); // Should return { message, ... }
+      const resp = await UserService.registerUser(payload);
       if (resp && resp.message) {
         setMsg(resp.message);
-        // DO NOT auto-navigate or set colors here!
       } else {
         setMsg("Unexpected server response.");
       }
@@ -65,15 +63,12 @@ export default function Register() {
           <span className="register-brand">GymMate</span>
           <span className="register-header-sub">Create your account</span>
         </div>
-
-        {/* Always show backend message */}
         {msg && (
           <div
             style={{
               marginBottom: 15,
               fontWeight: 550,
               textAlign: "center",
-              // No color, just the default! (You can remove "color" if you want.)
             }}
             aria-live="polite"
           >
@@ -82,7 +77,6 @@ export default function Register() {
         )}
 
         <form onSubmit={handleRegister} className="register-form-wide">
-          {/* ... all your input fields as before ... */}
           <div className="register-row">
             <div className="register-col">
               <label>First Name</label>
@@ -223,13 +217,13 @@ export default function Register() {
         </form>
         <p className="register-footer-link">
           Already have an account?{" "}
-          <Link to="/login" className="brand-link">
+          <Link to="/auth/signin" className="brand-link">
             Login here
           </Link>
         </p>
         <div style={{ textAlign: "center", marginTop: "16px" }}>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/auth/login")}
             className="btn btn-link back-home-btn"
             type="button"
           >

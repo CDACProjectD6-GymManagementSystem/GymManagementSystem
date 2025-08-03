@@ -1,6 +1,22 @@
 import React, { useState } from "react";
 import { FaStar, FaCommentDots } from "react-icons/fa";
 import "./FeedbackPage.css";
+import { jwtDecode } from "jwt-decode";
+import { UserService } from "../../../services/UserService"; // Import the service
+
+
+// Secure: always decode id from the current JWT session
+function getCurrentUserIdFromToken() {
+  const token = sessionStorage.getItem("gymmateAccessToken");
+  if (!token) return null;
+  try {
+    const decoded = jwtDecode(token);
+    // Adjust as per your backend identifier: id, sub, email, etc.
+    return decoded.id || decoded.sub || decoded.email || null;
+  } catch {
+    return null;
+  }
+}
 
 export default function FeedbackPage() {
   const [rating, setRating] = useState(0);
@@ -8,8 +24,8 @@ export default function FeedbackPage() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Helper: get logged-in user id (from login flow)
-  const userId = localStorage.getItem("gymmateUserId");
+  // Use secure, stateless userId
+  const userId = getCurrentUserIdFromToken();
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -18,14 +34,11 @@ export default function FeedbackPage() {
       return;
     }
     setLoading(true);
-    const payload = { message: msg, rating};
+    const payload = { message: msg, rating };
+    const token = sessionStorage.getItem("gymmateAccessToken");
     try {
-      const res = await fetch(`http://localhost:8080/user/feedback/${userId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error("Failed to send feedback");
+      // Call service method instead of "fetch" directly
+      await UserService.submitFeedback(userId, payload, token);
       setSent(true);
     } catch (err) {
       alert("Submission failed. Please try again.");

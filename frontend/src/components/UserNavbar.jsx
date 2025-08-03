@@ -3,23 +3,37 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   FaHome, FaDumbbell, FaAppleAlt, FaSignOutAlt, FaUserCircle,
 } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
 
 const navLinks = [
   { label: "Dashboard", path: "/user", icon: <FaHome className="me-1" /> },
   { label: "Workouts", path: "/user/workout", icon: <FaDumbbell className="me-1" /> },
   { label: "Diet & Nutrition", path: "/user/diet-nutrition", icon: <FaAppleAlt className="me-1" /> },
-  // No "Profile" here
 ];
+
+function getUserNameFromToken() {
+  const token = sessionStorage.getItem("gymmateAccessToken");
+  if (!token) return "";
+  try {
+    const decoded = jwtDecode(token);
+    // Prefer first name, fallback to sub/email if missing
+    return decoded.firstName
+      || (decoded.sub && String(decoded.sub).split("@")[0])
+      || decoded.email
+      || "";
+  } catch {
+    return "";
+  }
+}
 
 const UserNavbar = () => {
   const navigate = useNavigate();
-  const userName = localStorage.getItem("gymmateUserFirstName") || "";
+  const userName = getUserNameFromToken();
 
   const handleLogout = () => {
-    localStorage.removeItem("gymmateUserId");
-    localStorage.removeItem("gymmateUserFirstName");
-    localStorage.removeItem("gymmateUserEmail");
-    localStorage.removeItem("gymmateUserPhoto");
+    sessionStorage.removeItem("gymmateAccessToken");
+    // (Safely also remove gymmateUser if you ever stored legacy keys...)
+    // sessionStorage.removeItem("gymmateUser"); // optional
     navigate("/");
   };
 

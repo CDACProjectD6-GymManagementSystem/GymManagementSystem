@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 import "./SchedulePage.css";
-import { UserScheduleService } from "../../../services/userSchedule";
+import { UserService } from "../../../services/UserService";
+import { jwtDecode } from "jwt-decode";
+
+// Optional: For not-logged-in checks/messages (service guards anyway)
+function getCurrentUserId() {
+  const token = sessionStorage.getItem("gymmateAccessToken");
+  if (!token) return null;
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.id || decoded.sub || decoded.email || null;
+  } catch {
+    return null;
+  }
+}
 
 const dayOrder = [
   { key: "sunday", label: "Sunday" },
@@ -13,14 +26,23 @@ const dayOrder = [
   { key: "saturday", label: "Saturday" }
 ];
 
-const SchedulePage = ({ userId }) => {
+const SchedulePage = () => {
   const [weekSchedule, setWeekSchedule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
 
+  // Secure: get user id dynamically!
+  const userId = getCurrentUserId();
+
   useEffect(() => {
+    if (!userId) {
+      setWeekSchedule(null);
+      setApiError("Not logged in. Please log in to view your schedule.");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    UserScheduleService.getUserSchedule(userId)
+    UserService.getUserSchedule()
       .then(res => {
         setWeekSchedule(res.data); // Use ONLY what backend sends
         setApiError("");
@@ -33,7 +55,8 @@ const SchedulePage = ({ userId }) => {
       });
   }, [userId]);
 
-  if (loading) return <div className="schedule-bg"><div>Loading schedule...</div></div>;
+  if (loading)
+    return <div className="schedule-bg"><div>Loading schedule...</div></div>;
 
   if (apiError || !weekSchedule) {
     return (

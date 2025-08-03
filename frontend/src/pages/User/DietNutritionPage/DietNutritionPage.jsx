@@ -1,118 +1,28 @@
 import React, { useEffect, useState } from "react";
- 
 import "./DietNutritionPage.css";
-import { DietService } from "./../../../services/DietService";
-
-// HARD-CODED reference food data for nutrition table
+import { UserService } from "../../../services/UserService";
+import { jwtDecode } from "jwt-decode";
 import {
   FaAppleAlt, FaEgg, FaLeaf, FaBreadSlice, FaDrumstickBite,
   FaFish, FaCarrot, FaCheese, FaHotdog, FaSeedling
 } from "react-icons/fa";
 
+// --- static nutrition reference as in your original code ---
 const dietData = [
-  {
-    item: "Apple",
-    icon: <FaAppleAlt />,
-    category: "Vegan",
-    calories: 52,
-    protein: 0.3,
-    carbs: 14,
-    fat: 0.2,
-    fiber: 2.4,
-  },
-  {
-    item: "Egg",
-    icon: <FaEgg />,
-    category: "Vegetarian",
-    calories: 78,
-    protein: 6,
-    carbs: 1,
-    fat: 5,
-    fiber: 0,
-  },
-  {
-    item: "Spinach",
-    icon: <FaLeaf />,
-    category: "Vegan",
-    calories: 23,
-    protein: 2.9,
-    carbs: 3.6,
-    fat: 0.4,
-    fiber: 2.2,
-  },
-  {
-    item: "Brown Bread",
-    icon: <FaBreadSlice />,
-    category: "Vegetarian",
-    calories: 74,
-    protein: 2.6,
-    carbs: 13.8,
-    fat: 1.1,
-    fiber: 2.2,
-  },
-  {
-    item: "Chicken Breast",
-    icon: <FaDrumstickBite />,
-    category: "Non-Vegetarian",
-    calories: 165,
-    protein: 31,
-    carbs: 0,
-    fat: 3.6,
-    fiber: 0,
-  },
-  {
-    item: "Salmon",
-    icon: <FaFish />,
-    category: "Non-Vegetarian",
-    calories: 206,
-    protein: 22,
-    carbs: 0,
-    fat: 13,
-    fiber: 0,
-  },
-  {
-    item: "Carrot",
-    icon: <FaCarrot />,
-    category: "Vegan",
-    calories: 41,
-    protein: 0.9,
-    carbs: 10,
-    fat: 0.2,
-    fiber: 2.8,
-  },
-  {
-    item: "Paneer",
-    icon: <FaCheese />,
-    category: "Vegetarian",
-    calories: 265,
-    protein: 18,
-    carbs: 1.2,
-    fat: 20.8,
-    fiber: 0,
-  },
-  {
-    item: "Tofu",
-    icon: <FaSeedling />,
-    category: "Vegan",
-    calories: 76,
-    protein: 8,
-    carbs: 1.9,
-    fat: 4.8,
-    fiber: 0.3,
-  },
-  {
-    item: "Chicken Sausage",
-    icon: <FaHotdog />,
-    category: "Non-Vegetarian",
-    calories: 150,
-    protein: 8,
-    carbs: 1,
-    fat: 13,
-    fiber: 0,
-  },
+  { item: "Apple",    icon: <FaAppleAlt />, category: "Vegan",      calories: 52,  protein: 0.3, carbs: 14,  fat: 0.2, fiber: 2.4 },
+  { item: "Egg",      icon: <FaEgg />,     category: "Vegetarian", calories: 68,  protein: 6.0, carbs: 0.6,  fat: 5,   fiber: 0   },
+  { item: "Leafy Salad", icon: <FaLeaf />, category: "Vegan",      calories: 15,  protein: 1.4, carbs: 2.9,  fat: 0.2, fiber: 1.5 },
+  { item: "Roti",     icon: <FaBreadSlice />,category: "Vegan",    calories: 70,  protein: 2.7, carbs: 14,   fat: 0.4, fiber: 1.7 },
+  { item: "Chicken",  icon: <FaDrumstickBite />,category: "Non-Veg",calories: 190,protein: 29, carbs: 0,    fat: 7,   fiber: 0   },
+  { item: "Fish",     icon: <FaFish />,    category: "Non-Veg",    calories: 206, protein: 22,  carbs: 0,    fat: 12,  fiber: 0   },
+  { item: "Carrot",   icon: <FaCarrot />,  category: "Vegan",      calories: 41,  protein: 0.9, carbs: 10,   fat: 0.2, fiber: 2.8 },
+  { item: "Paneer",   icon: <FaCheese />,  category: "Vegetarian", calories: 265, protein: 18,  carbs: 1.2,  fat: 21,  fiber: 0   },
+  { item: "Soy Hotdog",icon: <FaHotdog />, category: "Vegan",      calories: 105, protein: 9.5, carbs: 7.2,  fat: 4.4, fiber: 2.2 },
+  { item: "Sprouts",  icon: <FaSeedling />,category: "Vegan",      calories: 30,  protein: 3,   carbs: 6,    fat: 0.5, fiber: 1.8 },
+  // ...add more rows as needed...
 ];
 
-
+// Style helper
 const categoryColor = (cat) =>
   cat === "Vegan"
     ? "#222"
@@ -120,18 +30,36 @@ const categoryColor = (cat) =>
     ? "#555"
     : "#999";
 
-const DietNutritionPage = ({ membershipType = "premium", userId: propUserId }) => {
+// Helper to decode userId/sub/email from JWT at render time!
+function getCurrentUserIdFromToken() {
+  const token = sessionStorage.getItem("gymmateAccessToken");
+  if (!token) return null;
+  try {
+    const decoded = jwtDecode(token);
+    // Choose your id field based on backend (commonly: id, sub, or email)
+    return decoded.id || decoded.sub || decoded.email || null;
+  } catch {
+    return null;
+  }
+}
+
+const DietNutritionPage = ({ membershipType = "premium" }) => {
   const [dietPlan, setDietPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
 
-  // Prefer prop or fallback to logged-in user from localStorage
-  const userId = propUserId || localStorage.getItem("gymmateUserId");
+  // Always decode user id fresh!
+  const userId = getCurrentUserIdFromToken();
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setLoading(false);
+      setDietPlan(null);
+      setApiError("You must be logged in to view your diet plan.");
+      return;
+    }
     setLoading(true);
-    DietService.getUserDiet(userId)
+    UserService.getUserDiet(userId)
       .then(res => {
         setDietPlan(res.data);
         setLoading(false);
@@ -144,7 +72,7 @@ const DietNutritionPage = ({ membershipType = "premium", userId: propUserId }) =
   }, [userId]);
 
   if (!userId) {
-    return <div className="dietnut-bg"><div className="text-danger">User ID required.</div></div>;
+    return <div className="dietnut-bg"><div className="text-danger">You must be logged in.</div></div>;
   }
   if (loading) {
     return <div className="dietnut-bg"><div>Loading diet...</div></div>;

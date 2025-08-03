@@ -1,15 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  FaUserEdit, FaSave, FaUser, FaEnvelope, FaPhone, FaHome, FaVenusMars, FaCamera, FaTrash
+  FaUserEdit, FaSave, FaUser, FaEnvelope, FaPhone, FaHome,
+  FaVenusMars, FaCamera, FaTrash
 } from "react-icons/fa";
 import './ProfilePage.css';
-import { profileService } from "../../../services/UserProfileService"; // Your custom service
+import { UserService } from "../../../services/UserService";
+import { jwtDecode } from "jwt-decode";
 
 const GENDERS = [
   { value: "MALE", label: "Male" },
   { value: "FEMALE", label: "Female" },
   { value: "OTHER", label: "Other" }
 ];
+
+// Helper: always decode the user from JWT at runtime
+function getCurrentUserId() {
+  const token = sessionStorage.getItem("gymmateAccessToken");
+  if (!token) return null;
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.id || decoded.sub || decoded.email || null;
+  } catch {
+    return null;
+  }
+}
 
 const ProfilePage = () => {
   const [form, setForm] = useState(null);
@@ -20,14 +34,15 @@ const ProfilePage = () => {
   const [imgLoading, setImgLoading] = useState(false);
   const [fileInput, setFileInput] = useState(null);
 
-  const userId = localStorage.getItem("gymmateUserId");
+  const userId = getCurrentUserId();
 
-  // Fetches full profile (fields + image) after any change
+  // Fetches full profile after any change
   const fetchProfile = async () => {
     setLoading(true);
     setApiError("");
     try {
-      const res = await profileService.fetch();
+      if (!userId) throw new Error("Missing user id");
+      const res = await UserService.fetchProfile();
       setForm(res.data);
       setLoading(false);
     } catch {
@@ -46,20 +61,14 @@ const ProfilePage = () => {
     // eslint-disable-next-line
   }, [userId]);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleEdit = (e) => {
-    e.preventDefault();
-    setEditing(true);
-    setSuccessMsg("");
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleEdit = (e) => { e.preventDefault(); setEditing(true); setSuccessMsg(""); };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError(""); setSuccessMsg("");
     try {
-      await profileService.update(form);
+      await UserService.updateProfile(form);
       setEditing(false);
       setSuccessMsg("Profile updated successfully!");
       await fetchProfile();
@@ -76,12 +85,15 @@ const ProfilePage = () => {
     setImgLoading(true); setApiError(""); setSuccessMsg("");
     const data = new FormData();
     data.append("file", fileInput);
-
     try {
-      // Call the backend
+      const token = sessionStorage.getItem("gymmateAccessToken");
       const res = await fetch(
         `http://localhost:8080/user/upload-photo/${userId}`,
-        { method: "POST", body: data }
+        {
+          method: "POST",
+          body: data,
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined
+        }
       );
       if (!res.ok) throw new Error();
       setSuccessMsg("Profile photo updated!");
@@ -97,9 +109,13 @@ const ProfilePage = () => {
     if (!userId) return;
     setImgLoading(true); setApiError(""); setSuccessMsg("");
     try {
+      const token = sessionStorage.getItem("gymmateAccessToken");
       const res = await fetch(
         `http://localhost:8080/user/delete-photo/${userId}`,
-        { method: "DELETE" }
+        {
+          method: "DELETE",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined
+        }
       );
       if (!res.ok) throw new Error();
       setSuccessMsg("Profile photo removed.");

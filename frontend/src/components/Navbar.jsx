@@ -52,7 +52,7 @@ const Navbar = () => {
 </ul>
 
 
-        <Link to="/login" className="btn btn-warning ms-4 fw-bold px-4 py-2">
+        <Link to="/auth/signin" className="btn btn-warning ms-4 fw-bold px-4 py-2">
           Login
         </Link>
       </div>
