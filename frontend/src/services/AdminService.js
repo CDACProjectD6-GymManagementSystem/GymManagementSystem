@@ -167,3 +167,13 @@ export const updateTrainer = (id, trainerData) => {
 };
 
 export const getAllFeedbacks = () => axios.get(`${API_BASE_URL}/feedback`);
+
+export async function fetchPayments() {
+  const response = await axios.get(`${API_BASE_URL}/payments`);
+  return response.data;
+}
+
+export async function fetchDashboardStats() {
+    const response = await axios.get(`${API_BASE_URL}/dashboardstats`);
+    return response.data;
+}

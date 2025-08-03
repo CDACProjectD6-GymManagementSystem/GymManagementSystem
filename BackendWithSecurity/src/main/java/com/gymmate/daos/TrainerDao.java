@@ -15,4 +15,7 @@ public interface TrainerDao extends JpaRepository<Trainer, Long> {
 	@Query("select u from Trainer u where u.email=:email")
 	Optional<Trainer> findByEmailAddress(String email);
 
+	@Query(nativeQuery = true,value = "select count(*) from trainers")
+	int getCount();
+
 }

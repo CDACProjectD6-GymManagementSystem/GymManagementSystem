@@ -27,6 +27,7 @@ import com.gymmate.entities.UserEntity;
 import com.gymmate.services.AdminService;
 import com.gymmate.services.EquipmentService;
 import com.gymmate.services.MongoFeedbackService;
+import com.gymmate.services.PaymentService;
 import com.gymmate.services.ReceptionistService;
 import com.gymmate.services.SubscriptionService;
 import com.gymmate.services.TrainerService;
@@ -45,6 +46,7 @@ public class AdminController {
 	private final ReceptionistService receptionistService;
 	private final TrainerService trainerService;
 	private final MongoFeedbackService feedbackService;
+	private final PaymentService paymentService;
 	
 	@PostMapping("/add-user")
 	@Operation(description = "Add a User by Admin")
@@ -183,5 +185,17 @@ public class AdminController {
 	@Operation(description = "Fetch all the feedbacks")
 	public ResponseEntity<?> getFeedbacks(){
 		return ResponseEntity.ok(feedbackService.getAllFeedbacks());
+	}
+	
+	@GetMapping("/payments")
+	@Operation(description = "Get All Payments")
+	public ResponseEntity<?> getAllPayments(){
+		return ResponseEntity.ok(paymentService.getAllPayments());
+	}
+	
+	@GetMapping("/dashboardstats")
+	@Operation(description = "Fetch dashboard stats")
+	public ResponseEntity<?> getAllStats(){
+		return ResponseEntity.ok(adminService.getStats());
 	}
 }

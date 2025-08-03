@@ -11,13 +11,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gymmate.customexception.ResourceNotFoundException;
 import com.gymmate.daos.EquipmentDao;
+import com.gymmate.daos.PaymentDAO;
+import com.gymmate.daos.ReceptionistDao;
 import com.gymmate.daos.SubscriptionDao;
+import com.gymmate.daos.TrainerDao;
 import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.ApiResponse;
+import com.gymmate.dtos.DashboardStatsDto;
 import com.gymmate.dtos.UserEntityResponseDto;
 import com.gymmate.dtos.UserSubscriptionAddDto;
 import com.gymmate.dtos.UserSubscriptionUpdateDto;
 import com.gymmate.entities.BaseEntity.UserRole;
+import com.gymmate.entities.Payment;
 import com.gymmate.entities.Subscription;
 import com.gymmate.entities.UserEntity;
 
@@ -29,9 +34,12 @@ import lombok.AllArgsConstructor;
 public class AdminServiceImpl implements AdminService {
 
 	private final EquipmentDao equipmentDao;
+	private final TrainerDao trainerDao;
+	private final ReceptionistDao receptionistDao;
 	private final SubscriptionDao subscriptionDao;
 	private final UserDao userDao;
 	private final ModelMapper mapper;
+	private final PaymentDAO pdao;
 	 
 	@Override
 	public ApiResponse addUser(UserSubscriptionAddDto userAddDto) {
@@ -45,13 +53,18 @@ public class AdminServiceImpl implements AdminService {
 
 		UserEntity userEntity = mapper.map(userAddDto, UserEntity.class);
 		Subscription subEntity = subscriptionDao.findByName(userAddDto.getSubscriptionType());
-
+		
 		userEntity.setSubscriptionId(subEntity);
 		userEntity.setActive(true);
 		userEntity.setRole(UserRole.ROLE_USER);
 		userEntity.setSubscribed(true);
 		userEntity.setPassword(encode.encode(userAddDto.getPassword()));
-
+		Payment payment=new Payment();
+		payment.setAmount(subEntity.getPrice());
+		payment.setFirstName(userEntity.getFirstName());
+		payment.setLastName(userEntity.getLastName());
+		payment.setSubscriptionName(subEntity.getName());
+		pdao.save(payment);
 		userDao.save(userEntity);
 
 		return new ApiResponse("User Created");
@@ -84,9 +97,9 @@ public class AdminServiceImpl implements AdminService {
 		List<UserEntity> list = userDao.findByIsActiveTrue();
 		List<UserEntityResponseDto> subtypelist = new ArrayList<>();
 
-		Subscription freeSubscription = subscriptionDao.findByName("Free");
-		if (freeSubscription == null) {
-			throw new ResourceNotFoundException("'Free' subscription not found in the database!");
+		Subscription stdSubscription = subscriptionDao.findByName("Standard");
+		if (stdSubscription == null) {
+			throw new ResourceNotFoundException("'Standard' subscription not found in the database!");
 		}
 		if (list != null && !list.isEmpty()) {
 			for (UserEntity user : list) {
@@ -95,8 +108,8 @@ public class AdminServiceImpl implements AdminService {
 				if (user.getSubscriptionId() != null) {
 					u1.setSubscriptionType(user.getSubscriptionId().getName());
 				} else {
-					user.setSubscriptionId(freeSubscription);
-					u1.setSubscriptionType(freeSubscription.getName());
+					user.setSubscriptionId(stdSubscription);
+					u1.setSubscriptionType(stdSubscription.getName());
 					userDao.save(user);
 				}
 				subtypelist.add(u1);
@@ -104,5 +117,19 @@ public class AdminServiceImpl implements AdminService {
 
 		}
 		return subtypelist;
+	}
+
+	@Override
+	public DashboardStatsDto getStats() {
+		DashboardStatsDto respDto=new DashboardStatsDto();
+		respDto.setActiveUsers(userDao.getActiveUsersCount());
+		respDto.setTotalUsers(userDao.getAllUsersCount());
+		respDto.setReceptionists(receptionistDao.getCount());
+		respDto.setTrainers(trainerDao.getCount());
+		respDto.setTotalEquipments(equipmentDao.getCount());
+		respDto.setTotalPackages(subscriptionDao.getCount());
+		respDto.setTotalMoneyReceived(pdao.getTotalMoney());
+		
+		return respDto;
 	}
 }

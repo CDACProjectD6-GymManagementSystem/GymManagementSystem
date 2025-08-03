@@ -26,4 +26,10 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
 	@Query("select u from UserEntity u where u.email=:email")
 	Optional<UserEntity> findByEmailAddress(String email);
 
+	@Query(nativeQuery = true,value = "select count(*) from users where is_active=true")
+	int getActiveUsersCount();
+	
+	@Query(nativeQuery = true,value = "select count(*) from users")
+	int getAllUsersCount();
+
 }
