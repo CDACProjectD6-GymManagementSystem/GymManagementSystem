@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
+import {
+  fetchUserDietPlan,
+  updateUserDietPlan
+} from '../../services/TrainerService';
 
 const DietPlanEditor = () => {
   const { userId } = useParams();
@@ -14,8 +17,7 @@ const DietPlanEditor = () => {
   useEffect(() => {
     const fetchDiet = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/trainer/user/${userId}/diet`);
-        const data = response.data;
+        const data = await fetchUserDietPlan(userId);
 
         const plan = {
           breakfast: data.diet?.breakfast || '',
@@ -26,9 +28,9 @@ const DietPlanEditor = () => {
 
         setUserName(`${data.firstName} ${data.lastName}`);
         setDietPlan(plan);
-        setOriginalDiet(plan); // for cancel button
+        setOriginalDiet(plan);
       } catch (error) {
-        console.error("Error fetching diet:", error);
+        console.log(error);
         alert("Failed to load diet plan.");
       } finally {
         setLoading(false);
@@ -47,20 +49,18 @@ const DietPlanEditor = () => {
       const payload = {
         firstName: userName.split(" ")[0],
         lastName: userName.split(" ")[1],
-        gender: "FEMALE", // Change this if needed or pull from user data
         diet: dietPlan
       };
 
-      await axios.post(`http://localhost:8080/trainer/user/${userId}/diet`, payload);
+      await updateUserDietPlan(userId, payload);
       alert("Diet plan updated successfully!");
-      setOriginalDiet(dietPlan); // update original
+      setOriginalDiet(dietPlan);
       setEditMode(false);
     } catch (error) {
-      console.error("Error saving diet plan:", error);
+      console.log(error);
       alert("Failed to update diet plan.");
     }
   };
-
 
   const handleCancel = () => {
     setDietPlan(originalDiet);
@@ -70,41 +70,50 @@ const DietPlanEditor = () => {
   return (
     <>
       <TrainerNavbar />
-      <div className="container mt-4">
-        <h3 className="mb-4">
-          Diet Plan for <span className="text-primary">{userName}</span>
-        </h3>
+      <div className="container mt-5">
+        <h2 className="text-center fw-bold mb-4">Diet Plan</h2>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <>
-            {["breakfast", "midSnack", "lunch", "dinner"].map((mealKey, index) => (
-              <div className="mb-3" key={index}>
-                <label className="form-label text-capitalize">{mealKey.replace(/([A-Z])/g, ' $1')}</label>
+        <div className="card p-4 shadow-sm rounded-4 border-0 mx-auto" style={{ maxWidth: '800px' }}>
+          <h5 className="text-center text-primary mb-4">Plan for {userName}</h5>
+
+          {loading ? (
+            <p className="text-center text-muted">Loading...</p>
+          ) : (
+            <>
+              {["breakfast", "midSnack", "lunch", "dinner"].map((mealKey, index) => (
+                <div className="mb-4" key={index}>
+                  <label className="form-label fw-semibold text-capitalize">
+                    {mealKey.replace(/([A-Z])/g, ' $1')}
+                  </label>
+                  {editMode ? (
+                    <textarea
+                      className="form-control"
+                      rows="3"
+                      placeholder={`Enter ${mealKey} details...`}
+                      value={dietPlan[mealKey]}
+                      onChange={(e) => handleChange(mealKey, e.target.value)}
+                    />
+                  ) : (
+                    <p className="border rounded p-3 bg-light text-muted">
+                      {dietPlan[mealKey] || <em>No information provided.</em>}
+                    </p>
+                  )}
+                </div>
+              ))}
+
+              <div className="text-center">
                 {editMode ? (
-                  <textarea
-                    className="form-control"
-                    rows="3"
-                    value={dietPlan[mealKey]}
-                    onChange={(e) => handleChange(mealKey, e.target.value)}
-                  />
+                  <>
+                    <button className="btn btn-success me-3 px-4" onClick={handleSave}>Save</button>
+                    <button className="btn btn-secondary px-4" onClick={handleCancel}>Cancel</button>
+                  </>
                 ) : (
-                  <p className="border rounded p-2 bg-light">{dietPlan[mealKey]}</p>
+                  <button className="btn btn-primary px-5" onClick={() => setEditMode(true)}>Edit Diet Plan</button>
                 )}
               </div>
-            ))}
-
-            {editMode ? (
-              <div className="d-flex gap-3">
-                <button className="btn btn-success" onClick={handleSave}>Save</button>
-                <button className="btn btn-secondary" onClick={handleCancel}>Cancel</button>
-              </div>
-            ) : (
-              <button className="btn btn-primary" onClick={() => setEditMode(true)}>Edit Diet Plan</button>
-            )}
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
     </>
   );

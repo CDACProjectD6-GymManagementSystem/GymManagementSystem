@@ -1,45 +1,44 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
+import {
+  fetchResistanceMachines,
+  toggleEquipmentMaintenance
+} from '../../services/TrainerService';
 
 const ResistanceMachinesEquipments = () => {
   const [equipments, setEquipments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('all');
 
-  
   useEffect(() => {
-    axios.get('http://localhost:8080/trainer/equipments/resistancemachines')
-      .then((res) => {
-        if (Array.isArray(res.data)) {
-          setEquipments(res.data);
+    const loadEquipments = async () => {
+      try {
+        const data = await fetchResistanceMachines();
+        if (Array.isArray(data)) {
+          setEquipments(data);
         } else {
-          console.error('Unexpected response format:', res.data);
+          console.error('Unexpected response format:', data);
           setEquipments([]);
         }
-      })
-      .catch((err) => {
-        console.error('Error fetching resistance machines:', err);
+      } catch {
         setEquipments([]);
-      });
+      }
+    };
+
+    loadEquipments();
   }, []);
 
-
-  const toggleMaintenance = (id, currentStatus) => {
-    axios.put(`http://localhost:8080/trainer/equipments/${id}/maintenance`, {
-      forMaintenance: !currentStatus
-    })
-      .then(() => {
-        setEquipments((prev) =>
-          prev.map((eq) =>
-            eq.id === id ? { ...eq, forMaintenance: !currentStatus } : eq
-          )
-        );
-      })
-      .catch((err) => {
-        console.error('Failed to update maintenance status:', err);
-        alert("Failed to update maintenance status.");
-      });
+  const toggleMaintenance = async (id, currentStatus) => {
+    try {
+      await toggleEquipmentMaintenance(id, currentStatus);
+      setEquipments(prev =>
+        prev.map(eq =>
+          eq.id === id ? { ...eq, forMaintenance: !currentStatus } : eq
+        )
+      );
+    } catch {
+      alert("Failed to update maintenance status.");
+    }
   };
 
   let filtered = equipments.filter(eq =>
@@ -47,9 +46,9 @@ const ResistanceMachinesEquipments = () => {
   );
 
   if (sortOption === 'maintenance') {
-    filtered = filtered.filter(eq => eq.forMaintenance === true);
+    filtered = filtered.filter(eq => eq.forMaintenance);
   } else if (sortOption === 'available') {
-    filtered = filtered.filter(eq => eq.forMaintenance === false);
+    filtered = filtered.filter(eq => !eq.forMaintenance);
   }
 
   if (sortOption === 'a-z') {
@@ -62,11 +61,14 @@ const ResistanceMachinesEquipments = () => {
     <>
       <TrainerNavbar />
       <div className="container mt-4">
-        <div className="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+        <h2 className="mb-4 text-center fw-bold">Resistance Machines</h2>
+
+        <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4 align-items-center">
           <input
             type="text"
-            className="form-control"
-            placeholder="Search by name..."
+            className="form-control w-100 w-md-50"
+            style={{ maxWidth: '300px' }}
+            placeholder="Search equipment..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -84,22 +86,24 @@ const ResistanceMachinesEquipments = () => {
         </div>
 
         {filtered.length === 0 ? (
-          <p>No equipment found.</p>
+          <p className="text-center text-muted">No equipment found.</p>
         ) : (
           <div className="row">
             {filtered.map((eq) => (
-              <div className="col-md-4 mb-3" key={eq.id}>
-                <div className="card shadow-sm h-100">
-                  <div className="card-body">
-                    <h5 className="card-title">{eq.name}</h5>
-                    <p className="card-text">
-                      <strong>Category:</strong> {eq.description}
-                    </p>
-                    <p className={`card-text ${eq.forMaintenance ? 'text-danger' : 'text-success'}`}>
-                      <strong>Status:</strong> {eq.forMaintenance ? 'Under Maintenance' : 'Available'}
-                    </p>
+              <div className="col-md-4 mb-4" key={eq.id}>
+                <div className="card h-100 shadow-sm border-0 rounded-4">
+                  <div className="card-body d-flex flex-column justify-content-between">
+                    <div>
+                      <h5 className="card-title fw-bold">{eq.name}</h5>
+                      <p className="card-text text-muted mb-1">
+                        <strong>Category:</strong> {eq.description}
+                      </p>
+                      <p className={`fw-semibold ${eq.forMaintenance ? 'text-danger' : 'text-success'}`}>
+                        <strong>Status:</strong> {eq.forMaintenance ? 'Under Maintenance' : 'Available'}
+                      </p>
+                    </div>
                     <button
-                      className={`btn ${eq.forMaintenance ? 'btn-success' : 'btn-warning'}`}
+                      className={`btn mt-3 ${eq.forMaintenance ? 'btn-success' : 'btn-warning'}`}
                       onClick={() => toggleMaintenance(eq.id, eq.forMaintenance)}
                     >
                       {eq.forMaintenance ? 'Unmark Maintenance' : 'Mark as Maintenance'}

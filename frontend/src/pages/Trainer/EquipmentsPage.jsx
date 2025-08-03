@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
-import '../../styles/EquipmentsPage.css';
+import '../../styles/Trainer/EquipmentsPage.css';
+import { fetchEquipmentCategories } from '../../services/TrainerService';
 
-// Map category enum to images
 const categoryImages = {
   CARDIO: '/images/Cardio.png',
   STRENGTH: '/images/Strength.png',
   FLEXIBILITY: '/images/Flexibility.png',
   FREE_WEIGHTS: '/images/FreeWeights.png',
-  RESISTANCE_MACHINES: '/images/ResistanceMachines.png'
+  RESISTANCE_MACHINES: '/images/ResistanceMachines.png',
 };
 
 const EquipmentsPage = () => {
@@ -18,42 +17,40 @@ const EquipmentsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/trainer/equipments`)
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        console.error('Failed to fetch equipment categories:', error);
-      });
+    const loadCategories = async () => {
+      try {
+        const data = await fetchEquipmentCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Failed to load equipment categories:', error);
+      }
+    };
+    loadCategories();
   }, []);
 
   return (
     <>
       <TrainerNavbar />
-      <div className="container mt-4">
-        <h2 className="mb-4">Gym Equipment Categories</h2>
-        <div className="row">
+      <div className="container mt-4 equipment-page">
+        <h2 className="text-center mb-5 section-title"> Gym Equipment Categories</h2>
+        <div className="row justify-content-center">
           {categories.map((cat, idx) => (
-            <div className="col-md-4 mb-4" key={idx}>
-              <div className="card h-100 shadow text-center">
+            <div className="col-sm-6 col-md-4 col-lg-3 mb-4" key={idx}>
+              <div className="equipment-card text-center shadow-sm">
                 <img
                   src={categoryImages[cat.category] || '/images/default.png'}
-                  className="card-img-top equipment-image"
                   alt={cat.category}
+                  className="equipment-image"
                 />
-                <div className="card-body">
-                  <h5 className="card-title">{cat.category.replace('_', ' ')} Equipment</h5>
-                  <p className="card-text mb-1">
-                    <strong>Active:</strong> {cat.activeCount}
-                  </p>
-                  <p className="card-text text-warning">
-                    <strong>Under Maintenance:</strong> {cat.maintenanceCount}
-                  </p>
+                <div className="card-body px-3">
+                  <h5 className="equipment-title">{cat.category.replace('_', ' ')} Equipment</h5>
+                  <p className="mb-1"><strong>Active:</strong> {cat.activeCount}</p>
+                  <p className="text-warning mb-2"><strong>Maintenance:</strong> {cat.maintenanceCount}</p>
                   <button
-                    className="btn btn-primary mt-2"
+                    className="btn btn-outline-primary rounded-pill"
                     onClick={() => navigate(`/trainer/equipments/${cat.category.toLowerCase()}`)}
                   >
-                    View Details
+                    View Details →
                   </button>
                 </div>
               </div>

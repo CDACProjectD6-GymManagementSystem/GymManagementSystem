@@ -1,60 +1,56 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
+import {
+  fetchStrengthEquipments,
+  toggleEquipmentMaintenance
+} from '../../services/TrainerService';
 
 const StrengthEquipments = () => {
   const [equipments, setEquipments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('all');
 
-  // ✅ Fetch strength equipment list
   useEffect(() => {
-    axios.get('http://localhost:8080/trainer/equipments/strength')
-      .then((res) => {
-        if (Array.isArray(res.data)) {
-          setEquipments(res.data);
+    const loadEquipments = async () => {
+      try {
+        const data = await fetchStrengthEquipments();
+        if (Array.isArray(data)) {
+          setEquipments(data);
         } else {
-          console.error('Unexpected response format:', res.data);
+          console.error('Unexpected response format:', data);
           setEquipments([]);
         }
-      })
-      .catch((err) => {
-        console.error('Error fetching strength equipments:', err);
+      } catch {
         setEquipments([]);
-      });
+      }
+    };
+
+    loadEquipments();
   }, []);
 
-  // ✅ Toggle maintenance status
-  const toggleMaintenance = (id, currentStatus) => {
-    axios.put(`http://localhost:8080/trainer/equipments/${id}/maintenance`, {
-      forMaintenance: !currentStatus
-    })
-      .then(() => {
-        setEquipments((prev) =>
-          prev.map((eq) =>
-            eq.id === id ? { ...eq, forMaintenance: !currentStatus } : eq
-          )
-        );
-      })
-      .catch((err) => {
-        console.error('Failed to update maintenance status:', err);
-        alert("Maintenance update failed.");
-      });
+  const toggleMaintenance = async (id, currentStatus) => {
+    try {
+      await toggleEquipmentMaintenance(id, currentStatus);
+      setEquipments(prev =>
+        prev.map(eq =>
+          eq.id === id ? { ...eq, forMaintenance: !currentStatus } : eq
+        )
+      );
+    } catch {
+      alert("Maintenance update failed.");
+    }
   };
 
-  // ✅ Filtering by name
   let filtered = equipments.filter(eq =>
     eq.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // ✅ Apply status filtering
   if (sortOption === 'maintenance') {
-    filtered = filtered.filter(eq => eq.forMaintenance === true);
+    filtered = filtered.filter(eq => eq.forMaintenance);
   } else if (sortOption === 'available') {
-    filtered = filtered.filter(eq => eq.forMaintenance === false);
+    filtered = filtered.filter(eq => !eq.forMaintenance);
   }
 
-  // ✅ Apply sorting
   if (sortOption === 'a-z') {
     filtered.sort((a, b) => a.name.localeCompare(b.name));
   } else if (sortOption === 'z-a') {

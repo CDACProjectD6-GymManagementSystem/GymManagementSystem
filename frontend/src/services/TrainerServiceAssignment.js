@@ -13,3 +13,5 @@ export const assignTrainerToUser = async ({ userId, trainerId }) => {
   });
   return res.data;
 };
+
+

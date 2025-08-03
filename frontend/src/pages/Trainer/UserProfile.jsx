@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
+import { fetchUserProfile } from '../../services/TrainerService';
 
 const UserProfile = () => {
   const { userId } = useParams();
@@ -9,10 +9,10 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
+    const loadUser = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/trainer/user/${userId}`);
-        setUser(response.data);
+        const data = await fetchUserProfile(userId);
+        setUser(data);
       } catch (error) {
         console.error('Error fetching user details:', error);
         setUser(null);
@@ -21,28 +21,34 @@ const UserProfile = () => {
       }
     };
 
-    fetchUserDetails();
+    loadUser();
   }, [userId]);
 
   return (
     <>
       <TrainerNavbar />
-      <div className="container mt-4">
-        <h3>User Profile</h3>
-        <div className="card shadow p-4 mt-3">
-          {loading ? (
-            <p>Loading user details...</p>
-          ) : user ? (
-            <>
-              <h5 className="mb-3">
-                Name: <span className="text-primary">{user.firstName} {user.lastName}</span>
-              </h5>
-              <p><strong>Gender:</strong> {user.gender}</p>
-              {/* Add more fields as needed from backend DTO */}
-            </>
-          ) : (
-            <p>User not found.</p>
-          )}
+      <div className="container mt-5">
+        <h2 className="text-center fw-bold mb-4">User Profile</h2>
+
+        <div className="d-flex justify-content-center">
+          <div className="card shadow-sm border-0 p-4 rounded-4" style={{ maxWidth: '500px', width: '100%' }}>
+            {loading ? (
+              <p className="text-muted text-center">Loading user details...</p>
+            ) : user ? (
+              <>
+                <h4 className="mb-3 text-primary text-center">
+                  {user.firstName} {user.lastName}
+                </h4>
+                <ul className="list-group list-group-flush">
+                  <li className="list-group-item">
+                    <strong>Gender:</strong> {user.gender}
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <p className="text-danger text-center">User not found.</p>
+            )}
+          </div>
         </div>
       </div>
     </>
@@ -50,4 +56,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-

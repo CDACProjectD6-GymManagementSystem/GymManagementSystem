@@ -18,3 +18,5 @@ public class UserForTrainerDTO {
 	private String lastName; 
 	private Gender gender;
 }
+
+

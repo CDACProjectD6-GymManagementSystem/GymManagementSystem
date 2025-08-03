@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import TrainerNavbar from '../../components/TrainerNavbar';
+import { fetchUserSchedule, updateUserSchedule } from '../../services/TrainerService';
 
 const UserSchedule = () => {
   const { userId } = useParams();
@@ -13,13 +13,11 @@ const UserSchedule = () => {
   const [gender, setGender] = useState("");
 
   useEffect(() => {
-    const fetchSchedule = async () => {
+    const loadSchedule = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/trainer/user/${userId}/schedule`);
-        const data = response.data;
-
+        const data = await fetchUserSchedule(userId);
         setUserName(`${data.firstName} ${data.lastName}`);
-        setGender(data.gender || "OTHER"); // Keep gender for POST request
+        setGender(data.gender || "OTHER");
 
         const scheduleData = {
           Monday: data.schedule?.monday || '',
@@ -33,15 +31,14 @@ const UserSchedule = () => {
 
         setSchedule(scheduleData);
         setOriginalSchedule(scheduleData);
-      } catch (error) {
-        console.error("Failed to fetch schedule:", error);
+      } catch {
         alert("Could not load schedule.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSchedule();
+    loadSchedule();
   }, [userId]);
 
   const handleChange = (day, value) => {
@@ -65,12 +62,11 @@ const UserSchedule = () => {
         }
       };
 
-      await axios.post(`http://localhost:8080/trainer/user/${userId}/schedule`, payload);
+      await updateUserSchedule(userId, payload);
       alert("Schedule updated successfully!");
       setOriginalSchedule(schedule);
       setIsEditing(false);
-    } catch (error) {
-      console.error("Error updating schedule:", error);
+    } catch {
       alert("Failed to update schedule.");
     }
   };
@@ -83,55 +79,60 @@ const UserSchedule = () => {
   return (
     <>
       <TrainerNavbar />
-      <div className="container mt-4">
-        <h3 className="mb-4">
-          Weekly Schedule for <span className="text-primary">{userName}</span>
-        </h3>
+      <div className="container mt-5">
+        <h2 className="text-center fw-bold mb-4">Workout Schedule</h2>
 
-        {loading ? (
-          <p>Loading schedule...</p>
-        ) : (
-          <>
-            <table className="table table-bordered shadow">
-              <thead className="table-dark">
-                <tr>
-                  <th>Day</th>
-                  <th>Workout</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(schedule).map(([day, workout]) => (
-                  <tr key={day}>
-                    <td><strong>{day}</strong></td>
-                    <td>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={workout}
-                          onChange={(e) => handleChange(day, e.target.value)}
-                        />
-                      ) : (
-                        workout
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="card p-4 rounded-4 shadow-sm border-0" style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h5 className="text-center text-primary mb-4">Schedule for {userName}</h5>
 
-            <div className="mt-3">
-              {isEditing ? (
-                <>
-                  <button className="btn btn-success me-2" onClick={handleSave}>Save Schedule</button>
-                  <button className="btn btn-secondary" onClick={handleCancel}>Cancel</button>
-                </>
-              ) : (
-                <button className="btn btn-primary" onClick={() => setIsEditing(true)}>Edit Schedule</button>
-              )}
-            </div>
-          </>
-        )}
+          {loading ? (
+            <p className="text-center text-muted">Loading schedule...</p>
+          ) : (
+            <>
+              <div className="table-responsive">
+                <table className="table table-bordered align-middle">
+                  <thead className="table-dark text-center">
+                    <tr>
+                      <th style={{ width: '30%' }}>Day</th>
+                      <th>Workout</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(schedule).map(([day, workout]) => (
+                      <tr key={day}>
+                        <td className="fw-semibold text-center">{day}</td>
+                        <td>
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={workout}
+                              onChange={(e) => handleChange(day, e.target.value)}
+                              placeholder="Enter workout"
+                            />
+                          ) : (
+                            <span>{workout || <em className="text-muted">No workout assigned</em>}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="d-flex justify-content-center gap-3 mt-3">
+                {isEditing ? (
+                  <>
+                    <button className="btn btn-success px-4" onClick={handleSave}>Save</button>
+                    <button className="btn btn-secondary px-4" onClick={handleCancel}>Cancel</button>
+                  </>
+                ) : (
+                  <button className="btn btn-primary px-4" onClick={() => setIsEditing(true)}>Edit Schedule</button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
   );
