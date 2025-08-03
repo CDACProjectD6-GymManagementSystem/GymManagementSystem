@@ -10,4 +10,7 @@ import com.gymmate.entities.Admin;
 public interface AdminDao extends JpaRepository<Admin, Long> {
 	@Query("select u from Admin u where u.email=:email")
 	Optional<Admin> findByEmailAddress(String email);
+
+
+	boolean existsByEmail(String defaultEmail);
 }
