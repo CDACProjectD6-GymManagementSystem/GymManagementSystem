@@ -13,4 +13,7 @@ public interface ReceptionistDao extends JpaRepository<Receptionist, Long>{
 	boolean existsByEmail(String email);
 	@Query("select u from Receptionist u where u.email=:email")
 	Optional<Receptionist> findByEmailAddress(String email);
+	
+	@Query(nativeQuery = true,value = "select count(*) from receptionists")
+	int getCount();
 }

@@ -3,6 +3,7 @@ package com.gymmate.daos;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.gymmate.entities.Equipment;
 import com.gymmate.entities.Equipment.Category;
@@ -14,5 +15,8 @@ public interface EquipmentDao extends JpaRepository<Equipment, Long> {
 	long countByCategoryAndForMaintenance(Category category, boolean b);
 	
 	List<Equipment> findByCategory(Equipment.Category category);
+
+	@Query(nativeQuery = true,value = "select count(*) from equipments")
+	int getCount();
 
 }
