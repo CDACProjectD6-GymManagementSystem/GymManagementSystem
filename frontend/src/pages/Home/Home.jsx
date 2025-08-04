@@ -15,31 +15,31 @@ import "./Home.css";
 const trainers = [
   {
     id: 1,
-    name: "Vaibhav Shinde",
+    name: "Alex Pill",
     expertise: "Strength & Conditioning",
     certifications: ["NSCA-CSCS", "ACE Certified"],
-    photo: "../../../public/images/VaibhavTrainer.jpg",
+    photo: "../../../public/images/Trainer1.png",
   },
   {
     id: 2,
-    name: "Nehal Malshikare",
+    name: "Ashley Smith",
     expertise: "Bodybuilding, Nutrition",
     certifications: ["ISSA Master Trainer", "IFBB Pro"],
-    photo: "../../../public/images/NehalTrainer.jpg",
+    photo: "../../../public/images/Trainer2.png",
   },
   {
     id: 3,
-    name: "Pratik Pawar",
+    name: "John King",
     expertise: "Muscle Building, Fat Loss",
     certifications: ["NASM CPT", "S&C Specialist"],
-    photo: "../../../public/images/PratikTrainer.jpg",
+    photo: "../../../public/images/Trainer3.png",
   },
   {
     id: 4,
-    name: "Anurag Kashyap",
-    expertise: "Powerlifting, Men's Physique",
-    certifications: ["Personal Trainer", "CPR AED"],
-        photo: "../../../public/images/AnuragTrainer.png",
+    name: "Priya Aggarwal",
+    expertise: "Yoga, MentalHealth",
+    certifications: ["Yoga International", "CPR AED"],
+        photo: "../../../public/images/Trainer4.png",
   }
 ];
 
