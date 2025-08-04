@@ -174,7 +174,7 @@ const Home = () => {
                     </div>
                     <div style={{ textAlign: "center", padding: "0.6em 1em" }}>
                       <Link
-                        to={`/login`}
+                        to={`/auth/signin`}
                         style={isHovered ? outlineBtnHoverStyle : outlineBtnStyle}
                       >
                         Choose Plan

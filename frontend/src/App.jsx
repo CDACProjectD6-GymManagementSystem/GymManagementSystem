@@ -38,7 +38,7 @@ import PaymentPage from './pages/Payment/PaymentPage';
 
  
 // These are the only routes/pages handled at top-level (all else is modular inside User or Admin)
-const authPages = ["/login", "/register"];
+const authPages = ["/auth/signin", "/register"];
 
 function AppContent() {
   const location = useLocation();
