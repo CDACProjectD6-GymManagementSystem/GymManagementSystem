@@ -10,6 +10,9 @@ const BASE_URL = 'http://localhost:8080/trainer';
 
 
 
+
+
+
 export const getAssignedUsers = async (trainerId) => {
   try {
     const response = await axios.get(`${BASE_URL}/users/${trainerId}`);
@@ -19,6 +22,8 @@ export const getAssignedUsers = async (trainerId) => {
     throw error;
   }
 };
+
+
 
 
 

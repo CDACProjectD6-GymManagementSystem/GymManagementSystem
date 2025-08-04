@@ -7,9 +7,10 @@ import {
   deleteTrainerPhoto,
 } from '../../services/TrainerService';
 import '../../styles/Trainer/TrainerProfile.css';
+import { jwtDecode } from 'jwt-decode';
 
 const TrainerProfile = () => {
-  const trainerId = 1;
+  const [trainerId, setTrainerId] = useState(null);
 
   const [profile, setProfile] = useState({
     firstName: '',
@@ -28,14 +29,31 @@ const TrainerProfile = () => {
   const [apiError, setApiError] = useState('');
   const [apiSuccess, setApiSuccess] = useState('');
 
+  // Extract trainerId from token
   useEffect(() => {
+    const token = sessionStorage.getItem("gymmateAccessToken");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const id = decoded.id || decoded.userId || decoded.sub || null; // Adjust based on actual claim
+        setTrainerId(id);
+      } catch (err) {
+        console.error("Error decoding JWT:", err);
+      }
+    }
+  }, []);
+
+  // Fetch profile after trainerId is available
+  useEffect(() => {
+    if (!trainerId) return;
+
     fetchTrainerProfile(trainerId)
       .then(data => {
         setProfile(data);
         setOriginalProfile(data);
       })
       .catch(() => setApiError("❌ Failed to load trainer profile"));
-  }, []);
+  }, [trainerId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,7 +63,7 @@ const TrainerProfile = () => {
   const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !trainerId) return;
     setUploading(true);
     try {
       const res = await uploadTrainerPhoto(trainerId, selectedFile);
@@ -65,6 +83,7 @@ const TrainerProfile = () => {
   };
 
   const handleDeletePhoto = async () => {
+    if (!trainerId) return;
     try {
       await deleteTrainerPhoto(trainerId);
       setProfile(prev => ({ ...prev, imageUrl: '', imagePublicId: '' }));
@@ -77,6 +96,7 @@ const TrainerProfile = () => {
   };
 
   const handleSave = () => {
+    if (!trainerId) return;
     updateTrainerProfile(trainerId, profile)
       .then(() => {
         setOriginalProfile(profile);
