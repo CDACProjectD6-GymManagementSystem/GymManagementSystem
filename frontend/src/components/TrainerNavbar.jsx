@@ -1,11 +1,21 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { FaTachometerAlt, FaUsers, FaDumbbell, FaUser, FaSignOutAlt } from 'react-icons/fa';
 
 const TrainerNavbar = () => {
+  const navigate = useNavigate();
+
+  // Logout handler
+  const handleLogout = (e) => {
+    e.preventDefault(); // Prevents default NavLink behavior
+    sessionStorage.removeItem("gymmateAccessToken");
+    // Redirect to login with a logout message
+    navigate("/auth/signin", { replace: true, state: { msg: "Logged out successfully." } });
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-2 sticky-top">
-      <NavLink className="navbar-brand fw-bold fs-4 text-warning" to="/trainer-dashboard">
+      <NavLink className="navbar-brand fw-bold fs-4 text-warning" to="/trainer">
         TrainerPanel
       </NavLink>
 
@@ -24,7 +34,7 @@ const TrainerNavbar = () => {
       <div className="collapse navbar-collapse" id="trainerNavbar">
         <ul className="navbar-nav me-auto mb-2 mb-lg-0 gap-2">
           <li className="nav-item">
-            <NavLink to="/trainer-dashboard" className="nav-link">
+            <NavLink to="/trainer" className="nav-link">
               <FaTachometerAlt className="me-1" />
               Dashboard
             </NavLink>
@@ -51,7 +61,11 @@ const TrainerNavbar = () => {
 
         <ul className="navbar-nav ms-auto">
           <li className="nav-item">
-            <NavLink to="/logout" className="nav-link text-danger fw-semibold">
+            <NavLink
+              to="/logout"
+              className="nav-link text-danger fw-semibold"
+              onClick={handleLogout}
+            >
               <FaSignOutAlt className="me-1" />
               Logout
             </NavLink>

@@ -44,9 +44,9 @@ public class TrainerController {
 	@Operation(description = "Get trainer profile details")
 	public ResponseEntity<?> getTrainerDetails(@PathVariable Long trainerId){
 		System.out.println("in getting trainer details " + trainerId);
-		
 		return ResponseEntity.ok(trainerService.getTrainerDetails(trainerId));
 	}
+	
 	
 	
 	

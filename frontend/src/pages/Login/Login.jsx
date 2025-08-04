@@ -41,7 +41,7 @@ export default function Login() {
       } else if (userRole === "ROLE_ADMIN") {
         navigate("/admin-dashboard");
       } else if (userRole === "ROLE_TRAINER") {
-        navigate("/trainer-dashboard");
+        navigate("/trainer");
       } else if (userRole === "ROLE_RECEPTIONIST") {
         navigate("/reception-dashboard");
       } else if (userRole === "ROLE_USER") {
