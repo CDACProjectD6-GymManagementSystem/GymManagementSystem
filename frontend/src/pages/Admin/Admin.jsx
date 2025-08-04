@@ -20,15 +20,16 @@ const sections = [
 export default function Admin() {
   const [current, setCurrent] = useState(sections[0]);
   return (
-    <div className="admin-container">
-      <AdminNavbar items={sections} current={current} onNav={setCurrent} />
-      {current === "Admin Dashboard" && <DashboardSection />}
-      {current === "Manage Users" && <UserSection />}
-      {current === "Manage Staff" && <StaffSection />}
-      {current === "Manage Subscription" && <SubscriptionSection />}
-      {current === "Manage Equipments" && <EquipmentSection />}
-      {current === "Feedback Review" && <Feedback />}
-      
-    </div>
+      <div className="admin-container">
+        <AdminNavbar items={sections} current={current} onNav={setCurrent} />
+        {current === "Admin Dashboard" && <DashboardSection />}
+        {current === "Manage Users" && <UserSection />}
+        {current === "Manage Staff" && <StaffSection />}
+        {current === "Manage Subscription" && <SubscriptionSection />}
+        {current === "Manage Equipments" && <EquipmentSection />}
+        {current === "Feedback Review" && <Feedback />}
+
+      </div>
+    
   );
 }

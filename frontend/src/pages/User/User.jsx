@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import UserNavbar from "../../components/UserNavbar";
+import ProtectedRoute from "../../components/ProtectedRoute"; // <--- import it
 import UserHomePage from "./UserHome/UserHomePage";
 import ProfilePage from "./Profile/ProfilePage";
 import MembershipPage from "./Membership/MembershipPage";
@@ -15,14 +16,23 @@ export default function User() {
       <UserNavbar />
       <main>
         <Routes>
-          <Route index element={<UserHomePage />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="membership" element={<MembershipPage />} />
-          <Route path="workout" element={<WorkoutDietPage />} />
-          <Route path="schedule" element={<SchedulePage />} />
-          <Route path="diet-nutrition" element={<DietNutritionPage />} />
-          <Route path="feedback" element={<FeedbackPage />} />
-          <Route path="*" element={<Navigate to="" replace />} />
+          <Route 
+            path="*" 
+            element={
+              <ProtectedRoute>
+                <Routes>
+                  <Route index element={<UserHomePage />} />
+                  <Route path="profile" element={<ProfilePage />} />
+                  <Route path="membership" element={<MembershipPage />} />
+                  <Route path="workout" element={<WorkoutDietPage />} />
+                  <Route path="schedule" element={<SchedulePage />} />
+                  <Route path="diet-nutrition" element={<DietNutritionPage />} />
+                  <Route path="feedback" element={<FeedbackPage />} />
+                  <Route path="*" element={<Navigate to="" replace />} />
+                </Routes>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
     </div>

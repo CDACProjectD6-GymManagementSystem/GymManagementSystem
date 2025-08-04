@@ -8,6 +8,7 @@ const AdminNavbar = ({ items, current, onNav }) => {
 
   const handleLogout = () => {
     navigate("/");
+    sessionStorage.removeItem("gymmateAccessToken");
   };
 
   return (

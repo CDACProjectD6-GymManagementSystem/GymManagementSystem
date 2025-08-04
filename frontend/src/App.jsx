@@ -36,7 +36,7 @@ import Trainers from "./pages/Trainer/Trainer";
 import PaymentPage from './pages/Payment/PaymentPage';
 
 
- 
+
 // These are the only routes/pages handled at top-level (all else is modular inside User or Admin)
 const authPages = ["/auth/signin", "/register"];
 
@@ -61,29 +61,29 @@ function AppContent() {
 
         {/* User dashboard (all features now modular in User.jsx) */}
         <Route path="/user/*" element={<User />} />
+         
+          {/* Admin dashboard -- load as-is with NO CHANGE */}
+          <Route path="/admin-dashboard" element={<Admin />} />
 
-        {/* Admin dashboard -- load as-is with NO CHANGE */}
-        <Route path="/admin-dashboard" element={<Admin />} />
 
-
-        {/* Standalone dashboards & utility routes */}
-        <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
-        <Route path="/reception-dashboard/*" element={<ReceptionistDashboard />} />
-        <Route path="/trainers" element={<Trainers />} />
-        <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/trainer/profile" element={<TrainerProfile />} />
-        <Route path="/trainer/users" element={<AssignedUsers />} />
-        <Route path="/trainer/equipments" element={<EquipmentsPage />} />
-        <Route path="/trainer/equipments/strength" element={<StrengthEquipments />} />
-        <Route path="/trainer/equipments/cardio" element={<CardioEquipments />} />
-        <Route path="/trainer/equipments/flexibility" element={<FlexibilityEquipments />} />
-        <Route path="/trainer/equipments/free_weights" element={<FreeWeightsEquipments />} />
-        <Route path="/trainer/equipments/resistance_machines" element={<ResistanceMachinesEquipments/>}/>
-        <Route path="/trainer/user/:userId" element={<UserProfile />} />
-        <Route path="/trainer/user/:userId/diet" element={<DietPlanEditor />} />
-        <Route path="/trainer/user/:userId/schedule" element={<UserSchedule />} />
-        <Route path="*" element={<Home />} />
-
+          {/* Standalone dashboards & utility routes */}
+          <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
+          <Route path="/reception-dashboard/*" element={<ReceptionistDashboard />} />
+          <Route path="/trainers" element={<Trainers />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/trainer/profile" element={<TrainerProfile />} />
+          <Route path="/trainer/users" element={<AssignedUsers />} />
+          <Route path="/trainer/equipments" element={<EquipmentsPage />} />
+          <Route path="/trainer/equipments/strength" element={<StrengthEquipments />} />
+          <Route path="/trainer/equipments/cardio" element={<CardioEquipments />} />
+          <Route path="/trainer/equipments/flexibility" element={<FlexibilityEquipments />} />
+          <Route path="/trainer/equipments/free_weights" element={<FreeWeightsEquipments />} />
+          <Route path="/trainer/equipments/resistance_machines" element={<ResistanceMachinesEquipments />} />
+          <Route path="/trainer/user/:userId" element={<UserProfile />} />
+          <Route path="/trainer/user/:userId/diet" element={<DietPlanEditor />} />
+          <Route path="/trainer/user/:userId/schedule" element={<UserSchedule />} />
+          <Route path="*" element={<Home />} />
+         
       </Routes>
     </>
   );

@@ -21,68 +21,67 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import lombok.AllArgsConstructor;
 
-// Inside your SecurityConfiguration class
-@Configuration // to declare config class - equivalent to bean config xml file
-@EnableWebSecurity // to enable spring security
-@EnableMethodSecurity // later - to enable auth rules at method level
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 @AllArgsConstructor
 public class SecurityConfiguration {
 
 	private final CustomUserDetailsServiceImpl customUserDetailsServiceImpl;
-  	private final CustomJWTFilter customJWTFilter;
+	private final CustomJWTFilter customJWTFilter;
 
-	// configure spring security filter chain - as a spring bean
 	@Bean
 	SecurityFilterChain configureFilterChain(HttpSecurity http) throws Exception {
-		// HttpSecurity - spring sec supplied class
-		// to customize n build filter chain
-		// 1. disable CSRF protection
 		http.csrf(csrf -> csrf.disable());
-		 http
-	      .cors(); 
-		// 2. any request - has to be authenticated
-		http.authorizeHttpRequests(
+		http.cors();
 
-				request -> request
-						.anyRequest()
-						.permitAll());
-						 //only for react apps - permit in flight requests - otherwise CORS error
-//						.requestMatchers(HttpMethod.OPTIONS).permitAll().requestMatchers(HttpMethod.GET, "/user")
-//								.permitAll().requestMatchers(HttpMethod.GET, "/admin").hasRole("ADMIN").anyRequest()
-//						.authenticated());
-		// 3. disable HttpSession tracking - stateless
-		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-		// 4. To support REST APIs , disable form login
-		http.formLogin(form -> form.disable());
-		// 5. Disable Basic auth support
-		http.httpBasic(basic -> basic.disable());
-		
-		// add custom jwt filter before usernamepwd auth filter
+		http.authorizeHttpRequests(authz -> authz
+				// PUBLIC ENDPOINTS (anyone can access)
+				.requestMatchers("/user/register", "/auth/**", "/subscriptions").permitAll()
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+				// ADMIN ONLY ENDPOINTS
+				.requestMatchers("/admin/**").hasRole("ADMIN")
+
+				// RECEPTIONIST ONLY ENDPOINTS
+				.requestMatchers("/receptionist/**").hasRole("RECEPTIONIST")
+
+				// TRAINER ONLY ENDPOINTS
+				.requestMatchers("/trainer/**").hasRole("TRAINER")
+
+				// USER-ONLY ENDPOINTS (and higher, if you want)
+				.requestMatchers("/user/**").hasRole("USER")
+
+				// Otherwise, authenticated
+				.anyRequest().authenticated());
+
+		http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		http.formLogin(f -> f.disable());
+		http.httpBasic(b -> b.disable());
 		http.addFilterBefore(customJWTFilter, UsernamePasswordAuthenticationFilter.class);
+
 		return http.build();
 	}
 
-	// configure AuthManager as a spring bean
 	@Bean
 	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
 	}
-	
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-	    return new BCryptPasswordEncoder();
-	}
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
-	    CorsConfiguration configuration = new CorsConfiguration();
-	    configuration.setAllowedOrigins(List.of("*")); // Use your frontend url(s) in prod!
-	    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-	    configuration.setAllowedHeaders(List.of("*"));
-	    configuration.setAllowCredentials(false);
-	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", configuration);
-	    return source;
+		return new BCryptPasswordEncoder();
 	}
 
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(List.of("*"));
+		configuration.setAllowCredentials(false);
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 }

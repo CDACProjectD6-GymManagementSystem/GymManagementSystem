@@ -1,11 +1,18 @@
-
 import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8080/admin";
 
+function getAuthHeaders() {
+  const token = sessionStorage.getItem("gymmateAccessToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// --- USERS ---
 export const getUsers = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/get-users`);
+    const response = await axios.get(`${API_BASE_URL}/get-users`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching users", error);
@@ -15,7 +22,9 @@ export const getUsers = async () => {
 
 export const addUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/add-user`, userData);
+    const response = await axios.post(`${API_BASE_URL}/add-user`, userData, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error adding user:", error);
@@ -25,7 +34,9 @@ export const addUser = async (userData) => {
 
 export const deleteUser = async (userId) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/delete-user/${userId}`);
+    const response = await axios.delete(`${API_BASE_URL}/delete-user/${userId}`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error deleting user:", error);
@@ -35,7 +46,9 @@ export const deleteUser = async (userId) => {
 
 export const updateUser = async (userId, userData) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/update-user/${userId}`, userData);
+    const response = await axios.put(`${API_BASE_URL}/update-user/${userId}`, userData, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error updating user:", error);
@@ -43,9 +56,12 @@ export const updateUser = async (userId, userData) => {
   }
 };
 
+// --- SUBSCRIPTIONS ---
 export const getSubscriptionNames = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/subscription/getnames`);
+    const response = await axios.get(`${API_BASE_URL}/subscription/getnames`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching subscription names:", error);
@@ -54,27 +70,36 @@ export const getSubscriptionNames = async () => {
 };
 
 export const addSubscription = (data) => {
-  return axios.post(`${API_BASE_URL}/subscription/add-subscription`, data);
+  return axios.post(`${API_BASE_URL}/subscription/add-subscription`, data, {
+    headers: getAuthHeaders(),
+  });
 };
 
-
 export const getSubscriptions = () => {
-  return axios.get(`${API_BASE_URL}/subscription`);
+  return axios.get(`${API_BASE_URL}/subscription`, {
+    headers: getAuthHeaders(),
+  });
 };
 
 export const deleteSubscription = (subId) => {
-  return axios.delete(`${API_BASE_URL}/subscription/${subId}`);
+  return axios.delete(`${API_BASE_URL}/subscription/${subId}`, {
+    headers: getAuthHeaders(),
+  });
 };
 
 export const updateSubscription = (subId, updateData) => {
-  return axios.put(`${API_BASE_URL}/subscription/${subId}`, updateData);
+  return axios.put(`${API_BASE_URL}/subscription/${subId}`, updateData, {
+    headers: getAuthHeaders(),
+  });
 };
 
+// --- EQUIPMENTS ---
 export const addEquipment = async (equipmentData) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/equipment/add`,
-      equipmentData
+      equipmentData,
+      { headers: getAuthHeaders() }
     );
     return response.data;
   } catch (error) {
@@ -85,7 +110,9 @@ export const addEquipment = async (equipmentData) => {
 
 export const getAllEquipments = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/equipment/getall`);
+    const response = await axios.get(`${API_BASE_URL}/equipment/getall`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching equipment list:", error);
@@ -95,8 +122,10 @@ export const getAllEquipments = async () => {
 
 export const deleteEquipment = async (id) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/equipment/${id}`);
-    return response.data; 
+    const response = await axios.delete(`${API_BASE_URL}/equipment/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
   } catch (error) {
     console.error("Error deleting equipment:", error);
     throw error;
@@ -105,16 +134,21 @@ export const deleteEquipment = async (id) => {
 
 export const updateEquipment = async (id, updateDto) => {
   try {
-    return await axios.put(`${API_BASE_URL}/equipment/${id}`, updateDto);
+    return await axios.put(`${API_BASE_URL}/equipment/${id}`, updateDto, {
+      headers: getAuthHeaders(),
+    });
   } catch (error) {
     console.error("Error updating equipment:", error);
     throw error;
   }
 };
 
+// --- RECEPTIONISTS ---
 export const getAllReceptionists = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/receptionist`);
+    const response = await axios.get(`${API_BASE_URL}/receptionist`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching receptionists:", error);
@@ -124,7 +158,11 @@ export const getAllReceptionists = async () => {
 
 export const addReceptionist = async (receptionistData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/receptionist`, receptionistData);
+    const response = await axios.post(
+      `${API_BASE_URL}/receptionist`,
+      receptionistData,
+      { headers: getAuthHeaders() }
+    );
     return response.data;
   } catch (error) {
     console.error("Error adding receptionist:", error);
@@ -133,47 +171,66 @@ export const addReceptionist = async (receptionistData) => {
 };
 
 export const deleteReceptionist = (id) => {
-  return axios.delete(`${API_BASE_URL}/receptionist/delete/${id}`);
+  return axios.delete(`${API_BASE_URL}/receptionist/delete/${id}`, {
+    headers: getAuthHeaders(),
+  });
 };
 
 export const updateReceptionist = (id, receptionistData) => {
   const { id: _, ...dataWithoutId } = receptionistData;
-  return axios.put(`${API_BASE_URL}/receptionist/update/${id}`, dataWithoutId);
+  return axios.put(`${API_BASE_URL}/receptionist/update/${id}`, dataWithoutId, {
+    headers: getAuthHeaders(),
+  });
 };
 
+// --- TRAINERS ---
 export const addTrainer = (trainerData) => {
-  return axios.post(`${API_BASE_URL}/trainer`, trainerData).then((res) => res.data);
+  return axios.post(`${API_BASE_URL}/trainer`, trainerData, {
+    headers: getAuthHeaders(),
+  }).then((res) => res.data);
 };
 
-export const getAllTrainers=async()=>{
-  try{
-  const response=await axios.get(`${API_BASE_URL}/trainer`);
-  return response.data;
-  }
-  catch(error)
-  {
+export const getAllTrainers = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/trainer`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
     console.error("Error fetching Trainers");
     throw error;
   }
 };
 
 export const deleteTrainer = (id) => {
-  return axios.delete(`${API_BASE_URL}/trainer/delete/${id}`);
+  return axios.delete(`${API_BASE_URL}/trainer/delete/${id}`, {
+    headers: getAuthHeaders(),
+  });
 };
 
 export const updateTrainer = (id, trainerData) => {
   const { id: _, ...data } = trainerData;
-  return axios.put(`${API_BASE_URL}/trainer/update/${id}`, data).then(res => res.data);
+  return axios.put(`${API_BASE_URL}/trainer/update/${id}`, data, {
+    headers: getAuthHeaders(),
+  }).then(res => res.data);
 };
 
-export const getAllFeedbacks = () => axios.get(`${API_BASE_URL}/feedback`);
+// --- FEEDBACK ---
+export const getAllFeedbacks = () =>
+  axios.get(`${API_BASE_URL}/feedback`, { headers: getAuthHeaders() });
 
+// --- PAYMENTS ---
 export async function fetchPayments() {
-  const response = await axios.get(`${API_BASE_URL}/payments`);
+  const response = await axios.get(`${API_BASE_URL}/payments`, {
+    headers: getAuthHeaders(),
+  });
   return response.data;
 }
 
+// --- DASHBOARD STATS ---
 export async function fetchDashboardStats() {
-    const response = await axios.get(`${API_BASE_URL}/dashboardstats`);
-    return response.data;
+  const response = await axios.get(`${API_BASE_URL}/dashboardstats`, {
+    headers: getAuthHeaders(),
+  });
+  return response.data;
 }
