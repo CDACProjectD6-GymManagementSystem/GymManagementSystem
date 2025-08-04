@@ -7,6 +7,7 @@ import SubscriptionSection from "./SubscriptionSection";
 import EquipmentSection from "./EquipmentSection";
 import DashboardSection from "./DashboardSection";
 import Feedback from "./Feedback";
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 const sections = [
   "Admin Dashboard",
@@ -21,6 +22,8 @@ export default function Admin() {
   const [current, setCurrent] = useState(sections[0]);
   return (
       <div className="admin-container">
+      <ProtectedRoute>  
+      
         <AdminNavbar items={sections} current={current} onNav={setCurrent} />
         {current === "Admin Dashboard" && <DashboardSection />}
         {current === "Manage Users" && <UserSection />}
@@ -28,7 +31,7 @@ export default function Admin() {
         {current === "Manage Subscription" && <SubscriptionSection />}
         {current === "Manage Equipments" && <EquipmentSection />}
         {current === "Feedback Review" && <Feedback />}
-
+      </ProtectedRoute>
       </div>
     
   );

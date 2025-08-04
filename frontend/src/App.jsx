@@ -10,7 +10,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
-
+import NotFound from "./components/NotFound.jsx";
 // Modular dashboards (User & Admin handled modularly!)
 import User from "./pages/User/User";      // Modular User Dashboard
 import Admin from "./pages/Admin/Admin";   // Modular Admin Dashboard (unchanged!)
@@ -82,8 +82,7 @@ function AppContent() {
           <Route path="/trainer/user/:userId" element={<UserProfile />} />
           <Route path="/trainer/user/:userId/diet" element={<DietPlanEditor />} />
           <Route path="/trainer/user/:userId/schedule" element={<UserSchedule />} />
-          <Route path="*" element={<Home />} />
-         
+          <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
