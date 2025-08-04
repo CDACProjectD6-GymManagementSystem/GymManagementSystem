@@ -1,197 +1,202 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  getUsers,
+  addUser,
+  updateUser,
+  deleteUser,
+} from "../../services/ReceptionistService";
+import { getSubscriptionNames } from "../../services/AdminService";
+
+import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { Modal, Button, Form, Alert } from "react-bootstrap";
 
-// Dummy Subscription Plans data (assuming you'd fetch this from backend /api/subscriptions)
-const dummySubscriptionPlans = [
-  { id: 101, name: "Basic Access" },
-  { id: 102, name: "Standard Elite" },
-  { id: 103, name: "Family Plus" },
-  { id: 104, name: "Elite Performance" }
-];
+const emptyUser = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  mobile: "",
+  address: "",
+  gender: "",
+  subscriptionType: "",
+};
 
-// Dummy initial members data - Updated to match UserEntity fields
-const membersData = [
-  {
-    id: 1,
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@email.com",
-    mobile: "123-456-7890",
-    address: "Pune",
-    gender: "MALE",
-    isSubscribed: true,
-    isActive: true,
-    subscriptionId: dummySubscriptionPlans[0],
-    joinDate: "2024-01-15"
-  },
-  {
-    id: 2,
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane@email.com",
-    mobile: "098-765-4321",
-    address: "Mumbai",
-    gender: "FEMALE",
-    isSubscribed: true,
-    isActive: true,
-    subscriptionId: dummySubscriptionPlans[1],
-    joinDate: "2024-02-20"
-  },
-  {
-    id: 3,
-    firstName: "Mike",
-    lastName: "Johnson",
-    email: "mike@email.com",
-    mobile: "555-123-4567",
-    address: "Goa",
-    gender: "MALE",
-    isSubscribed: false,
-    isActive: false,
-    subscriptionId: null,
-    joinDate: "2023-12-10"
-  }
-];
-
-function UserManagement({ onProceedToPayment }) {
-  const [members, setMembers] = useState(membersData);
-  const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
+const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
+  const [users, setUsers] = useState([]);
+  const [subscriptionNames, setSubscriptionNames] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const [message, setMessage] = useState(null); 
+  const [showModal, setShowModal] = useState(false);
+  const [uiMessage, setUiMessage] = useState(null);
   const [savedUserId, setSavedUserId] = useState(null);
+  const [search, setSearch] = useState("");
+  const [currentUser, setCurrentUser] = useState(emptyUser);
+  const [loading, setLoading] = useState(false);
+  const [formDirty, setFormDirty] = useState(false); // for validation feedback
+  const focusFirstInputRef = useRef(null);
 
-  const [currentUser, setCurrentUser] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobile: "",
-    address: "",
-    gender: "MALE",
-    isSubscribed: false,
-    isActive: true,
-    subscriptionId: "",
-    joinDate: ""
-  });
+  useEffect(() => {
+    const fetchInitial = async () => {
+      setLoading(true);
+      try {
+        const [usersData, subscriptionData] = await Promise.all([
+          getUsers(),
+          getSubscriptionNames(),
+        ]);
+        setUsers(usersData);
+        console.log(subscriptionData);
+        setSubscriptionNames(subscriptionData);
+      } catch (error) {
+        setUiMessage({ type: "danger", text: "Failed to load user data." });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitial();
+  }, []);
 
-  const filtered = members.filter(
-    m =>
-      `${m.firstName} ${m.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
-      m.email.toLowerCase().includes(search.toLowerCase()) ||
-      m.mobile.includes(search)
-  );
+  // Focus first input on modal open
+  useEffect(() => {
+    if (showModal && focusFirstInputRef.current) {
+      focusFirstInputRef.current.focus();
+    }
+  }, [showModal]);
 
+  // Validation helpers
+  function validateFields(fields) {
+    const errors = {};
+    if (!fields.firstName.trim()) errors.firstName = "First name is required.";
+    if (!fields.lastName.trim()) errors.lastName = "Last name is required.";
+    if (!fields.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errors.email = "Valid email required.";
+    if (!fields.mobile.trim() || !/^[0-9-+()\s]+$/.test(fields.mobile)) errors.mobile = "Valid mobile required.";
+    if (!fields.address.trim()) errors.address = "Address is required.";
+    if (!fields.gender) errors.gender = "Select gender.";
+    // Password: required on add, or if editing & filled
+    if (!editingId && !fields.password.trim()) errors.password = "Password required.";
+    return errors;
+  }
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCurrentUser((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    setFormDirty(true);
+  };
+
+  // Can be invoked with or without a user argument
   const handleShowModal = (userToEdit = null) => {
+    setFormDirty(false);
+    setSavedUserId(null);
+    setUiMessage(null);
     if (userToEdit) {
       setEditingId(userToEdit.id);
       setCurrentUser({
         ...userToEdit,
-        subscriptionId: userToEdit.subscriptionId ? userToEdit.subscriptionId.id : ""
+        gender: userToEdit.gender
+          ? userToEdit.gender.toUpperCase()
+          : "MALE",
+        password: "", // Reset password field
       });
     } else {
       setEditingId(null);
-      setCurrentUser({
-        firstName: "",
-        lastName: "",
-        email: "",
-        mobile: "",
-        address: "",
-        gender: "MALE",
-        isSubscribed: false,
-        isActive: true,
-        subscriptionId: "",
-        joinDate: ""
-      });
+      setCurrentUser(emptyUser);
     }
     setShowModal(true);
-    setMessage(null); 
-    setSavedUserId(null); 
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingId(null);
-    setSavedUserId(null); 
-    setMessage(null); 
-    setCurrentUser({
-      firstName: "",
-      lastName: "",
-      email: "",
-      mobile: "",
-      address: "",
-      gender: "MALE",
-      isSubscribed: false,
-      isActive: true,
-      subscriptionId: "",
-      joinDate: ""
-    });
+    setSavedUserId(null);
+    setFormDirty(false);
+    setUiMessage(null);
+    setCurrentUser(emptyUser);
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setCurrentUser(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const handleSaveUser = (e) => {
+  const handleSaveUser = async (e) => {
     e.preventDefault();
-
-    if (!currentUser.firstName || !currentUser.lastName || !currentUser.email || !currentUser.mobile || !currentUser.address || !currentUser.joinDate) {
-      setMessage({ type: "danger", text: "Please fill in all required fields." });
+    setFormDirty(true);
+    const errors = validateFields(currentUser);
+    if (Object.keys(errors).length) {
+      setUiMessage({ type: "danger", text: "Please fill in all required fields." });
       return;
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(currentUser.email)) {
-      setMessage({ type: "danger", text: "Please enter a valid email address." });
-      return;
+    setLoading(true);
+    const payload = {
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      email: currentUser.email,
+      address: currentUser.address,
+      mobile: currentUser.mobile,
+      gender: currentUser.gender.toUpperCase(),
+      subscriptionType: currentUser.subscriptionType || "Basic",
+    };
+    if (!editingId || (editingId !== null && currentUser.password.trim() !== "")) {
+      payload.password = currentUser.password;
     }
-
-    const mobileRegex = /^[0-9-+()\s]+$/;
-    if (!mobileRegex.test(currentUser.mobile)) {
-      setMessage({ type: "danger", text: "Please enter a valid mobile number." });
-      return;
+    try {
+      // On success, show feedback and reload list
+      if (editingId !== null) {
+        await updateUser(editingId, payload);
+        setUiMessage({ type: "success", text: "User updated successfully!" });
+        const updatedUsers = await getUsers();
+        setUsers(updatedUsers);
+        setSavedUserId(editingId);
+        if (setGlobalAlert)
+          setGlobalAlert({ type: "success", text: `User "${currentUser.firstName}" updated.` });
+      } else {
+        await addUser(payload);
+        setUiMessage({ type: "success", text: "User added successfully!" });
+        const updatedUsers = await getUsers();
+        setUsers(updatedUsers);
+        const newUserId = updatedUsers.length > 0
+          ? Math.max(...updatedUsers.map(u => u.id))
+          : 1;
+        setSavedUserId(newUserId);
+        if (setGlobalAlert)
+          setGlobalAlert({ type: "success", text: `User "${currentUser.firstName}" added.` });
+      }
+      setTimeout(() => {
+        handleCloseModal();
+      }, 1200);
+    } catch (error) {
+      setUiMessage({ type: "danger", text: "Error saving user. Please try again." });
+    } finally {
+      setLoading(false);
     }
-
-    const selectedSubscription = dummySubscriptionPlans.find(plan => plan.id === Number(currentUser.subscriptionId));
-    let userIdToSave = editingId;
-
-    if (editingId !== null) {
-      setMembers(members.map(m => (
-        m.id === editingId
-          ? { ...currentUser, id: editingId, subscriptionId: selectedSubscription }
-          : m
-      )));
-      setMessage({ type: "success", text: "User updated successfully!" });
-    } else {
-      const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
-      const userToAdd = {
-        id: newId,
-        ...currentUser,
-        subscriptionId: selectedSubscription
-      };
-      setMembers(prev => [...prev, userToAdd]);
-      userIdToSave = newId; 
-      setMessage({ type: "success", text: "User added successfully! You can now proceed to payment." });
-    }
-    setSavedUserId(userIdToSave); 
   };
 
-  const handleDeleteUser = (id) => {
+  const handleDeleteUser = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
-      setMembers(members.filter(m => m.id !== id));
-      setMessage({ type: "success", text: "User deleted successfully!" });
+      setLoading(true);
+      try {
+        await deleteUser(userId);
+        const updatedUsers = await getUsers();
+        setUsers(updatedUsers);
+        setUiMessage({ type: "success", text: "User deleted successfully!" });
+        if (editingId === userId) handleCloseModal();
+        if (setGlobalAlert)
+          setGlobalAlert({ type: "success", text: "User deleted." });
+      } catch (error) {
+        setUiMessage({ type: "danger", text: "Error deleting user. Please try again." });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   const handleProceedToPaymentClick = () => {
-    handleCloseModal(); // Close the UserManagement modal
-    if (onProceedToPayment && savedUserId) {
-        onProceedToPayment(savedUserId); // Call the callback to switch tab and pass user ID
-    }
+    handleCloseModal();
+    if (onProceedToPayment && savedUserId)
+      onProceedToPayment(savedUserId);
   };
+
+  const filteredUsers = users.filter((user) =>
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
+    user.email.toLowerCase().includes(search.toLowerCase()) ||
+    user.mobile.includes(search)
+  );
 
   return (
     <div className="bg-white rounded shadow p-4">
@@ -200,19 +205,23 @@ function UserManagement({ onProceedToPayment }) {
           <h4>User Management</h4>
           <small className="text-muted">Manage gym members and their information</small>
         </div>
-        <button className="btn btn-dark" onClick={() => handleShowModal()}>
+        <button className="btn btn-dark" onClick={() => handleShowModal()} disabled={loading}>
           + Add User
         </button>
       </div>
-
       <input
         className="form-control mb-3"
         placeholder="Search users…"
         value={search}
-        onChange={e => setSearch(e.target.value)}
+        onChange={(e) => setSearch(e.target.value)}
         style={{ maxWidth: 320 }}
+        disabled={loading}
       />
-
+      {loading && (
+        <div className="text-center py-2">
+          <Spinner animation="border" size="sm" /> Loading...
+        </div>
+      )}
       <div className="table-responsive">
         <table className="table align-middle">
           <thead>
@@ -223,49 +232,57 @@ function UserManagement({ onProceedToPayment }) {
               <th>Address</th>
               <th>Gender</th>
               <th>Membership</th>
-              <th>Status</th>
-              <th>Join Date</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(m => (
-              <tr key={m.id}>
-                <td><b>{m.firstName} {m.lastName}</b></td>
-                <td>{m.email}</td>
-                <td>{m.mobile}</td>
-                <td>{m.address}</td>
-                <td>{m.gender}</td>
-                <td>{m.subscriptionId ? m.subscriptionId.name : "N/A"}</td>
-                <td>
-                  <span className={`badge ${m.isActive && m.isSubscribed ? "bg-dark" : "bg-danger"}`}>
-                    {m.isActive && m.isSubscribed ? "Active" : "Inactive/Expired"}
-                  </span>
-                </td>
-                <td>{m.joinDate}</td>
-                <td>
-                  <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleShowModal(m)}><FaEdit /></button>
-                  <button className="btn btn-outline-danger btn-sm" onClick={() => handleDeleteUser(m.id)}><FaTrash /></button>
-                </td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
+            {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan="9" className="text-center text-muted">No users found.</td>
+                <td colSpan="7" className="text-center text-muted">
+                  No users found.
+                </td>
               </tr>
+            ) : (
+              filteredUsers.map((user) => (
+                <tr key={user.id}>
+                  <td><b>{user.firstName} {user.lastName}</b></td>
+                  <td>{user.email}</td>
+                  <td>{user.mobile}</td>
+                  <td>{user.address}</td>
+                  <td>{user.gender}</td>
+                  <td>{user.subscriptionType || "N/A"}</td>
+                  <td>
+                    <button
+                      className="btn btn-outline-secondary btn-sm me-2"
+                      onClick={() => handleShowModal(user)}
+                      disabled={loading}
+                      aria-label={`Edit ${user.firstName} ${user.lastName}`}
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => handleDeleteUser(user.id)}
+                      disabled={loading}
+                      aria-label={`Delete ${user.firstName} ${user.lastName}`}
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Add/Edit User Modal */}
       <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>{editingId ? "Edit User" : "Add New User"}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSaveUser}>
           <Modal.Body>
-            {message && <Alert variant={message.type}>{message.text}</Alert>} {/* Display alert message */}
+            {uiMessage && <Alert variant={uiMessage.type}>{uiMessage.text}</Alert>}
 
             <Form.Group className="mb-3" controlId="userFirstName">
               <Form.Label>First Name *</Form.Label>
@@ -276,6 +293,8 @@ function UserManagement({ onProceedToPayment }) {
                 value={currentUser.firstName}
                 onChange={handleChange}
                 required
+                ref={focusFirstInputRef}
+                aria-invalid={!!(formDirty && !currentUser.firstName)}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="userLastName">
@@ -287,9 +306,9 @@ function UserManagement({ onProceedToPayment }) {
                 value={currentUser.lastName}
                 onChange={handleChange}
                 required
+                aria-invalid={!!(formDirty && !currentUser.lastName)}
               />
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="userEmail">
               <Form.Label>Email *</Form.Label>
               <Form.Control
@@ -299,9 +318,9 @@ function UserManagement({ onProceedToPayment }) {
                 value={currentUser.email}
                 onChange={handleChange}
                 required
+                aria-invalid={!!(formDirty && (!currentUser.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentUser.email)))}
               />
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="userMobile">
               <Form.Label>Mobile *</Form.Label>
               <Form.Control
@@ -311,6 +330,7 @@ function UserManagement({ onProceedToPayment }) {
                 value={currentUser.mobile}
                 onChange={handleChange}
                 required
+                aria-invalid={!!(formDirty && (!currentUser.mobile || !/^[0-9-+()\s]+$/.test(currentUser.mobile)))}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="userAddress">
@@ -322,66 +342,96 @@ function UserManagement({ onProceedToPayment }) {
                 value={currentUser.address}
                 onChange={handleChange}
                 required
+                aria-invalid={!!(formDirty && !currentUser.address)}
               />
             </Form.Group>
-
-            <Form.Group className="mb-3" controlId="userGender">
+            <Form.Group className="mb-3">
               <Form.Label>Gender *</Form.Label>
-              <Form.Select
-                name="gender"
-                value={currentUser.gender}
-                onChange={handleChange}
-                required
-              >
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-                <option value="OTHER">Other</option>
-              </Form.Select>
+              <div>
+                <Form.Check
+                  inline
+                  label="Male"
+                  name="gender"
+                  type="radio"
+                  value="MALE"
+                  checked={currentUser.gender === "MALE"}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  inline
+                  label="Female"
+                  name="gender"
+                  type="radio"
+                  value="FEMALE"
+                  checked={currentUser.gender === "FEMALE"}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  inline
+                  label="Other"
+                  name="gender"
+                  type="radio"
+                  value="OTHER"
+                  checked={currentUser.gender === "OTHER"}
+                  onChange={handleChange}
+                />
+              </div>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="userSubscription">
               <Form.Label>Membership Plan</Form.Label>
               <Form.Select
-                name="subscriptionId"
-                value={currentUser.subscriptionId}
+                name="subscriptionType"
+                value={currentUser.subscriptionType}
                 onChange={handleChange}
               >
                 <option value="">-- Select Plan --</option>
-                {dummySubscriptionPlans.map(plan => (
-                  <option key={plan.id} value={plan.id}>{plan.name}</option>
+                {subscriptionNames.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
                 ))}
               </Form.Select>
             </Form.Group>
-
-            <Form.Group className="mb-3" controlId="userJoinDate">
-              <Form.Label>Join Date *</Form.Label>
+            <Form.Group className="mb-3" controlId="userPassword">
+              <Form.Label>
+                Password {editingId ? "(Leave blank to keep unchanged)" : "*"}
+              </Form.Label>
               <Form.Control
-                type="date"
-                name="joinDate"
-                value={currentUser.joinDate}
+                type="password"
+                placeholder={editingId ? "Leave blank to keep unchanged" : "Password"}
+                name="password"
+                value={currentUser.password}
                 onChange={handleChange}
-                required
+                required={!editingId}
+                aria-invalid={!!(formDirty && !editingId && !currentUser.password)}
               />
             </Form.Group>
           </Modal.Body>
-
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseModal}>
+            <Button variant="secondary" onClick={handleCloseModal} disabled={loading}>
               Cancel
             </Button>
-            <Button variant="dark" type="submit" disabled={savedUserId !== null && message?.type === "success"}>
-              {editingId ? "Update User" : "Add User"}
+            <Button
+              variant="dark"
+              type="submit"
+              disabled={loading || (savedUserId !== null && uiMessage?.type === "success")}
+            >
+              {loading ? <Spinner size="sm" animation="border" /> : (editingId ? "Update User" : "Add User")}
             </Button>
-            {savedUserId && ( // Show "Proceed to Payment" only if a user was successfully saved/updated
-                <Button variant="info" onClick={handleProceedToPaymentClick} className="ms-2">
-                    Proceed to Payment
-                </Button>
+            {savedUserId && uiMessage?.type === "success" && (
+              <Button
+                variant="info"
+                onClick={handleProceedToPaymentClick}
+                className="ms-2"
+              >
+                Proceed to Payment
+              </Button>
             )}
           </Modal.Footer>
         </Form>
       </Modal>
     </div>
   );
-}
+};
 
 export default UserManagement;

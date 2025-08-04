@@ -28,6 +28,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
 	private final AdminDao adminDao;
 	private final TrainerDao trainerDao;
 	private final ReceptionistDao receptionistDao;
+	
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

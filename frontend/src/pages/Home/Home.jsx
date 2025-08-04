@@ -2,230 +2,236 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import {
-  FaDumbbell, FaUserFriends, FaHeartbeat, FaRunning, FaBiking, FaYinYang, FaUserShield,
-  FaChild, FaBox, FaClock, FaMobileAlt, FaShower, FaLeaf, FaGift
+  FaDumbbell,
+  FaCrown,
+  FaCheckCircle,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
-import trainer1 from "../../../public/images/Trainer1.png";
-import trainer2 from "../../../public/images/Trainer2.png";
-import trainer3 from "../../../public/images/Trainer3.png";
-import trainer4 from "../../../public/images/Trainer4.png";
+import "./Home.css";
+
 
 const trainers = [
   {
     id: 1,
-    name: "Alex Turner",
-    expertise: "Strength Training, HIIT",
-    certifications: ["ACE Certified", "CPR & AED"],
-    photo: trainer1,
+    name: "Vaibhav Shinde",
+    expertise: "Strength & Conditioning",
+    certifications: ["NSCA-CSCS", "ACE Certified"],
+    photo: "../../../public/images/VaibhavTrainer.jpg",
   },
   {
     id: 2,
-    name: "Sophia Lee",
-    expertise: "Yoga, Pilates",
-    certifications: ["RYT 500", "Nutrition Specialist"],
-    photo: trainer2,
+    name: "Nehal Malshikare",
+    expertise: "Bodybuilding, Nutrition",
+    certifications: ["ISSA Master Trainer", "IFBB Pro"],
+    photo: "../../../public/images/NehalTrainer.jpg",
   },
   {
     id: 3,
-    name: "Michael Chen",
-    expertise: "Bodybuilding, Powerlifting",
-    certifications: ["NSCA-CPT", "ISSA"],
-    photo: trainer3,
+    name: "Pratik Pawar",
+    expertise: "Muscle Building, Fat Loss",
+    certifications: ["NASM CPT", "S&C Specialist"],
+    photo: "../../../public/images/PratikTrainer.jpg",
   },
   {
     id: 4,
-    name: "Priya Sharma",
-    expertise: "Zumba, Functional Training",
-    certifications: ["ZIN License", "Functional Movement Certified"],
-    photo: trainer4,
+    name: "Anurag Kashyap",
+    expertise: "Powerlifting, Men's Physique",
+    certifications: ["Personal Trainer", "CPR AED"],
+        photo: "../../../public/images/AnuragTrainer.png",
   }
 ];
 
 const Home = () => {
   const [plans, setPlans] = useState([]);
-  const [hoveredCard, setHoveredCard] = useState(null);
-  const isMobile = window.innerWidth < 768;
+  const [hoveredIdx, setHoveredIdx] = useState(-1);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/subscriptions")
+    axios
+      .get("http://localhost:8080/subscriptions")
       .then((res) => setPlans(res.data))
       .catch((err) => console.error("Error fetching plans:", err));
   }, []);
 
-  const accentColor = "#007bff";
-  const mainFontColor = "#222";
-  const cardBorder = "#e5e5e5";
-  const cardShadow = "0 3px 18px #ececec";
-  const iconColor = "#222";
-
-
-  const formatAccessLabel = (access) => {
-  if (!access) return "";
-  return access
-    .toLowerCase()
-    .split("_")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
-
-  const cardStyle = {
-    background: "#fff",
-    color: mainFontColor,
-    borderRadius: 14,
-    border: `1px solid ${cardBorder}`,
-    boxShadow: cardShadow,
-    margin: "0 auto",
-    display: "flex",
-    flexDirection: "column",
-    height: "100%"
-  };
-
-  const outlineBtnStyle = {
-    border: `2px solid ${accentColor}`,
-    background: "#fff",
-    color: accentColor,
-    fontWeight: "bold",
-    borderRadius: "22px",
-    padding: "0.5rem 1.5rem",
-    transition: "all 0.12s",
-    fontSize: "1.02rem",
-    outline: "none",
-    cursor: "pointer",
-    textDecoration: "none",
-    marginTop: "0.4em"
-  };
-
-  const outlineBtnHoverStyle = {
-    ...outlineBtnStyle,
-    background: accentColor,
-    color: "#fff"
-  };
-
-  const titleStyle = {
-    color: mainFontColor,
-    letterSpacing: "1.2px",
-    fontSize: isMobile ? "1.7rem" : "2.2rem",
-    fontWeight: 800,
-    margin: "0.4em 0"
-  };
-
-  const sectionTitleStyle = {
-    color: mainFontColor,
-    borderLeft: `4px solid ${accentColor}`,
-    paddingLeft: isMobile ? 8 : 14,
-    textTransform: "uppercase",
-    fontSize: isMobile ? "1.05rem" : "1.4rem",
-    letterSpacing: "1px",
-    fontWeight: 700,
-    marginBottom: isMobile ? "1.2rem" : "2rem",
-    marginTop: "0"
-  };
+  const formatAccessLabel = (access) =>
+    access
+      ? access
+          .toLowerCase()
+          .split("_")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      : "";
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fff", color: mainFontColor, fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif" }}>
-      <div style={{ width: "100%", maxWidth: 1200, margin: "0 auto", padding: isMobile ? 14 : 36 }}>
-
-        {/* Welcome Section */}
-        <div style={{ textAlign: "center", marginBottom: "2.4rem" }}>
-          <h1 style={titleStyle}>
-            Welcome to <span style={{ color: accentColor, borderBottom: `3px solid ${accentColor}`, padding: "0 0.25em" }}>GymMate Fitness Club</span>
+    <div className="home__container">
+      {/* HERO */}
+      <header className="hero-section">
+        <div>
+          <h1 className="home__title">
+            <span className="accent">GymMate</span> Fitness
           </h1>
-          <p style={{ fontSize: isMobile ? "1.08rem" : "1.16rem", color: "#555", fontWeight: 500 }}>
-            <FaDumbbell style={{ marginRight: 8, color: iconColor, fontSize: "1.15em" }} />
-            A complete fitness ecosystem where you build your body and mind.
+          <div className="home__subtitle">
+            <FaDumbbell
+              style={{
+                marginRight: 10,
+                fontSize: "1.12em",
+                color: "#1976D2",
+              }}
+            />
+            Build strength, confidence, and community. Your fitness, your journey.
+          </div>
+          <Link to="/auth/signin" className="cta-btn">
+            Get Started
+          </Link>
+        </div>
+      </header>
+
+      {/* PLANS */}
+      <section id="plans" style={{ marginBottom: "2.7rem" }}>
+        <h2 className="home__section-title">Membership Plans</h2>
+        <div className="plans-grid">
+          {plans.map((plan, idx) => (
+            <div
+              key={plan.id}
+              className="plan-card"
+              onMouseEnter={() => setHoveredIdx(idx)}
+              onMouseLeave={() => setHoveredIdx(-1)}
+              tabIndex={0}
+            >
+              {idx === 1 && (
+                <span className="plan-badge">
+                  <FaCrown style={{ marginRight: 6, color: "#1766c2" }} /> Most Popular
+                </span>
+              )}
+              <div className="plan-title">{plan.name}</div>
+              <div className="plan-desc">{plan.description}</div>
+              <ul className="plan-features">
+                <li>
+                  <span className="dot" /> <b>Access</b>: {formatAccessLabel(plan.access)}
+                </li>
+                <li>
+                  <span className="dot" /> <b>Trainer</b>: {plan.trainerAvailable ? "Yes" : "No"}
+                </li>
+                <li>
+                  <span className="dot" /> <b>Diet</b>: {plan.dietConsultation ? "Yes" : "No"}
+                </li>
+                <li>
+                  <span className="dot" /> <b>Sauna</b>: {plan.sauna ? "Yes" : "No"}
+                </li>
+                <li>
+                  <span className="dot" /> <b>Classes</b>: {plan.groupClasses ? "Yes" : "No"}
+                </li>
+                <li>
+                  <span className="dot" /> <b>Duration</b>: {plan.duration} mo
+                </li>
+              </ul>
+              <div className="plan-price-row">
+                <span className="plan-price">₹{plan.price}</span>
+              </div>
+              <div className="plan-btn-group">
+                <Link to="/auth/signin" className="join-btn">
+                  Choose Plan
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* TRAINERS */}
+      <section id="trainers" style={{ marginBottom: "2.7rem" }}>
+        <h2 className="home__section-title">Meet Our Trainers</h2>
+        <div className="trainers-grid">
+          {trainers.map((t) => (
+            <div
+              key={t.id}
+              className="trainer-card equalize-trainers"
+              tabIndex={0}
+            >
+              <div className="trainer-photo-wrap">
+                <img src={t.photo} alt={t.name} className="trainer-photo" />
+              </div>
+              <div className="trainer-info">
+                <div className="trainer-name">{t.name}</div>
+                <div className="trainer-expertise">{t.expertise}</div>
+                <ul className="trainer-certs">
+                  {t.certifications.map((c, i) => (
+                    <li key={i}>
+                      <FaCheckCircle
+                        style={{
+                          color: "#1976D2",
+                          marginRight: 5,
+                          fontSize: "1.1em",
+                          verticalAlign: "-2px",
+                        }}
+                      />
+                      {c}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ABOUT US */}
+      <section className="about-contact-section" id="about" style={{ margin: "2rem 0 0 0" }}>
+        <div className="about-box">
+          <h2 className="about-title">About Us</h2>
+          <p>
+            <b>GymMate Fitness</b> is Pune’s community for transformation—bringing science, passion,
+            and energy together. From elite trainers to modern equipment and friendly vibes, we help you
+            achieve lasting results and real joy in fitness. All are welcome—become your strongest self, with us!
           </p>
         </div>
+      </section>
 
-        {/* Membership Plans */}
-        <section id="plans" style={{ marginBottom: "2.3rem" }}>
-          <h2 style={{ ...sectionTitleStyle, textAlign: "center" }}>Our Membership Plans</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 20 }}>
-            {plans.map((plan, idx) => {
-              const isHovered = hoveredCard === idx;
-              const scaleStyle = {
-                transform: isHovered ? "translateY(-7px) scale(1.018)" : "none",
-                boxShadow: isHovered ? "0 6px 20px #eee" : "0 1px 10px #f2f2f2",
-                transition: "transform 0.16s, box-shadow 0.2s"
-              };
-              return (
-                <div
-                  key={plan.id}
-                  style={{
-                    flex: "1 1 300px",
-                    maxWidth: 390,
-                    minWidth: 240,
-                    ...scaleStyle
-                  }}
-                  onMouseEnter={() => setHoveredCard(idx)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                >
-                  <div style={cardStyle}>
-                    <div style={{ padding: isMobile ? "1.1rem" : "1.45rem" }}>
-                      <h4 style={{ color: accentColor, fontWeight: 700, fontSize: "1.17rem" }}>{plan.name}</h4>
-                      <p>{plan.description}</p>
-                      <ul style={{ listStyle: "none", padding: 0, fontSize: "0.95em", color: "#353535" }}>
-                        <li><strong>Access:</strong> {formatAccessLabel(plan.access)}</li>
-                        <li><strong>Diet Consultation:</strong> {plan.dietConsultation ? "Yes" : "No"}</li>
-                        <li><strong>Sauna:</strong> {plan.sauna ? "Yes" : "No"}</li>
-                        <li><strong>Duration:</strong> {plan.duration} month(s)</li>
-                        <li><strong>Price:</strong> ₹{plan.price}</li>
-                        <li><strong>Discount:</strong> {plan.discount}%</li>
-                      </ul>
-                    </div>
-                    <div style={{ textAlign: "center", padding: "0.6em 1em" }}>
-                      <Link
-                        to={`/auth/signin`}
-                        style={isHovered ? outlineBtnHoverStyle : outlineBtnStyle}
-                      >
-                        Choose Plan
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+      {/* CONTACT US */}
+      <section className="about-contact-section" id="contact" style={{ margin: "2rem 0 0 0" }}>
+        <div className="contact-box">
+          <h2 className="about-title">Contact Us</h2>
+          <ul className="contact-list">
+            <li>
+              <FaPhoneAlt className="contact-icon" />
+              <b>Phone:</b>&nbsp;
+              <a href="tel:+912012345678">+91 20 1234 5678</a>
+            </li>
+            <li>
+              <FaEnvelope className="contact-icon" />
+              <b>Email:</b>&nbsp;
+              <a href="mailto:info@gymmate.in">info@gymmate.in</a>
+            </li>
+            <li>
+              <FaMapMarkerAlt className="contact-icon" />
+              <b>Address:</b>
+              <span>
+                404 Blue Avenue, Koregaon Park,<br />
+                Pune 411001, Maharashtra, India
+              </span>
+            </li>
+          </ul>
+        </div>
+      </section>
 
-        {/* Trainers Section */}
-        <section id="trainers" style={{ marginBottom: "2.5rem" }}>
-          <h2 style={{ ...sectionTitleStyle, textAlign: "center" }}>Meet Our Trainers</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
-            {trainers.map((trainer) => (
-              <div
-                key={trainer.id}
-                style={{
-                  flex: isMobile ? "1 1 100%" : "1 1 200px",
-                  maxWidth: isMobile ? "99%" : 220,
-                  margin: "0 1rem 1.2rem 0",
-                  minWidth: "180px",
-                  ...cardStyle,
-                  background: "#fafafa"
-                }}
-              >
-                <img
-                  src={trainer.photo}
-                  alt={trainer.name}
-                  style={{
-                    height: 160,
-                    width: "100%",
-                    objectFit: "cover",
-                    borderBottom: "2px solid #ededed",
-                    borderRadius: "0 0 14px 14px"
-                  }}
-                />
-                <div style={{ padding: "0.80em 1em 0.94em 1em" }}>
-                  <h5 style={{ margin: 0, fontWeight: 700 }}>{trainer.name}</h5>
-                  <div style={{ color: "#666", fontSize: "0.98em" }}>{trainer.expertise}</div>
-                  <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: "0.93em", color: "#333" }}>
-                    {trainer.certifications.map((cert, i) => <li key={i}>✅ {cert}</li>)}
-                  </ul>
-                </div>
-              </div>
-            ))}
+      {/* FOOTER */}
+      <footer className="main-footer">
+        <div>
+          <div className="footer-brand">
+            <span className="accent footer-logo-txt">GymMate</span> Fitness &nbsp;|&nbsp;
+            <span style={{ color: "#1976D2", fontWeight: 500 }}>
+              Pune, Maharashtra
+            </span>
           </div>
-        </section>
-      </div>
+          <div className="footer-address">
+            404 Blue Avenue, Koregaon Park, Pune 411001, Maharashtra, India
+          </div>
+          <div className="footer-copy">
+            © {new Date().getFullYear()} GymMate. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

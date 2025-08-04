@@ -2,17 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import TrainerNavbar from '../../components/TrainerNavbar';
 import { getAssignedUsers } from '../../services/TrainerService';
-import '../../styles/Trainer/AssignedUsers.css'; // NEW CSS FILE
+import '../../styles/Trainer/AssignedUsers.css';
+import { jwtDecode } from 'jwt-decode';
 
 const AssignedUsers = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('a-z');
   const [loading, setLoading] = useState(true);
+  const [trainerId, setTrainerId] = useState(null);
 
-  const trainerId = 1; // Replace with dynamic ID if needed
-
+  // Decode trainer ID from JWT
   useEffect(() => {
+    const token = sessionStorage.getItem("gymmateAccessToken");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const id = decoded.id || decoded.userId || decoded.sub || null;
+        setTrainerId(id);
+      } catch (err) {
+        console.error("Failed to decode token:", err);
+      }
+    }
+  }, []);
+
+  // Fetch users once trainerId is available
+  useEffect(() => {
+    if (!trainerId) return;
+
     const fetchUsers = async () => {
       try {
         const data = await getAssignedUsers(trainerId);

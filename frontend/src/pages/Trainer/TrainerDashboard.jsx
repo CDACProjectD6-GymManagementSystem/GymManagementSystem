@@ -3,16 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import TrainerNavbar from '../../components/TrainerNavbar.jsx';
 import { getTrainerAssignedUsers } from '../../services/TrainerService.js';
 import '../../styles/Trainer/TrainerDashboard.css';
+import { jwtDecode } from 'jwt-decode';
 
 const TrainerDashboard = () => {
   const navigate = useNavigate();
   const [assignedUsersCount, setAssignedUsersCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [trainerId, setTrainerId] = useState(null);
 
-  const trainerId = 1; // Replace with auth-based ID in real app
+  useEffect(() => {
+    const token = sessionStorage.getItem("gymmateAccessToken");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const id = decoded.id || decoded.userId || decoded.sub || null; 
+        setTrainerId(id);
+      } catch (err) {
+        console.error("Error decoding JWT:", err);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchAssignedUsers = async () => {
+      if (!trainerId) return;
       try {
         const users = await getTrainerAssignedUsers(trainerId);
         setAssignedUsersCount(users.length);
