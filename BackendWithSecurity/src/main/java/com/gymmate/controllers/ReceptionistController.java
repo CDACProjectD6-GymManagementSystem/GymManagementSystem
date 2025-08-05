@@ -18,6 +18,7 @@ import com.gymmate.dtos.UserSubscriptionAddDto;
 import com.gymmate.dtos.UserSubscriptionUpdateDto;
 import com.gymmate.dtos.UserTrainerNameDTO;
 import com.gymmate.services.ReceptionistService;
+import com.gymmate.services.SubscriptionService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,8 @@ import lombok.AllArgsConstructor;
 
 	@Autowired
 	ReceptionistService receptionistService;
+	@Autowired
+	SubscriptionService subscriptionService;
 	@GetMapping("/get-trainers-users")
 	@CrossOrigin(origins = "*")
 	public ResponseEntity<?> getTrainersAndUsers() {
@@ -65,6 +68,13 @@ import lombok.AllArgsConstructor;
 	public ResponseEntity<?> getActiveUsers(){
 		return ResponseEntity.status(HttpStatus.OK).body(receptionistService.getActiveUsers());
 	}
+	
+	@GetMapping("/subscription/get-names")
+	@Operation(description="Get only name of subscription")
+	public ResponseEntity<?> getNames(){
+		return ResponseEntity.ok(subscriptionService.getName());
+	}
+	
 }
 
 	

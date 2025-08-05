@@ -1,7 +1,7 @@
 
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = "http://localhost:8080/";
 const AXIOS_CONFIG = { timeout: 10000 };
 
 function getAuthHeaders() {
@@ -51,7 +51,7 @@ export const addUser = async (userData) => {
 // --- SUBSCRIPTIONS ---
 export const getSubscriptionNames = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/subscription/get-name`, {
+    const response = await axios.get(`${API_BASE_URL}receptionist/subscription/get-names`, {
       headers: getAuthHeaders(),
     });
     return response.data;
