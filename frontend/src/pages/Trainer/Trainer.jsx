@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Outlet } from "react-router-dom";
 import ProtectedRoute from "../../components/ProtectedRoute";
 
-// Import trainer pages...
+// Import trainer pages
 import TrainerDashboard from "./TrainerDashboard";
 import TrainerProfile from "./TrainerProfile";
 import AssignedUsers from "./AssignedUsers";
@@ -17,9 +17,15 @@ import DietPlanEditor from "./DietPlanEditor";
 import UserSchedule from "./UserSchedule";
 import NotFound from "../../components/NotFound";
 
-const MainTrainer = () => (
+const Trainer = () => (
   <Routes>
-    <Route element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
+    <Route
+      element={
+        <ProtectedRoute allowedRoles={["ROLE_TRAINER"]}>
+          <Outlet />
+        </ProtectedRoute>
+      }
+    >
       <Route index element={<TrainerDashboard />} />
       <Route path="dashboard" element={<TrainerDashboard />} />
       <Route path="profile" element={<TrainerProfile />} />
@@ -38,4 +44,4 @@ const MainTrainer = () => (
   </Routes>
 );
 
-export default MainTrainer;
+export default Trainer;
