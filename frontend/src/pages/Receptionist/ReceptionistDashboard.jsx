@@ -48,7 +48,7 @@ function ReceptionistDashboard() {
     sessionStorage.removeItem("gymmateAccessToken");
     localStorage.clear();
     alert("Logged out successfully!");
-    navigate("/login", { replace: true });
+    navigate("/auth/signin", { replace: true });
   };
 
   const renderContent = () => {

@@ -51,7 +51,7 @@ public class SecurityConfiguration {
 
 				// USER-ONLY ENDPOINTS (and higher, if you want)
 				.requestMatchers("/user/**").hasRole("USER")
-
+				
 				// Otherwise, authenticated
 				.anyRequest().authenticated());
 
@@ -69,12 +69,12 @@ public class SecurityConfiguration {
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	 PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
+	 CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(List.of("http://localhost:5173"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

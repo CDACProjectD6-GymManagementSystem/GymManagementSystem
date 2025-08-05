@@ -43,8 +43,7 @@ import lombok.AllArgsConstructor;
 	}
 	
 	@PostMapping("/add-user")
-	@Operation(description = "Add a User by Admin")
-	public ResponseEntity<?> addUser(@RequestBody UserSubscriptionAddDto userAddDto){
+ 	public ResponseEntity<?> addUser(@RequestBody UserSubscriptionAddDto userAddDto){
 		return ResponseEntity.status(HttpStatus.CREATED).body(receptionistService.addUser(userAddDto));
 	}
 	

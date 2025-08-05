@@ -19,6 +19,7 @@ import Trainer from "./pages/Trainer/Trainer";
 // Other dashboards & utility pages
 import ReceptionistDashboard from "./pages/Receptionist/ReceptionistDashboard";
 import PaymentPage from './pages/Payment/PaymentPage';
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 // Which routes hide the Navbar
 const authPages = ["/auth/signin", "/register"];
@@ -46,7 +47,10 @@ function AppContent() {
         <Route path="/trainer/*" element={<Trainer />} />
 
         {/* Other utility dashboards */}
-        <Route path="/reception-dashboard/*" element={<ReceptionistDashboard />} />
+        <Route path="/reception-dashboard/*" element={
+          <ProtectedRoute>
+            <ReceptionistDashboard />
+          </ProtectedRoute>} />
         <Route path="/payment" element={<PaymentPage />} />
 
         {/* 404 fallback */}

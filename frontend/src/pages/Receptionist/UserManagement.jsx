@@ -5,7 +5,7 @@ import {
   updateUser,
   deleteUser,
 } from "../../services/ReceptionistService";
-import { getSubscriptionNames } from "../../services/AdminService";
+import { getSubscriptionNames } from "../../services/ReceptionistService";
 
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
