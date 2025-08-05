@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import UserNavbar from "../../components/UserNavbar";
-import ProtectedRoute from "../../components/ProtectedRoute"; // <--- import it
+import ProtectedRoute from "../../components/ProtectedRoute";
 import UserHomePage from "./UserHome/UserHomePage";
 import ProfilePage from "./Profile/ProfilePage";
 import MembershipPage from "./Membership/MembershipPage";
@@ -16,10 +16,10 @@ export default function User() {
       <UserNavbar />
       <main>
         <Routes>
-          <Route 
-            path="*" 
+          <Route
+            path="*"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["ROLE_USER"]}>
                 <Routes>
                   <Route index element={<UserHomePage />} />
                   <Route path="profile" element={<ProfilePage />} />

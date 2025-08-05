@@ -7,7 +7,7 @@ import SubscriptionSection from "./SubscriptionSection";
 import EquipmentSection from "./EquipmentSection";
 import DashboardSection from "./DashboardSection";
 import Feedback from "./Feedback";
-import ProtectedRoute from "../../components/ProtectedRoute";
+import ProtectedRoute from "../../components/ProtectedRoute"; // universal role-based!
 
 const sections = [
   "Admin Dashboard",
@@ -21,9 +21,8 @@ const sections = [
 export default function Admin() {
   const [current, setCurrent] = useState(sections[0]);
   return (
-      <div className="admin-container">
-      <ProtectedRoute>  
-      
+    <div className="admin-container">
+      <ProtectedRoute allowedRoles={["ROLE_ADMIN"]}>
         <AdminNavbar items={sections} current={current} onNav={setCurrent} />
         {current === "Admin Dashboard" && <DashboardSection />}
         {current === "Manage Users" && <UserSection />}
@@ -32,7 +31,6 @@ export default function Admin() {
         {current === "Manage Equipments" && <EquipmentSection />}
         {current === "Feedback Review" && <Feedback />}
       </ProtectedRoute>
-      </div>
-    
+    </div>
   );
 }
