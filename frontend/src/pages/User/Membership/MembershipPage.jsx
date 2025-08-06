@@ -134,7 +134,7 @@ export default function MembershipPage() {
       alert(
         "Successfully subscribed! Please log in again to view your subscription."
       );
-      navigate("/auth/login", {
+      navigate("/auth/signin", {
         state: {
           msg:
             "Subscription successful! Please log in again to view your purchased subscription.",

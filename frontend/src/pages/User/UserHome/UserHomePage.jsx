@@ -23,8 +23,6 @@ function getUserDisplayNameFromToken() {
     const decoded = jwtDecode(token);
     // Prefer firstName, else use username/email, else fallback to ""
     return decoded.firstName
-      || (decoded.sub && String(decoded.sub).split("@")[0])
-      || decoded.email
       || "";
   } catch {
     return "";

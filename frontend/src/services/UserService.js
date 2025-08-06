@@ -39,40 +39,39 @@ export const UserService = {
     }
   },
 
- // ===== MEMBERSHIP SECTION =====
-async getMembershipPackages() {
-  const headers = { 
-    "Content-Type": "application/json",
-    ...getAuthHeaders()
-  };
-  const response = await fetch(`${BASE_URL}/user/available-subscriptions`, {
-    method: "GET",
-    headers,
-  });
-  if (!response.ok) {
-    throw new Error("Could not fetch membership packages.");
-  }
-  return response.json();
-},
+  // ===== MEMBERSHIP SECTION =====
+  async getMembershipPackages() {
+    const headers = {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    };
+    const response = await fetch(`${BASE_URL}/user/available-subscriptions`, {
+      method: "GET",
+      headers,
+    });
+    if (!response.ok) {
+      throw new Error("Could not fetch membership packages.");
+    }
+    return response.json();
+  },
 
-async buyMembershipPackage(userId, packageName) {
-  const payload = { name: packageName };
-  const headers = { 
-    "Content-Type": "application/json",
-    ...getAuthHeaders()
-  };
-  const response = await fetch(`${BASE_URL}/user/buy-package/${userId}`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(payload),
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.message || "Subscription failed. Try again.");
-  }
-  return data;
-},
-
+  async buyMembershipPackage(userId, packageName) {
+    const payload = { name: packageName };
+    const headers = {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    };
+    const response = await fetch(`${BASE_URL}/user/buy-package/${userId}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.message || "Subscription failed. Try again.");
+    }
+    return data;
+  },
 
   // ===== FEEDBACK SECTION =====
   async submitFeedback(userId, { message, rating }, token) {

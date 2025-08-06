@@ -2,17 +2,15 @@ import React, { useState } from "react";
 import { FaStar, FaCommentDots } from "react-icons/fa";
 import "./FeedbackPage.css";
 import { jwtDecode } from "jwt-decode";
-import { UserService } from "../../../services/UserService"; // Import the service
+import { UserService } from "../../../services/UserService";  
 
-
-// Secure: always decode id from the current JWT session
+// we are always decoding  id from the current JWT session and not saving decoded info 
 function getCurrentUserIdFromToken() {
   const token = sessionStorage.getItem("gymmateAccessToken");
   if (!token) return null;
   try {
     const decoded = jwtDecode(token);
-    // Adjust as per your backend identifier: id, sub, email, etc.
-    return decoded.id || decoded.sub || decoded.email || null;
+     return decoded.id || decoded.sub || decoded.email || null;
   } catch {
     return null;
   }
@@ -24,7 +22,7 @@ export default function FeedbackPage() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Use secure, stateless userId
+   
   const userId = getCurrentUserIdFromToken();
 
   const handleSubmit = async e => {
@@ -37,8 +35,7 @@ export default function FeedbackPage() {
     const payload = { message: msg, rating };
     const token = sessionStorage.getItem("gymmateAccessToken");
     try {
-      // Call service method instead of "fetch" directly
-      await UserService.submitFeedback(userId, payload, token);
+       await UserService.submitFeedback(userId, payload, token);
       setSent(true);
     } catch (err) {
       alert("Submission failed. Please try again.");

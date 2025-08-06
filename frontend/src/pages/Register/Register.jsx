@@ -46,6 +46,13 @@ export default function Register() {
       const resp = await UserService.registerUser(payload);
       if (resp && resp.message) {
         setMsg(resp.message);
+
+        // Navigate to signin after a short delay if successful
+        if (resp.message.toLowerCase().includes("success")) {
+          setTimeout(() => {
+            navigate("/auth/signin");
+          }, 1200); // 1.2s delay so user sees message
+        }
       } else {
         setMsg("Unexpected server response.");
       }
@@ -75,7 +82,6 @@ export default function Register() {
             {msg}
           </div>
         )}
-
         <form onSubmit={handleRegister} className="register-form-wide">
           <div className="register-row">
             <div className="register-col">
@@ -223,7 +229,7 @@ export default function Register() {
         </p>
         <div style={{ textAlign: "center", marginTop: "16px" }}>
           <button
-            onClick={() => navigate("/auth/login")}
+            onClick={() => navigate("/auth/signin")}
             className="btn btn-link back-home-btn"
             type="button"
           >

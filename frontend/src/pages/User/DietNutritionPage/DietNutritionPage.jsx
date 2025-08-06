@@ -19,8 +19,7 @@ const dietData = [
   { item: "Paneer",   icon: <FaCheese />,  category: "Vegetarian", calories: 265, protein: 18,  carbs: 1.2,  fat: 21,  fiber: 0   },
   { item: "Soy Hotdog",icon: <FaHotdog />, category: "Vegan",      calories: 105, protein: 9.5, carbs: 7.2,  fat: 4.4, fiber: 2.2 },
   { item: "Sprouts",  icon: <FaSeedling />,category: "Vegan",      calories: 30,  protein: 3,   carbs: 6,    fat: 0.5, fiber: 1.8 },
-  // ...add more rows as needed...
-];
+ ];
 
 // Style helper
 const categoryColor = (cat) =>
@@ -30,13 +29,13 @@ const categoryColor = (cat) =>
     ? "#555"
     : "#999";
 
-// Helper to decode userId/sub/email from JWT at render time!
+// wrote Helper to decode userId/sub/email from JWT at render time!
 function getCurrentUserIdFromToken() {
   const token = sessionStorage.getItem("gymmateAccessToken");
   if (!token) return null;
   try {
     const decoded = jwtDecode(token);
-    // Choose your id field based on backend (commonly: id, sub, or email)
+// just to play safe we have included every variable that we are sending from backend in jwt token
     return decoded.id || decoded.sub || decoded.email || null;
   } catch {
     return null;
