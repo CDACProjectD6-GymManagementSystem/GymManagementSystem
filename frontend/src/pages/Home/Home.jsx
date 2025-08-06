@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import {
-  FaDumbbell,
-  FaCrown,
-  FaCheckCircle,
-  FaPhoneAlt,
-  FaEnvelope,
-  FaMapMarkerAlt,
+  FaDumbbell, FaCrown, FaCheckCircle, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt
 } from "react-icons/fa";
+import { useTranslation, Trans } from "react-i18next";
 import "./Home.css";
 
+// List of supported languages (add to or edit these as needed)
+const languages = [
+  { code: "en", label: "English" },
+  { code: "hi", label: "हिंदी" },
+  { code: "mr", label: "मराठी" }
+];
 
 const trainers = [
   {
@@ -39,7 +41,7 @@ const trainers = [
     name: "Priya Aggarwal",
     expertise: "Yoga, MentalHealth",
     certifications: ["Yoga International", "CPR AED"],
-        photo: "../../../public/images/Trainer4.png",
+    photo: "../../../public/images/Trainer4.png",
   }
 ];
 
@@ -47,12 +49,24 @@ const Home = () => {
   const [plans, setPlans] = useState([]);
   const [hoveredIdx, setHoveredIdx] = useState(-1);
 
+  const { t, i18n } = useTranslation();
+
+  // For language dropdown value
+  const [selectedLang, setSelectedLang] = useState(i18n.language);
+
   useEffect(() => {
     axios
       .get("http://localhost:8080/subscriptions")
       .then((res) => setPlans(res.data))
       .catch((err) => console.error("Error fetching plans:", err));
   }, []);
+
+  // Handle language change from dropdown
+  const handleLanguageChange = (e) => {
+    const lng = e.target.value;
+    setSelectedLang(lng);
+    i18n.changeLanguage(lng);
+  };
 
   const formatAccessLabel = (access) =>
     access
@@ -65,31 +79,51 @@ const Home = () => {
 
   return (
     <div className="home__container">
-      {/* HERO */}
+
+      <div style={{ textAlign: "right", margin: "1em 1em 0 0" }}>
+        <select
+          value={selectedLang}
+          onChange={handleLanguageChange}
+          style={{ padding: "0.4em", borderRadius: "4px" }}
+        >
+          {languages.map((lng) => (
+            <option key={lng.code} value={lng.code}>
+              {lng.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* HERO SECTION */}
       <header className="hero-section">
         <div>
           <h1 className="home__title">
-            <span className="accent">GymMate</span> Fitness
+            <Trans
+              i18nKey="hero.title"
+              values={{
+                brand: t("app.brand"),
+                fitness: t("app.fitness")
+              }}
+              components={{ accent: <span className="accent" /> }}
+            />
           </h1>
           <div className="home__subtitle">
-            <FaDumbbell
-              style={{
-                marginRight: 10,
-                fontSize: "1.12em",
-                color: "#1976D2",
-              }}
-            />
-            Build strength, confidence, and community. Your fitness, your journey.
+            <FaDumbbell style={{
+              marginRight: 10,
+              fontSize: "1.12em",
+              color: "#1976D2",
+            }} />
+            {t("hero.subtitle")}
           </div>
           <Link to="/auth/signin" className="cta-btn">
-            Get Started
+            {t("hero.cta")}
           </Link>
         </div>
       </header>
 
-      {/* PLANS */}
+      {/* PLANS SECTION */}
       <section id="plans" style={{ marginBottom: "2.7rem" }}>
-        <h2 className="home__section-title">Membership Plans</h2>
+        <h2 className="home__section-title">{t("plans.title")}</h2>
         <div className="plans-grid">
           {plans.map((plan, idx) => (
             <div
@@ -101,29 +135,29 @@ const Home = () => {
             >
               {idx === 1 && (
                 <span className="plan-badge">
-                  <FaCrown style={{ marginRight: 6, color: "#1766c2" }} /> Most Popular
+                  <FaCrown style={{ marginRight: 6, color: "#1766c2" }} /> {t("plans.mostPopular")}
                 </span>
               )}
               <div className="plan-title">{plan.name}</div>
               <div className="plan-desc">{plan.description}</div>
               <ul className="plan-features">
                 <li>
-                  <span className="dot" /> <b>Access</b>: {formatAccessLabel(plan.access)}
+                  <span className="dot" /> <b>{t("plans.features.access")}</b>: {formatAccessLabel(plan.access)}
                 </li>
                 <li>
-                  <span className="dot" /> <b>Trainer</b>: {plan.trainerAvailable ? "Yes" : "No"}
+                  <span className="dot" /> <b>{t("plans.features.trainer")}</b>: {plan.trainerAvailable ? t("plans.yes") : t("plans.no")}
                 </li>
                 <li>
-                  <span className="dot" /> <b>Diet</b>: {plan.dietConsultation ? "Yes" : "No"}
+                  <span className="dot" /> <b>{t("plans.features.diet")}</b>: {plan.dietConsultation ? t("plans.yes") : t("plans.no")}
                 </li>
                 <li>
-                  <span className="dot" /> <b>Sauna</b>: {plan.sauna ? "Yes" : "No"}
+                  <span className="dot" /> <b>{t("plans.features.sauna")}</b>: {plan.sauna ? t("plans.yes") : t("plans.no")}
                 </li>
                 <li>
-                  <span className="dot" /> <b>Classes</b>: {plan.groupClasses ? "Yes" : "No"}
+                  <span className="dot" /> <b>{t("plans.features.classes")}</b>: {plan.groupClasses ? t("plans.yes") : t("plans.no")}
                 </li>
                 <li>
-                  <span className="dot" /> <b>Duration</b>: {plan.duration} mo
+                  <span className="dot" /> <b>{t("plans.features.duration")}</b>: {plan.duration} {t("plans.mo")}
                 </li>
               </ul>
               <div className="plan-price-row">
@@ -131,7 +165,7 @@ const Home = () => {
               </div>
               <div className="plan-btn-group">
                 <Link to="/auth/signin" className="join-btn">
-                  Choose Plan
+                  {t("plans.choosePlan")}
                 </Link>
               </div>
             </div>
@@ -139,16 +173,12 @@ const Home = () => {
         </div>
       </section>
 
-      {/* TRAINERS */}
+      {/* TRAINERS SECTION */}
       <section id="trainers" style={{ marginBottom: "2.7rem" }}>
-        <h2 className="home__section-title">Meet Our Trainers</h2>
+        <h2 className="home__section-title">{t("trainers.title")}</h2>
         <div className="trainers-grid">
           {trainers.map((t) => (
-            <div
-              key={t.id}
-              className="trainer-card equalize-trainers"
-              tabIndex={0}
-            >
+            <div key={t.id} className="trainer-card equalize-trainers" tabIndex={0}>
               <div className="trainer-photo-wrap">
                 <img src={t.photo} alt={t.name} className="trainer-photo" />
               </div>
@@ -176,59 +206,61 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ABOUT US */}
+      {/* ABOUT US SECTION */}
       <section className="about-contact-section" id="about" style={{ margin: "2rem 0 0 0" }}>
         <div className="about-box">
-          <h2 className="about-title">About Us</h2>
-          <p>
-            <b>GymMate Fitness</b> is Pune’s community for transformation—bringing science, passion,
-            and energy together. From elite trainers to modern equipment and friendly vibes, we help you
-            achieve lasting results and real joy in fitness. All are welcome—become your strongest self, with us!
-          </p>
+          <h2 className="about-title">{t("about.title")}</h2>
+          <Trans
+            i18nKey="about.content"
+            values={{ brand: t("app.brand"), fitness: t("app.fitness") }}
+            components={{ b: <b /> }}
+          />
         </div>
       </section>
 
-      {/* CONTACT US */}
+      {/* CONTACT US SECTION */}
       <section className="about-contact-section" id="contact" style={{ margin: "2rem 0 0 0" }}>
         <div className="contact-box">
-          <h2 className="about-title">Contact Us</h2>
+          <h2 className="about-title">{t("contact.title")}</h2>
           <ul className="contact-list">
             <li>
               <FaPhoneAlt className="contact-icon" />
-              <b>Phone:</b>&nbsp;
+              <b>{t("contact.phone")}:</b>&nbsp;
               <a href="tel:+912012345678">+91 20 1234 5678</a>
             </li>
             <li>
               <FaEnvelope className="contact-icon" />
-              <b>Email:</b>&nbsp;
+              <b>{t("contact.email")}:</b>&nbsp;
               <a href="mailto:info@gymmate.in">info@gymmate.in</a>
             </li>
             <li>
               <FaMapMarkerAlt className="contact-icon" />
-              <b>Address:</b>
+              <b>{t("contact.address")}:</b>
               <span>
-                404 Blue Avenue, Koregaon Park,<br />
-                Pune 411001, Maharashtra, India
+                {t("footer.address")}
               </span>
             </li>
           </ul>
         </div>
       </section>
 
-      {/* FOOTER */}
+      {/* FOOTER SECTION */}
       <footer className="main-footer">
         <div>
           <div className="footer-brand">
-            <span className="accent footer-logo-txt">GymMate</span> Fitness &nbsp;|&nbsp;
+            <span className="accent footer-logo-txt">{t("app.brand")}</span> {t("app.fitness")} &nbsp;|&nbsp;
             <span style={{ color: "#1976D2", fontWeight: 500 }}>
-              Pune, Maharashtra
+              {t("footer.location")}
             </span>
           </div>
           <div className="footer-address">
-            404 Blue Avenue, Koregaon Park, Pune 411001, Maharashtra, India
+            {t("footer.address")}
           </div>
           <div className="footer-copy">
-            © {new Date().getFullYear()} GymMate. All rights reserved.
+            {t("footer.copyright", {
+              year: new Date().getFullYear(),
+              brand: t("app.brand")
+            })}
           </div>
         </div>
       </footer>

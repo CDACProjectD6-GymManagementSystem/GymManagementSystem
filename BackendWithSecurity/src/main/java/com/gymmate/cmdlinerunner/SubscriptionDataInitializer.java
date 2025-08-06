@@ -31,7 +31,7 @@ public class SubscriptionDataInitializer {
 				sdao.save(sub);
 				System.out.println("Default package created with "+name+" name");
 			}
-			
+				
 		};
 	}
 }
