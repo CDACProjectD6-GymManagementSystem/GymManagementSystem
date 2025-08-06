@@ -40,6 +40,7 @@ public class AdminServiceImpl implements AdminService {
 	private final UserDao userDao;
 	private final ModelMapper mapper;
 	private final PaymentDAO pdao;
+	
 	 
 	@Override
 	public ApiResponse addUser(UserSubscriptionAddDto userAddDto) {
@@ -81,12 +82,14 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public ApiResponse updateUser(UserSubscriptionUpdateDto userUpdatedto, Long userId) {
+		BCryptPasswordEncoder bcrypt=new BCryptPasswordEncoder();
 		UserEntity userEntity = userDao.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 		if (!userEntity.getSubscriptionId().getName().equals(userUpdatedto.getSubscriptionType())) {
 			Subscription subEntity = subscriptionDao.findByName(userUpdatedto.getSubscriptionType());
 			userEntity.setSubscriptionId(subEntity);
 		}
+		userUpdatedto.setPassword(bcrypt.encode(userUpdatedto.getPassword()));
 		mapper.map(userUpdatedto, userEntity);
 		return new ApiResponse("User Updated Successfully");
 	}
