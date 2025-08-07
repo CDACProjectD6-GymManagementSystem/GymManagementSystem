@@ -1,5 +1,6 @@
 package com.gymmate.services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +66,14 @@ public class AdminServiceImpl implements AdminService {
 		payment.setFirstName(userEntity.getFirstName());
 		payment.setLastName(userEntity.getLastName());
 		payment.setSubscriptionName(subEntity.getName());
+		
+		LocalDateTime now = LocalDateTime.now();
+		userEntity.setSubscriptionStartDate(now);
+
+		LocalDateTime endDate = now.plusDays(subEntity.getDurationInDays());
+		userEntity.setSubscriptionEndDate(endDate);
+
+		
 		pdao.save(payment);
 		userDao.save(userEntity);
 
