@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef} from "react";
 import {
   getUsers,
   addUser,
@@ -7,7 +7,7 @@ import {
 } from "../../services/ReceptionistService";
 import { getSubscriptionNames } from "../../services/ReceptionistService";
 
-import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
+import { Modal, Button, Form, Alert, Spinner, Pagination, Row, Col} from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 const emptyUser = {
@@ -30,8 +30,11 @@ const UserManagement = () => {
   const [search, setSearch] = useState("");
   const [currentUser, setCurrentUser] = useState(emptyUser);
   const [loading, setLoading] = useState(false);
-  const [formDirty, setFormDirty] = useState(false); // for validation feedback
+  const [formDirty, setFormDirty] = useState(false);
   const focusFirstInputRef = useRef(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
 
   useEffect(() => {
     const fetchInitial = async () => {
@@ -42,7 +45,6 @@ const UserManagement = () => {
           getSubscriptionNames(),
         ]);
         setUsers(usersData);
-        console.log(subscriptionData);
         setSubscriptionNames(subscriptionData);
       } catch (error) {
         setUiMessage({ type: "danger", text: "Failed to load user data." });
@@ -69,6 +71,7 @@ const UserManagement = () => {
     if (!fields.mobile.trim() || !/^[0-9-+()\s]+$/.test(fields.mobile)) errors.mobile = "Valid mobile required.";
     if (!fields.address.trim()) errors.address = "Address is required.";
     if (!fields.gender) errors.gender = "Select gender.";
+    if (!fields.subscriptionType) errors.subscriptionType = "Select subscription type.";
     // Password: required on add, or if editing & filled
     if (!editingId && !fields.password.trim()) errors.password = "Password required.";
     return errors;
@@ -127,7 +130,7 @@ const UserManagement = () => {
       address: currentUser.address,
       mobile: currentUser.mobile,
       gender: currentUser.gender.toUpperCase(),
-      subscriptionType: currentUser.subscriptionType || "Basic",
+      subscriptionType: currentUser.subscriptionType
     };
     if (!editingId || (editingId !== null && currentUser.password.trim() !== "")) {
       payload.password = currentUser.password;
@@ -179,6 +182,18 @@ const UserManagement = () => {
     user.mobile.includes(search)
   );
 
+  // --- NEW PAGINATION LOGIC ---
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(filteredUsers.length / usersPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
   return (
     <div className="bg-white rounded shadow p-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -224,7 +239,7 @@ const UserManagement = () => {
                 </td>
               </tr>
             ) : (
-              filteredUsers.map((user) => (
+              currentUsers.map((user) => (
                 <tr key={user.id}>
                   <td><b>{user.firstName} {user.lastName}</b></td>
                   <td>{user.email}</td>
@@ -256,6 +271,18 @@ const UserManagement = () => {
           </tbody>
         </table>
       </div>
+      <div className="d-flex justify-content-center mt-3">
+        <Pagination>
+          <Pagination.Prev onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} />
+          {pageNumbers.map(number => (
+            <Pagination.Item key={number} active={number === currentPage} onClick={() => paginate(number)}>
+              {number}
+            </Pagination.Item>
+          ))}
+          <Pagination.Next onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageNumbers.length))} disabled={currentPage === pageNumbers.length} />
+        </Pagination>
+      </div>
+
 
       <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
         <Modal.Header closeButton>
@@ -264,7 +291,8 @@ const UserManagement = () => {
         <Form onSubmit={handleSaveUser}>
           <Modal.Body>
             {uiMessage && <Alert variant={uiMessage.type}>{uiMessage.text}</Alert>}
-
+            <Row>
+            <Col md={6}>
             <Form.Group className="mb-3" controlId="userFirstName">
               <Form.Label>First Name *</Form.Label>
               <Form.Control
@@ -278,6 +306,8 @@ const UserManagement = () => {
                 aria-invalid={!!(formDirty && !currentUser.firstName)}
               />
             </Form.Group>
+            </Col>
+            <Col md={6}>
             <Form.Group className="mb-3" controlId="userLastName">
               <Form.Label>Last Name *</Form.Label>
               <Form.Control
@@ -290,6 +320,10 @@ const UserManagement = () => {
                 aria-invalid={!!(formDirty && !currentUser.lastName)}
               />
             </Form.Group>
+            </Col>
+            </Row>
+            <Row>
+            <Col md={6}>
             <Form.Group className="mb-3" controlId="userEmail">
               <Form.Label>Email *</Form.Label>
               <Form.Control
@@ -302,6 +336,8 @@ const UserManagement = () => {
                 aria-invalid={!!(formDirty && (!currentUser.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentUser.email)))}
               />
             </Form.Group>
+            </Col>
+            <Col md={6}>
             <Form.Group className="mb-3" controlId="userMobile">
               <Form.Label>Mobile *</Form.Label>
               <Form.Control
@@ -314,6 +350,10 @@ const UserManagement = () => {
                 aria-invalid={!!(formDirty && (!currentUser.mobile || !/^[0-9-+()\s]+$/.test(currentUser.mobile)))}
               />
             </Form.Group>
+            </Col>
+            </Row>
+            <Row>
+            <Col md={6}>
             <Form.Group className="mb-3" controlId="userAddress">
               <Form.Label>Address *</Form.Label>
               <Form.Control
@@ -326,6 +366,8 @@ const UserManagement = () => {
                 aria-invalid={!!(formDirty && !currentUser.address)}
               />
             </Form.Group>
+            </Col>
+            <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Gender *</Form.Label>
               <div>
@@ -358,6 +400,10 @@ const UserManagement = () => {
                 />
               </div>
             </Form.Group>
+            </Col>
+            </Row>
+            <Row>
+            <Col md={6}>
             <Form.Group className="mb-3" controlId="userSubscription">
               <Form.Label>Membership Plan</Form.Label>
               <Form.Select
@@ -373,6 +419,8 @@ const UserManagement = () => {
                 ))}
               </Form.Select>
             </Form.Group>
+            </Col>
+            <Col md={6}>
             <Form.Group className="mb-3" controlId="userPassword">
               <Form.Label>
                 Password {editingId ? "(Leave blank to keep unchanged)" : "*"}
@@ -387,6 +435,8 @@ const UserManagement = () => {
                 aria-invalid={!!(formDirty && !editingId && !currentUser.password)}
               />
             </Form.Group>
+            </Col>
+            </Row>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseModal} disabled={loading}>
