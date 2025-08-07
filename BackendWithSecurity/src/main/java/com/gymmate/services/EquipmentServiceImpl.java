@@ -15,6 +15,7 @@ import com.gymmate.daos.EquipmentDao;
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.EquipmentCategoryDTO;
 import com.gymmate.dtos.EquipmentRequestDto;
+import com.gymmate.dtos.EquipmentResp2Dto;
 import com.gymmate.dtos.EquipmentRespDto;
 import com.gymmate.entities.Equipment;
 import com.gymmate.entities.Equipment.Category;
@@ -41,7 +42,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 	@Override
 	public List<EquipmentRespDto> getAllEquipments() {
 		
-		return equipmentDao.findByForMaintenanceFalse()
+		return equipmentDao.findAll()
 				.stream()
 				.map(equi->mapper.map(equi,EquipmentRespDto.class))
 				.toList();
@@ -131,6 +132,13 @@ public class EquipmentServiceImpl implements EquipmentService {
 	    } else {
 	        throw new IllegalArgumentException("Missing 'forMaintenance' key");
 	    }
+	}
+
+
+	@Override
+	public List<EquipmentResp2Dto> getMaintenanceEquipment() {
+		
+		return equipmentDao.findByForMaintenanceTrue().stream().map(e->mapper.map(e, EquipmentResp2Dto.class)).toList();
 	}
 
 

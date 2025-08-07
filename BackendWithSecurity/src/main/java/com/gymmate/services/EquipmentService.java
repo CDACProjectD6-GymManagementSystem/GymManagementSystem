@@ -6,6 +6,7 @@ import java.util.Map;
 import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.EquipmentCategoryDTO;
 import com.gymmate.dtos.EquipmentRequestDto;
+import com.gymmate.dtos.EquipmentResp2Dto;
 import com.gymmate.dtos.EquipmentRespDto;
 import com.gymmate.entities.Equipment;
 
@@ -32,6 +33,8 @@ public interface EquipmentService {
 	List<Equipment> getResistanceEquipments();
 
 	ApiResponse toggleMaintenance(Long id, Map<String, Boolean> body);
+
+	List<EquipmentResp2Dto> getMaintenanceEquipment();
 
 
 }

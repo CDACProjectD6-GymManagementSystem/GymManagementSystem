@@ -234,3 +234,16 @@ export async function fetchDashboardStats() {
   });
   return response.data;
 }
+
+export const toggleEquipmentMaintenance = async (id, currentStatus) => {
+  try {
+    await axios.put(
+      `${API_BASE_URL}/equipments/${id}/maintenance`,
+      { forMaintenance: !currentStatus },
+      { headers: getAuthHeaders() }
+    );
+  } catch (error) {
+    console.error('Failed to update maintenance status:', error);
+    throw error;
+  }
+};

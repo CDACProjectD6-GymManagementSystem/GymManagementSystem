@@ -4,6 +4,7 @@ import {
   getAllEquipments,
   deleteEquipment,
   updateEquipment,
+  toggleEquipmentMaintenance, // Import the toggle function
 } from "../../services/AdminService";
 
 const CATEGORY_OPTIONS = [
@@ -16,7 +17,7 @@ const CATEGORY_OPTIONS = [
 
 const EquipmentSection = () => {
   const [emps, setEmps] = useState([]);
-  const [editing, setEditing] = useState(null); 
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({
     id: "",
     name: "",
@@ -25,10 +26,12 @@ const EquipmentSection = () => {
     category: "",
   });
   const [loading, setLoading] = useState(false);
+  const [maintenanceLoading, setMaintenanceLoading] = useState({});
   const [error, setError] = useState("");
 
   useEffect(() => {
     fetchEquipment();
+    // eslint-disable-next-line
   }, []);
 
   const fetchEquipment = async () => {
@@ -122,9 +125,26 @@ const EquipmentSection = () => {
     });
   };
 
+  const handleToggleMaintenance = async (idx) => {
+    const equipment = emps[idx];
+    if (!equipment?.id) return;
+    setError("");
+    setMaintenanceLoading((prev) => ({ ...prev, [equipment.id]: true }));
+    try {
+      await toggleEquipmentMaintenance(equipment.id, equipment.forMaintenance);
+      await fetchEquipment();
+    } catch (err) {
+      setError(
+        "Failed to update maintenance status: " +
+          (err?.response?.data?.message || err.message)
+      );
+    }
+    setMaintenanceLoading((prev) => ({ ...prev, [equipment.id]: false }));
+  };
+
   return (
     <div className="container my-5">
-      <div className="mx-auto p-4 bg-white rounded-4 shadow" style={{maxWidth: 900}}>
+      <div className="mx-auto p-4 bg-white rounded-4 shadow" style={{ maxWidth: 900 }}>
         <h2 className="fw-bold text-center mb-4">Manage Equipment</h2>
 
         <form className="row g-3 mb-4" onSubmit={handleSubmit}>
@@ -215,13 +235,14 @@ const EquipmentSection = () => {
                 <th>Description</th>
                 <th>Price</th>
                 <th>Category</th>
+                <th>Maintenance</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {emps.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center fst-italic py-4 text-secondary bg-white">
+                  <td colSpan={7} className="text-center fst-italic py-4 text-secondary bg-white">
                     No equipment found.
                   </td>
                 </tr>
@@ -236,7 +257,25 @@ const EquipmentSection = () => {
                       {e.category ? e.category.toString().replace(/_/g, " ") : ""}
                     </td>
                     <td>
-                      <button className="btn btn-info btn-sm me-2 fw-semibold text-white"
+                      <button
+                        className={
+                          "btn btn-sm fw-semibold " +
+                          (e.forMaintenance ? "btn-warning" : "btn-outline-secondary")
+                        }
+                        onClick={() => handleToggleMaintenance(i)}
+                        disabled={maintenanceLoading[e.id]}
+                        title={e.forMaintenance ? "Unmark Maintenance" : "Mark for Maintenance"}
+                      >
+                        {maintenanceLoading[e.id]
+                          ? "Updating..."
+                          : e.forMaintenance
+                          ? "Marked"
+                          : "Available"}
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-info btn-sm me-2 fw-semibold text-white"
                         onClick={() => handleEdit(i)}
                         disabled={loading}
                       >

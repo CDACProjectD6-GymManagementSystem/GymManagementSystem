@@ -1,6 +1,7 @@
 package com.gymmate.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gymmate.dtos.ApiResponse;
 import com.gymmate.dtos.EquipmentRequestDto;
 import com.gymmate.dtos.ReceptionistRequestDto;
 import com.gymmate.dtos.ReceptionistUpdateDto;
@@ -117,9 +119,22 @@ public class AdminController {
 	}
 	
 	@GetMapping("/equipment/getall")
-	@Operation(description = "Get all Equipments not for maintenance")
+	@Operation(description = "Get all Equipments")
 	public ResponseEntity<?> getAllEquipments(){
 		return ResponseEntity.ok(equipmentService.getAllEquipments());
+	}
+	
+	@GetMapping("/equipment/maintenance")
+	@Operation(description = "Get equipment for maintenance")
+	public ResponseEntity<?> getMaintenanceEquipments(){
+		return ResponseEntity.ok(equipmentService.getMaintenanceEquipment());
+	}
+	
+	@PutMapping("/equipments/{id}/maintenance")
+	@Operation(description = "Set and unset for maintenance")
+	public ResponseEntity<ApiResponse> toggleMaintenance(@PathVariable Long id,
+	                                                     @RequestBody Map<String, Boolean> body) {
+	    return ResponseEntity.ok(equipmentService.toggleMaintenance(id, body));
 	}
 	
 	@DeleteMapping("/equipment/{id}")
