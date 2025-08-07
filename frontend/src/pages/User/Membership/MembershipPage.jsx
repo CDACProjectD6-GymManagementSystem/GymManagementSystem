@@ -68,8 +68,7 @@ export default function MembershipPage() {
     ) {
       navigate("/user", { replace: true });
     }
-    // eslint-disable-next-line
-  }, [navigate, location.state, user.isSubscribed]);
+   }, [navigate, location.state, user.isSubscribed]);
 
   // Fetch available membership packages (from UserService)
   useEffect(() => {

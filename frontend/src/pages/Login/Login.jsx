@@ -13,7 +13,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Extract any optional message from navigation state (e.g., sent from MembershipPage)
+  // Extract any optional message from navigation state sent from MembershipPage
   const msg = location.state?.msg;
 
   const handleLogin = async (e) => {
@@ -23,21 +23,21 @@ export default function Login() {
     try {
       const resp = await loginUser(email, password);
       const token = resp.jwt;
-      if (!token) throw new Error("Login failed: No token from server!");
+      if (!token) throw new Error("Login failed Not able to get token from server!");
 
-      // Save token for use in API/authenticated requests ONLY.
+      // Saving  token for use future pages to retrieve from here.
       sessionStorage.setItem("gymmateAccessToken", token);
 
-      // Decode the JWT for claims on-the-fly, instead of storing decoded user object.
+      // Decode the JWT for claims on-the-fly, and not storing decoded user object.
       const decoded = jwtDecode(token);
       const userRole =
         decoded.authorities && decoded.authorities.length > 0
           ? decoded.authorities[0]
           : null;
 
-      // Routing logic:
+      // Routing logic based on role
       if (!userRole) {
-        alert("Login Error: Role not found in token.");
+        alert("Login Error: Role did not found in token.");
       } else if (userRole === "ROLE_ADMIN") {
         navigate("/admin-dashboard");
       } else if (userRole === "ROLE_TRAINER") {

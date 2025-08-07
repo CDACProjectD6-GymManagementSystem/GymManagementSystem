@@ -7,7 +7,7 @@ import {
   FaFish, FaCarrot, FaCheese, FaHotdog, FaSeedling
 } from "react-icons/fa";
 
-// --- static nutrition reference as in your original code ---
+// --- static data for user to help  him in nutrition ---
 const dietData = [
   { item: "Apple",    icon: <FaAppleAlt />, category: "Vegan",      calories: 52,  protein: 0.3, carbs: 14,  fat: 0.2, fiber: 2.4 },
   { item: "Egg",      icon: <FaEgg />,     category: "Vegetarian", calories: 68,  protein: 6.0, carbs: 0.6,  fat: 5,   fiber: 0   },
@@ -116,8 +116,7 @@ const DietNutritionPage = ({ membershipType = "premium" }) => {
           </table>
         </div>
 
-        {/* ----------- Nutrition Reference Table (PREMIUM) ----------- */}
-        {membershipType === "premium" && (
+         {  (
           <>
             <div className="dietnut-header">
               <h2 className="dietnut-title">Diet &amp; Nutrition Reference</h2>

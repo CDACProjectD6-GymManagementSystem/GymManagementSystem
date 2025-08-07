@@ -47,11 +47,11 @@ export default function Register() {
       if (resp && resp.message) {
         setMsg(resp.message);
 
-        // Navigate to signin after a short delay if successful
+        // Navigating  to signin after a short delay if successful
         if (resp.message.toLowerCase().includes("success")) {
           setTimeout(() => {
             navigate("/auth/signin");
-          }, 1200); // 1.2s delay so user sees message
+          }, 1200);   
         }
       } else {
         setMsg("Unexpected server response.");

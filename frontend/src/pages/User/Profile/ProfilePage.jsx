@@ -58,7 +58,7 @@ const ProfilePage = () => {
       return;
     }
     fetchProfile();
-    // eslint-disable-next-line
+    
   }, [userId]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
