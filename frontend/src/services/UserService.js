@@ -73,20 +73,18 @@ export const UserService = {
     return data;
   },
 
-  // ===== FEEDBACK SECTION =====
-  async submitFeedback(userId, { message, rating }, token) {
+  async submitFeedback(userId, { message, rating, trainerId }, token) {
     const response = await fetch(`${BASE_URL}/user/feedback/${userId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ message, rating }),
+      body: JSON.stringify({ message, rating, trainerId }),
     });
     if (!response.ok) throw new Error("Failed to send feedback");
     return response.json();
   },
-
   // ===== DIET SECTION =====
   getUserDiet(providedId) {
     const userId = providedId || getCurrentUserIdFromToken();
@@ -116,6 +114,4 @@ export const UserService = {
       headers: getAuthHeaders(),
     });
   },
-
-   
 };

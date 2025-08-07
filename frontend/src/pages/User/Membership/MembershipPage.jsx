@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaStar, FaMedal, FaCrown } from "react-icons/fa";
 import { UserService } from "../../../services/UserService";
 import { jwtDecode } from "jwt-decode";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./MembershipPage.css";
 
 // Helper: safely decode user from token in sessionStorage
@@ -61,14 +63,10 @@ export default function MembershipPage() {
 
   // After login: if user is already subscribed, redirect.
   useEffect(() => {
-    if (
-      location.state &&
-      location.state.fromLogin &&
-      user.isSubscribed
-    ) {
+    if (location.state && location.state.fromLogin && user.isSubscribed) {
       navigate("/user", { replace: true });
     }
-   }, [navigate, location.state, user.isSubscribed]);
+  }, [navigate, location.state, user.isSubscribed]);
 
   // Fetch available membership packages (from UserService)
   useEffect(() => {
@@ -110,8 +108,7 @@ export default function MembershipPage() {
       // Redirect to login page and show a message if not logged in
       navigate("/auth/signin", {
         state: {
-          msg:
-            "To view your purchased subscription, please log in again.",
+          msg: "To view your purchased subscription, please log in again.",
         },
       });
       return;
@@ -128,17 +125,23 @@ export default function MembershipPage() {
     try {
       await UserService.buyMembershipPackage(userId, selected.name);
 
-      // After successful subscription, log user out to force fresh re-login
+      // Remove old token forcing fresh login
       sessionStorage.removeItem("gymmateAccessToken");
-      alert(
+
+      // Use toast instead of alert
+      toast.success(
         "Successfully subscribed! Please log in again to view your subscription."
       );
-      navigate("/auth/signin", {
-        state: {
-          msg:
-            "Subscription successful! Please log in again to view your purchased subscription.",
-        },
-      });
+
+      // Redirect after short delay to allow user to see toast
+      setTimeout(() => {
+        navigate("/auth/signin", {
+          state: {
+            msg:
+              "Subscription successful! Please log in again to view your purchased subscription.",
+          },
+        });
+      }, 2500); // 2.5 seconds delay
     } catch (err) {
       setApiError(err.message || "Subscription error.");
     } finally {
@@ -169,9 +172,7 @@ export default function MembershipPage() {
         {packages.map((pkg, idx) => (
           <div
             key={pkg.id || pkg.name}
-            className={`membership-package-card${
-              idx === selectedIdx ? " selected" : ""
-            }`}
+            className={`membership-package-card${idx === selectedIdx ? " selected" : ""}`}
             onClick={() => setSelectedIdx(idx)}
           >
             <div className="membership-card-title">
@@ -189,15 +190,13 @@ export default function MembershipPage() {
                 <b>Gym Access:</b> {getAccessDisplay(pkg.access)}
               </li>
               <li>
-                <b>Diet Consultation:</b>{" "}
-                {pkg.dietConsultation ? "Yes" : "No"}
+                <b>Diet Consultation:</b> {pkg.dietConsultation ? "Yes" : "No"}
               </li>
               <li>
                 <b>Sauna Access:</b> {pkg.isSauna ? "Yes" : "No"}
               </li>
               <li>
-                <b>Duration:</b> {pkg.duration} month
-                {pkg.duration > 1 ? "s" : ""}
+                <b>Duration:</b> {pkg.duration} month{pkg.duration > 1 ? "s" : ""}
               </li>
               <li>
                 <b>Price:</b> ₹{pkg.price}
@@ -205,9 +204,7 @@ export default function MembershipPage() {
             </ul>
             <div className="membership-card-monthly">
               ({pkg.duration} {pkg.duration === 1 ? "month" : "months"})
-              {idx === selectedIdx && (
-                <span>&nbsp;|&nbsp;₹{monthly}/mo</span>
-              )}
+              {idx === selectedIdx && <span>&nbsp;|&nbsp;₹{monthly}/mo</span>}
             </div>
           </div>
         ))}
@@ -224,13 +221,24 @@ export default function MembershipPage() {
           ) : (
             <>
               Confirm &amp; Pay for{" "}
-              <span className="membership-btn-plan">
-                {selected.name}
-              </span>
+              <span className="membership-btn-plan">{selected.name}</span>
             </>
           )}
         </button>
       )}
+
+      {/* ToastContainer to display toasts */}
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false} 
+        newestOnTop={false} 
+        closeOnClick 
+        rtl={false} 
+        pauseOnFocusLoss 
+        draggable 
+        pauseOnHover 
+      />
     </div>
   );
 }
