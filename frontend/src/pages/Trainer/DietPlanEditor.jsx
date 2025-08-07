@@ -19,12 +19,13 @@ const DietPlanEditor = () => {
       try {
         const data = await fetchUserDietPlan(userId);
 
-        const plan = {
-          breakfast: data.diet?.breakfast || '',
-          midSnack: data.diet?.midSnack || '',
-          lunch: data.diet?.lunch || '',
-          dinner: data.diet?.dinner || ''
-        };
+    const plan = {
+    breakfast: data.diet?.breakfast || '',
+    midSnack: data.diet?.midSnack || '',
+    lunch: data.diet?.lunch || '',
+    dinner: data.diet?.dinner || '',
+    instructions: data.diet?.instructions || ''
+    };
 
         setUserName(`${data.firstName} ${data.lastName}`);
         setDietPlan(plan);
@@ -101,6 +102,25 @@ const DietPlanEditor = () => {
                 </div>
               ))}
 
+        <div className="mb-4">
+          <label className="form-label fw-semibold text-capitalize">
+              Instructions
+          </label>
+            {editMode ? (
+        <textarea
+            className="form-control"
+            rows="3"
+            placeholder="Any special instructions..."
+            value={dietPlan.instructions}
+            onChange={e => handleChange("instructions", e.target.value)}
+        />
+        ) : (
+        <p className="border rounded p-3 bg-light text-muted">
+        {dietPlan.instructions || <em>No instructions provided.</em>}
+      </p>
+        )}
+      </div>
+
               <div className="text-center">
                 {editMode ? (
                   <>
@@ -120,3 +140,4 @@ const DietPlanEditor = () => {
 };
 
 export default DietPlanEditor;
+

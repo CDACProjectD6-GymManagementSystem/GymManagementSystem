@@ -4,6 +4,8 @@ import "./LoginPage.css";
 import { loginUser } from "../../services/authService";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -37,24 +39,31 @@ export default function Login() {
 
       // Routing logic:
       if (!userRole) {
-        alert("Login Error: Role not found in token.");
+        toast.error("Login Error: Role not found in token.");
       } else if (userRole === "ROLE_ADMIN") {
-        navigate("/admin-dashboard");
+        toast.success("Welcome, Admin!", { autoClose: 1200 });
+        setTimeout(() => navigate("/admin-dashboard"), 1300);
       } else if (userRole === "ROLE_TRAINER") {
-        navigate("/trainer");
+        toast.success("Welcome, Trainer!", { autoClose: 1200 });
+        setTimeout(() => navigate("/trainer"), 1300);
       } else if (userRole === "ROLE_RECEPTIONIST") {
-        navigate("/reception-dashboard");
+        toast.success("Welcome, Receptionist!", { autoClose: 1200 });
+        setTimeout(() => navigate("/reception-dashboard"), 1300);
       } else if (userRole === "ROLE_USER") {
-        if (decoded.isSubscribed) {
-          navigate("/user");
-        } else {
-          navigate("/user/membership", { state: { fromLogin: true } });
-        }
+        toast.success("Welcome, User!", { autoClose: 1200 });
+        setTimeout(() => {
+          if (decoded.isSubscribed) {
+            navigate("/user");
+          } else {
+            navigate("/user/membership", { state: { fromLogin: true } });
+          }
+        }, 1300);
       } else {
-        navigate("/");
+        toast.error("Unknown role! Redirecting...");
+        setTimeout(() => navigate("/"), 1300);
       }
     } catch (err) {
-      alert(err.message || "Invalid credentials!");
+      toast.error(err.message || "Invalid credentials!");
     } finally {
       setLoading(false);
     }
@@ -62,6 +71,7 @@ export default function Login() {
 
   return (
     <div className="login-root">
+      <ToastContainer position="top-center" />
       <div className="login-card">
         <div className="login-header">
           <span className="brand-highlight">GymMate</span>

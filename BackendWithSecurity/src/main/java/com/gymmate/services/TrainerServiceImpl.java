@@ -76,8 +76,10 @@ public class TrainerServiceImpl implements TrainerService {
 
 	@Override
 	public List<UserForTrainerDTO> getAssignedUsers(Long trainerId) {
-		List<UserEntity> users = userDao.findByTrainer_IdAndIsActiveTrue(trainerId);
-		return users.stream().map(user -> modelMapper.map(user, UserForTrainerDTO.class)).toList();
+	    List<UserEntity> users = userDao.findByTrainer_IdAndIsActiveTrueAndIsSubscribedTrue(trainerId);
+	    return users.stream()
+	                .map(user -> modelMapper.map(user, UserForTrainerDTO.class))
+	                .toList();
 	}
 
 	@Override
@@ -95,6 +97,7 @@ public class TrainerServiceImpl implements TrainerService {
 
 	}
 
+	
 	@Override
 	public ApiResponse updateUserDiet(Long userId, UserDietDTO dto) {
 
@@ -229,3 +232,5 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 }
+
+
