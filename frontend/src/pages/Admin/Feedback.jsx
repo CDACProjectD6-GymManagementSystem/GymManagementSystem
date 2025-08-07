@@ -12,7 +12,7 @@ const Feedback = () => {
       setError(null);
       try {
         const res = await getAllFeedbacks();
-       
+
         let list = res.data;
         if (Array.isArray(list)) {
         } else if (Array.isArray(res.data?.data)) {
@@ -44,6 +44,7 @@ const Feedback = () => {
               <tr>
                 <th>First Name</th>
                 <th>Last Name</th>
+                <th>Trainer Name</th>
                 <th>Message</th>
                 <th>Rating</th>
               </tr>
@@ -51,15 +52,16 @@ const Feedback = () => {
             <tbody>
               {(Array.isArray(feedbacks) ? feedbacks : []).length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center fst-italic py-4 text-secondary bg-white">
+                  <td colSpan={5} className="text-center fst-italic py-4 text-secondary bg-white">
                     No feedbacks found.
                   </td>
                 </tr>
               ) : (
                 feedbacks.map((fb, i) => (
-                  <tr key={i}>
+                  <tr key={fb._id ?? i}>
                     <td>{fb.firstName}</td>
                     <td>{fb.lastName}</td>
+                    <td>{fb.trainerName}</td>
                     <td style={{ whiteSpace: "pre-line", maxWidth: 380 }}>{fb.message}</td>
                     <td>
                       {fb.rating}

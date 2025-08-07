@@ -10,5 +10,6 @@ public class FeedbackResponseDTO {
 	private String firstName;
 	private String lastName;
     private String message;
+    private String trainerName;
     private int rating;  
 }

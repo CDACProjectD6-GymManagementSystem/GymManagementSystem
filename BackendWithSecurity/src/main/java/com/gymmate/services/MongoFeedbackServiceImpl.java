@@ -63,6 +63,7 @@ public class MongoFeedbackServiceImpl implements MongoFeedbackService {
 			mapper.map(feed, fres);
 			fres.setFirstName(uentity.getFirstName());
 			fres.setLastName(uentity.getLastName());
+			fres.setTrainerName(feed.getTrainerName());
 			flist.add(fres);
 		}
 		return flist;
