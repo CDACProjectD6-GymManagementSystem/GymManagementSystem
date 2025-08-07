@@ -30,6 +30,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 		
 		Subscription subEntity = mapper.map(subDto, Subscription.class);
 		subEntity.setActive(true);
+		subEntity.setDurationInDays(30*subEntity.getDuration());
 		subscriptionDao.save(subEntity);
 		return new ApiResponse("Subscription Created Successfully");
 	}
