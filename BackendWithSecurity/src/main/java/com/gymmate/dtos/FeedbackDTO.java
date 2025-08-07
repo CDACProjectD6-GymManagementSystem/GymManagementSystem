@@ -7,5 +7,6 @@ import lombok.Setter;
 @Setter
 public class FeedbackDTO {
     private String message;
-    private int rating;  
+    private int rating; 
+    private String trainerId;
 }

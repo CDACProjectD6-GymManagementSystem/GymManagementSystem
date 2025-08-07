@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.gymmate.dtos.ApiResponse;
+import com.gymmate.dtos.AssignedTrainerTDTO;
 import com.gymmate.dtos.SubscriptionResponseForUserDTO;
 import com.gymmate.dtos.UserDietRespDTO;
 import com.gymmate.dtos.UserDisplayProfileDto;
@@ -39,5 +40,7 @@ public interface UserService {
 	Map<String, String> uploadPhoto(Long userId, MultipartFile file) throws IOException;
 
 	ApiResponse deletePhoto(Long userId) throws IOException;
+
+	AssignedTrainerTDTO getTrainer(Long id);
 
 }

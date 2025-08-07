@@ -35,7 +35,7 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-	 
+
 	@Autowired
 	private MongoFeedbackService feedbackService;
 
@@ -124,6 +124,11 @@ public class UserController {
 	public ResponseEntity<?> deleteProfilePhoto(@PathVariable Long id) throws IOException {
 		ApiResponse resp = userService.deletePhoto(id);
 		return ResponseEntity.ok(resp);
+	}
+
+	@GetMapping("/get-trainer/{id}")
+	public ResponseEntity<?> getAssignedTrainer(@PathVariable Long id) {
+		return ResponseEntity.ok(userService.getTrainer(id));
 	}
 
 }

@@ -23,6 +23,7 @@ import com.gymmate.daos.PaymentDAO;
 import com.gymmate.daos.SubscriptionDao;
 import com.gymmate.daos.UserDao;
 import com.gymmate.dtos.ApiResponse;
+import com.gymmate.dtos.AssignedTrainerTDTO;
 import com.gymmate.dtos.SubscriptionResponseForUserDTO;
 import com.gymmate.dtos.UserDietRespDTO;
 import com.gymmate.dtos.UserDisplayProfileDto;
@@ -233,5 +234,17 @@ public class UserServiceImpl implements UserService {
 			return new ApiResponse("Image deleted successfully");
 		}
 		return new ApiResponse("No image found to delete");
+	}
+
+	@Override
+	public AssignedTrainerTDTO getTrainer(Long id) {
+		UserEntity userEnt = userDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		if (userEnt.getTrainer() != null) {
+			AssignedTrainerTDTO dto = new AssignedTrainerTDTO();
+			dto.setTrainerId(userEnt.getTrainer().getId());
+			dto.setTrainerName(userEnt.getTrainer().getFirstName());
+			return dto;
+		}
+		throw new ResourceNotFoundException("no Trainer Assigned Yet!!!!");
 	}
 }

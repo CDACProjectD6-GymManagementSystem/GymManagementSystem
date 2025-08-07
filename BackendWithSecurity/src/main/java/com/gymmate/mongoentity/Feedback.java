@@ -19,7 +19,7 @@ public class Feedback {
     private String userId;
     private String message;
     private int rating;  
-
+    private String trainerName;
     @CreatedDate
     private LocalDateTime createdAt;
 
