@@ -21,13 +21,12 @@ const emptyUser = {
   subscriptionType: "",
 };
 
-const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
+const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [subscriptionNames, setSubscriptionNames] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [uiMessage, setUiMessage] = useState(null);
-  const [savedUserId, setSavedUserId] = useState(null);
   const [search, setSearch] = useState("");
   const [currentUser, setCurrentUser] = useState(emptyUser);
   const [loading, setLoading] = useState(false);
@@ -87,7 +86,6 @@ const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
   // Can be invoked with or without a user argument
   const handleShowModal = (userToEdit = null) => {
     setFormDirty(false);
-    setSavedUserId(null);
     setUiMessage(null);
     if (userToEdit) {
       setEditingId(userToEdit.id);
@@ -108,7 +106,6 @@ const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingId(null);
-    setSavedUserId(null);
     setFormDirty(false);
     setUiMessage(null);
     setCurrentUser(emptyUser);
@@ -142,21 +139,12 @@ const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
         setUiMessage({ type: "success", text: "User updated successfully!" });
         const updatedUsers = await getUsers();
         setUsers(updatedUsers);
-        setSavedUserId(editingId);
-        if (setGlobalAlert)
-          setGlobalAlert({ type: "success", text: `User "${currentUser.firstName}" updated.` });
-      } else {
+        } else {
         await addUser(payload);
         setUiMessage({ type: "success", text: "User added successfully!" });
         const updatedUsers = await getUsers();
         setUsers(updatedUsers);
-        const newUserId = updatedUsers.length > 0
-          ? Math.max(...updatedUsers.map(u => u.id))
-          : 1;
-        setSavedUserId(newUserId);
-        if (setGlobalAlert)
-          setGlobalAlert({ type: "success", text: `User "${currentUser.firstName}" added.` });
-      }
+        }
       setTimeout(() => {
         handleCloseModal();
       }, 1200);
@@ -176,9 +164,7 @@ const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
         setUsers(updatedUsers);
         setUiMessage({ type: "success", text: "User deleted successfully!" });
         if (editingId === userId) handleCloseModal();
-        if (setGlobalAlert)
-          setGlobalAlert({ type: "success", text: "User deleted." });
-      } catch (error) {
+        } catch (error) {
         setUiMessage({ type: "danger", text: "Error deleting user. Please try again." });
       } finally {
         setLoading(false);
@@ -186,11 +172,6 @@ const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
     }
   };
 
-  const handleProceedToPaymentClick = () => {
-    handleCloseModal();
-    if (onProceedToPayment && savedUserId)
-      onProceedToPayment(savedUserId);
-  };
 
   const filteredUsers = users.filter((user) =>
     `${user.firstName} ${user.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
@@ -276,7 +257,7 @@ const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
         </table>
       </div>
 
-      <Modal show={showModal} onHide={handleCloseModal} centered>
+      <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title>{editingId ? "Edit User" : "Add New User"}</Modal.Title>
         </Modal.Header>
@@ -414,19 +395,11 @@ const UserManagement = ({ onProceedToPayment, setGlobalAlert }) => {
             <Button
               variant="dark"
               type="submit"
-              disabled={loading || (savedUserId !== null && uiMessage?.type === "success")}
+              disabled={loading}
             >
               {loading ? <Spinner size="sm" animation="border" /> : (editingId ? "Update User" : "Add User")}
             </Button>
-            {savedUserId && uiMessage?.type === "success" && (
-              <Button
-                variant="info"
-                onClick={handleProceedToPaymentClick}
-                className="ms-2"
-              >
-                Proceed to Payment
-              </Button>
-            )}
+            
           </Modal.Footer>
         </Form>
       </Modal>
