@@ -26,7 +26,8 @@ const UserSchedule = () => {
           Thursday: data.schedule?.thursday || '',
           Friday: data.schedule?.friday || '',
           Saturday: data.schedule?.saturday || '',
-          Sunday: data.schedule?.sunday || ''
+          Sunday: data.schedule?.sunday || '',
+          instructions: data.schedule?.instructions || ''
         };
 
         setSchedule(scheduleData);
@@ -41,8 +42,8 @@ const UserSchedule = () => {
     loadSchedule();
   }, [userId]);
 
-  const handleChange = (day, value) => {
-    setSchedule(prev => ({ ...prev, [day]: value }));
+  const handleChange = (key, value) => {
+    setSchedule(prev => ({ ...prev, [key]: value }));
   };
 
   const handleSave = async () => {
@@ -58,7 +59,8 @@ const UserSchedule = () => {
           thursday: schedule.Thursday,
           friday: schedule.Friday,
           saturday: schedule.Saturday,
-          sunday: schedule.Sunday
+          sunday: schedule.Sunday,
+          instructions: schedule.instructions
         }
       };
 
@@ -98,7 +100,7 @@ const UserSchedule = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(schedule).map(([day, workout]) => (
+                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(day => (
                       <tr key={day}>
                         <td className="fw-semibold text-center">{day}</td>
                         <td>
@@ -106,18 +108,38 @@ const UserSchedule = () => {
                             <input
                               type="text"
                               className="form-control"
-                              value={workout}
+                              value={schedule[day]}
                               onChange={(e) => handleChange(day, e.target.value)}
                               placeholder="Enter workout"
                             />
                           ) : (
-                            <span>{workout || <em className="text-muted">No workout assigned</em>}</span>
+                            <span>{schedule[day] || <em className="text-muted">No workout assigned</em>}</span>
                           )}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Instructions field below the table */}
+              <div className="mb-4">
+                <label className="form-label fw-semibold">
+                  Special Instructions
+                </label>
+                {isEditing ? (
+                  <textarea
+                    className="form-control"
+                    rows={3}
+                    placeholder="Enter any special instructions..."
+                    value={schedule.instructions}
+                    onChange={e => handleChange('instructions', e.target.value)}
+                  />
+                ) : (
+                  <p className="border rounded p-3 bg-light text-muted">
+                    {schedule.instructions || <em>No special instructions.</em>}
+                  </p>
+                )}
               </div>
 
               <div className="d-flex justify-content-center gap-3 mt-3">

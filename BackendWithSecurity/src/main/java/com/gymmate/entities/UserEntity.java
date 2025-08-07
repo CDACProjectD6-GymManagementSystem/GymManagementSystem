@@ -25,6 +25,12 @@ import lombok.ToString;
 @Table(name = "users")
 @ToString(callSuper = true)
 public class UserEntity extends BaseEntity implements UserDetails {
+	private int age;
+	private String goals;
+	private double height;
+	private double wieght;
+	@Column(name = "conditions_allergies")
+	private String conditionsOrAllergies;
 	@Column(name = "is_subscribed")
 	private boolean isSubscribed;
 	@Column(name = "is_active")

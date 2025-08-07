@@ -18,5 +18,11 @@ public class Diet extends SuperBaseEntity {
 	private String dinner="Roti +sabji +salad";
 	@Column(name = "midsnack")
 	private String midSnack="Handful of chana";
+	private String instructions;
 
 }
+
+
+
+
+

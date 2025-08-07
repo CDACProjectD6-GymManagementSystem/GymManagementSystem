@@ -20,5 +20,7 @@ public class Schedule extends SuperBaseEntity {
 	private String thursday = "Chest";
 	private String friday = "Triceps + Shoulder";
 	private String saturday = "Legs";
+	private String instructions;
+	
 
 }

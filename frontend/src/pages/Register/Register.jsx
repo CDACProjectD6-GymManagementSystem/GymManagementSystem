@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import './RegisterPage.css';
 import { UserService } from "../../services/UserService";
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaLock, FaVenusMars } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const GENDERS = [
   { value: 'MALE', label: 'Male' },
@@ -21,7 +23,6 @@ export default function Register() {
     password: '',
     confirmPassword: '',
   });
-  const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -30,14 +31,12 @@ export default function Register() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
-    setMsg("");
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setMsg("");
     if (formData.password !== formData.confirmPassword) {
-      setMsg("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
     const { confirmPassword, ...payload } = formData;
@@ -45,19 +44,19 @@ export default function Register() {
     try {
       const resp = await UserService.registerUser(payload);
       if (resp && resp.message) {
-        setMsg(resp.message);
-
-        // Navigating  to signin after a short delay if successful
         if (resp.message.toLowerCase().includes("success")) {
+          toast.success(resp.message, { autoClose: 1200 });
           setTimeout(() => {
             navigate("/auth/signin");
-          }, 1200);   
+          }, 1300); // Let user see the toast
+        } else {
+          toast.info(resp.message);
         }
       } else {
-        setMsg("Unexpected server response.");
+        toast.error("Unexpected server response.");
       }
     } catch (err) {
-      setMsg("Registration failed. Please try again.");
+      toast.error("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -65,23 +64,12 @@ export default function Register() {
 
   return (
     <div className="register-root">
+      <ToastContainer position="top-center" />
       <div className="register-card-wide">
         <div className="register-header">
           <span className="register-brand">GymMate</span>
           <span className="register-header-sub">Create your account</span>
         </div>
-        {msg && (
-          <div
-            style={{
-              marginBottom: 15,
-              fontWeight: 550,
-              textAlign: "center",
-            }}
-            aria-live="polite"
-          >
-            {msg}
-          </div>
-        )}
         <form onSubmit={handleRegister} className="register-form-wide">
           <div className="register-row">
             <div className="register-col">

@@ -95,6 +95,7 @@ public class TrainerController {
 	}
 	
 	
+	
 	@GetMapping("/user/{userId}/schedule")
 	@Operation(description = "Get user schedule")
 	public ResponseEntity<?> getUserSchedule(@PathVariable Long userId){
@@ -154,8 +155,7 @@ public class TrainerController {
 	                                                     @RequestBody Map<String, Boolean> body) {
 	    return ResponseEntity.ok(equipmentService.toggleMaintenance(id, body));
 	}
-
-	       
+       
 
 	@PostMapping("/upload/{id}")
 	public ResponseEntity<?> upload(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
@@ -169,6 +169,8 @@ public class TrainerController {
         return ResponseEntity.ok(trainerService.deletePhoto(id));
     }
 	
+    
+    
     
 	
 

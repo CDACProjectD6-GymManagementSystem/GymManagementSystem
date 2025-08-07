@@ -5,7 +5,7 @@ import {
   FaDumbbell, FaCrown, FaCheckCircle, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt
 } from "react-icons/fa";
 import { useTranslation, Trans } from "react-i18next";
-import "./Home.css";
+import "./Home.css"; 
 
 // List of supported languages (add to or edit these as needed)
 const languages = [

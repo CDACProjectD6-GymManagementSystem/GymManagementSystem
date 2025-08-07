@@ -13,7 +13,7 @@ public interface UserDao extends JpaRepository<UserEntity, Long> {
 
 	Optional<UserEntity> findById(Long id);
 
-	List<UserEntity> findByTrainer_IdAndIsActiveTrue(Long trainerId);
+	List<UserEntity> findByTrainer_IdAndIsActiveTrueAndIsSubscribedTrue(Long trainerId);
 
 	boolean existsByEmail(String email);
 
