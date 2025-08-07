@@ -7,10 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EquipmentRespDto extends BaseDTO{
+public class EquipmentResp2Dto {
+	private Long id;
 	private String name;
 	private String description;
 	private Category category;
 	private double price;
-	private boolean forMaintenance;
 }
