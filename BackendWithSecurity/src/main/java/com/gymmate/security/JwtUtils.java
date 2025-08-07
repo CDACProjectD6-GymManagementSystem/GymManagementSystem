@@ -70,6 +70,7 @@ public class JwtUtils {
 				.claim("authorities", getAuthoritiesInString(userPrincipal.getAuthorities()))
 				.claim("isSubscribed", userPrincipal.isSubscribed())
 				.claim("id", userPrincipal.getId())
+				.claim("firstName", userPrincipal.getFirstName())
 				// setting a custom claim , to add user id (remove it if not required in the
 				// project) - future
 
