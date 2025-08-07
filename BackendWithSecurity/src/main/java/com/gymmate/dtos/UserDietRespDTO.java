@@ -10,4 +10,5 @@ public class UserDietRespDTO {
 	private String lunch;
 	private String dinner;
 	private String midSnack;
+	private String instructions = "None";
 }

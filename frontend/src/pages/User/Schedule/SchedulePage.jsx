@@ -105,6 +105,12 @@ const SchedulePage = () => {
               ))}
             </tbody>
           </table>
+          {/* Show instructions if present */}
+          {weekSchedule.instructions && (
+            <div className="schedule-instructions">
+              <strong>Instructions:</strong> {weekSchedule.instructions}
+            </div>
+          )}
         </div>
       </div>
     </div>

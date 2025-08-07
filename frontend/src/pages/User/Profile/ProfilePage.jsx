@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   FaUserEdit, FaSave, FaUser, FaEnvelope, FaPhone, FaHome,
-  FaVenusMars, FaCamera, FaTrash
+  FaVenusMars, FaCamera, FaTrash, FaHeartbeat, FaFlag, FaChild, FaWeight
 } from "react-icons/fa";
 import './ProfilePage.css';
 import { UserService } from "../../../services/UserService";
@@ -13,7 +13,6 @@ const GENDERS = [
   { value: "OTHER", label: "Other" }
 ];
 
-// Helper: always decode the user from JWT at runtime
 function getCurrentUserId() {
   const token = sessionStorage.getItem("gymmateAccessToken");
   if (!token) return null;
@@ -23,6 +22,13 @@ function getCurrentUserId() {
   } catch {
     return null;
   }
+}
+
+// Helper: BMI calculation
+function calculateBMI(height, weight) {
+  if (!height || !weight) return "";
+  const heightM = height / 100;
+  return (weight / (heightM * heightM)).toFixed(2);
 }
 
 const ProfilePage = () => {
@@ -36,7 +42,6 @@ const ProfilePage = () => {
 
   const userId = getCurrentUserId();
 
-  // Fetches full profile after any change
   const fetchProfile = async () => {
     setLoading(true);
     setApiError("");
@@ -58,7 +63,6 @@ const ProfilePage = () => {
       return;
     }
     fetchProfile();
-    
   }, [userId]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -265,6 +269,81 @@ const ProfilePage = () => {
                   <option key={g.value} value={g.value}>{g.label}</option>
                 ))}
               </select>
+            </div>
+            <div className="profile-form-group">
+              <label><FaChild className="profile-label-icon" /> Age</label>
+              <input
+                name="age"
+                type="number"
+                min="0"
+                value={form.age || ""}
+                onChange={handleChange}
+                required
+                readOnly={!editing}
+                className={`profile-input ${!editing ? "readonly" : ""}`}
+              />
+            </div>
+            <div className="profile-form-group">
+              <label><FaFlag className="profile-label-icon" /> Goals</label>
+              <input
+                name="goals"
+                value={form.goals || ""}
+                onChange={handleChange}
+                readOnly={!editing}
+                className={`profile-input ${!editing ? "readonly" : ""}`}
+              />
+            </div>
+            <div className="profile-form-group">
+              <label><FaHeartbeat className="profile-label-icon" /> Conditions or Allergies</label>
+              <input
+                name="conditionsOrAllergies"
+                value={form.conditionsOrAllergies || ""}
+                onChange={handleChange}
+                readOnly={!editing}
+                className={`profile-input ${!editing ? "readonly" : ""}`}
+                placeholder="Enter any medical condition or allergy"
+              />
+            </div>
+
+            {/* Weight and Height side by side */}
+            <div className="row">
+              <div className="col-md-6 profile-form-group">
+                <label><FaWeight className="profile-label-icon" /> Weight (kg)</label>
+                <input
+                  name="wieght"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={form.wieght || ""}
+                  onChange={handleChange}
+                  readOnly={!editing}
+                  className={`profile-input ${!editing ? "readonly" : ""}`}
+                />
+              </div>
+              <div className="col-md-6 profile-form-group">
+                <label><FaWeight className="profile-label-icon" /> Height (cm)</label>
+                <input
+                  name="height"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={form.height || ""}
+                  onChange={handleChange}
+                  readOnly={!editing}
+                  className={`profile-input ${!editing ? "readonly" : ""}`}
+                />
+              </div>
+            </div>
+
+            {/* BMI */}
+            <div className="profile-form-group">
+              <label><FaWeight className="profile-label-icon" /> BMI</label>
+              <input
+                value={calculateBMI(form.height, form.wieght)}
+                readOnly
+                className="profile-input readonly"
+                style={{ background: "#f5f5f5", fontWeight: 600, color: "#33691e" }}
+              />
             </div>
             {apiError && <div style={{ color: '#c00', marginBottom: 7 }}>{apiError}</div>}
             {successMsg && <div style={{ color: 'green', marginBottom: 7 }}>{successMsg}</div>}

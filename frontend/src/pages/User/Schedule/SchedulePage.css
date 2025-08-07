@@ -147,3 +147,16 @@
   color: #222;
   padding: 7px;
 }
+
+
+.schedule-instructions {
+  margin: 18px 0 0 0;
+  background: #e3ffe5;
+  border-left: 5px solid #00c853;
+  color: #165834;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px #00e6761a;
+}

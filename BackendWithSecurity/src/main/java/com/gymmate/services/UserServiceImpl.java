@@ -81,6 +81,11 @@ public class UserServiceImpl implements UserService {
 		userEnt.setLastName(user.getLastName());
 		userEnt.setGender(user.getGender());
 		userEnt.setMobile(user.getMobile());
+		userEnt.setAge(user.getAge());
+		userEnt.setConditionsOrAllergies(user.getConditionsOrAllergies());
+		userEnt.setWieght(user.getWieght());
+		userEnt.setHeight(user.getHeight());
+		userEnt.setGoals(user.getGoals());
 		return true;
 	}
 

@@ -14,6 +14,11 @@ public class UserDisplayProfileDto {
 	private String address;
 	private String mobile;
 	private Gender gender;
+	private int age;
+	private String goals;
+	private double height;
+	private double wieght;
+	private String conditionsOrAllergies;
 	private String imageUrl;         
 	private String imagePublicId;  
 }

@@ -7,7 +7,7 @@ import {
   FaFish, FaCarrot, FaCheese, FaHotdog, FaSeedling
 } from "react-icons/fa";
 
-// --- static data for user to help  him in nutrition ---
+// Static nutrition reference data
 const dietData = [
   { item: "Apple",    icon: <FaAppleAlt />, category: "Vegan",      calories: 52,  protein: 0.3, carbs: 14,  fat: 0.2, fiber: 2.4 },
   { item: "Egg",      icon: <FaEgg />,     category: "Vegetarian", calories: 68,  protein: 6.0, carbs: 0.6,  fat: 5,   fiber: 0   },
@@ -19,23 +19,20 @@ const dietData = [
   { item: "Paneer",   icon: <FaCheese />,  category: "Vegetarian", calories: 265, protein: 18,  carbs: 1.2,  fat: 21,  fiber: 0   },
   { item: "Soy Hotdog",icon: <FaHotdog />, category: "Vegan",      calories: 105, protein: 9.5, carbs: 7.2,  fat: 4.4, fiber: 2.2 },
   { item: "Sprouts",  icon: <FaSeedling />,category: "Vegan",      calories: 30,  protein: 3,   carbs: 6,    fat: 0.5, fiber: 1.8 },
- ];
+];
 
-// Style helper
 const categoryColor = (cat) =>
   cat === "Vegan"
-    ? "#222"
+    ? "#228B22"
     : cat === "Vegetarian"
-    ? "#555"
-    : "#999";
+    ? "#755a00"
+    : "#a52a2a";
 
-// wrote Helper to decode userId/sub/email from JWT at render time!
 function getCurrentUserIdFromToken() {
   const token = sessionStorage.getItem("gymmateAccessToken");
   if (!token) return null;
   try {
     const decoded = jwtDecode(token);
-// just to play safe we have included every variable that we are sending from backend in jwt token
     return decoded.id || decoded.sub || decoded.email || null;
   } catch {
     return null;
@@ -43,11 +40,11 @@ function getCurrentUserIdFromToken() {
 }
 
 const DietNutritionPage = ({ membershipType = "premium" }) => {
+  console.log(membershipType);
   const [dietPlan, setDietPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
 
-  // Always decode user id fresh!
   const userId = getCurrentUserIdFromToken();
 
   useEffect(() => {
@@ -83,7 +80,7 @@ const DietNutritionPage = ({ membershipType = "premium" }) => {
   return (
     <div className="dietnut-bg">
       <div className="dietnut-max-container">
-        {/* ----------- User's Diet Table ----------- */}
+        {/* User's Diet Table */}
         <div className="dietnut-header">
           <h2 className="dietnut-title">Your Personalized Diet Plan</h2>
         </div>
@@ -114,51 +111,54 @@ const DietNutritionPage = ({ membershipType = "premium" }) => {
               </tr>
             </tbody>
           </table>
+          {/* Show instructions if present */}
+          {dietPlan?.instructions && dietPlan.instructions.trim() !== "" && (
+            <div className="dietnut-instructions">
+              <strong>Instructions:</strong> {dietPlan.instructions}
+            </div>
+          )}
         </div>
 
-         {  (
-          <>
-            <div className="dietnut-header">
-              <h2 className="dietnut-title">Diet &amp; Nutrition Reference</h2>
-              <div className="dietnut-desc">
-                Reference of common foods and their nutrition values (Vegan, Veg, Non-Veg)
-              </div>
-            </div>
-            <div className="dietnut-tablewrapper">
-              <table className="dietnut-table">
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Type</th>
-                    <th>Calories</th>
-                    <th>Protein (g)</th>
-                    <th>Carbs (g)</th>
-                    <th>Fat (g)</th>
-                    <th>Fiber (g)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dietData.map((row) => (
-                    <tr key={row.item}>
-                      <td className="dietnut-itemcell">
-                        <span className="dietnut-icon">{row.icon}</span>
-                        {row.item}
-                      </td>
-                      <td>
-                        <span style={{ color: categoryColor(row.category), fontWeight: 700 }}>{row.category}</span>
-                      </td>
-                      <td>{row.calories}</td>
-                      <td>{row.protein}</td>
-                      <td>{row.carbs}</td>
-                      <td>{row.fat}</td>
-                      <td>{row.fiber}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
+        {/* Nutrition Reference Table */}
+        <div className="dietnut-header">
+          <h2 className="dietnut-title">Diet &amp; Nutrition Reference</h2>
+          <div className="dietnut-desc">
+            Reference of common foods and their nutrition values (Vegan, Veg, Non-Veg)
+          </div>
+        </div>
+        <div className="dietnut-tablewrapper">
+          <table className="dietnut-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Type</th>
+                <th>Calories</th>
+                <th>Protein (g)</th>
+                <th>Carbs (g)</th>
+                <th>Fat (g)</th>
+                <th>Fiber (g)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dietData.map((row) => (
+                <tr key={row.item}>
+                  <td className="dietnut-itemcell">
+                    <span className="dietnut-icon">{row.icon}</span>
+                    {row.item}
+                  </td>
+                  <td>
+                    <span style={{ color: categoryColor(row.category), fontWeight: 700 }}>{row.category}</span>
+                  </td>
+                  <td>{row.calories}</td>
+                  <td>{row.protein}</td>
+                  <td>{row.carbs}</td>
+                  <td>{row.fat}</td>
+                  <td>{row.fiber}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

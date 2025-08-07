@@ -15,4 +15,5 @@ public class UserRegistrationDTO {
 	private String address;
 	private String mobile;
 	private Gender gender;
+	private int age;
 }

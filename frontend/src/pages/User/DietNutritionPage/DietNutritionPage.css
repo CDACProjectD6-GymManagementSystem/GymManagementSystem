@@ -88,3 +88,16 @@
   margin-right: 6px;
   vertical-align: middle;
 }
+
+/* Instructions callout style */
+.dietnut-instructions {
+  margin: 18px 0 0 0;
+  background: #fff8e1;
+  border-left: 5px solid #ff9800;
+  color: #442a00;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px #ffeb3b1a;
+}

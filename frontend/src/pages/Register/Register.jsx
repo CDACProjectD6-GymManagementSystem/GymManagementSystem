@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import './RegisterPage.css';
 import { UserService } from "../../services/UserService";
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaLock, FaVenusMars } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaLock, FaVenusMars, FaBirthdayCake } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -19,6 +19,7 @@ export default function Register() {
     email: '',
     address: '',
     mobile: '',
+    age: '',          // <-- New field
     gender: '',
     password: '',
     confirmPassword: '',
@@ -39,6 +40,10 @@ export default function Register() {
       toast.error("Passwords do not match!");
       return;
     }
+    if (!formData.age || isNaN(formData.age) || Number(formData.age) < 10 || Number(formData.age) > 100) {
+      toast.error("Please enter a valid age between 10 and 100.");
+      return;
+    }
     const { confirmPassword, ...payload } = formData;
     setLoading(true);
     try {
@@ -48,7 +53,7 @@ export default function Register() {
           toast.success(resp.message, { autoClose: 1200 });
           setTimeout(() => {
             navigate("/auth/signin");
-          }, 1300); // Let user see the toast
+          }, 1300);
         } else {
           toast.info(resp.message);
         }
@@ -154,6 +159,28 @@ export default function Register() {
               </div>
             </div>
             <div className="register-col">
+              <label>Age</label>
+              <div className="input-wrapper">
+                <FaBirthdayCake className="input-icon" />
+                <input
+                  type="number"
+                  name="age"
+                  className="register-input"
+                  min="10"
+                  max="100"
+                  required
+                  value={formData.age}
+                  onChange={handleChange}
+                  placeholder="Age"
+                  pattern="[0-9]+"
+                  title="Enter a valid age"
+                  style={{ paddingLeft: "40px" }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="register-row">
+            <div className="register-col">
               <label>Gender</label>
               <div className="input-wrapper">
                 <FaVenusMars className="input-icon" />
@@ -172,6 +199,7 @@ export default function Register() {
                 </select>
               </div>
             </div>
+            <div className="register-col"></div>
           </div>
           <div className="register-row">
             <div className="register-col">
