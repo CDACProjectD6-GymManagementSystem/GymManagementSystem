@@ -144,10 +144,7 @@ const Home = () => {
                 <li>
                   <span className="dot" /> <b>{t("plans.features.access")}</b>: {formatAccessLabel(plan.access)}
                 </li>
-                <li>
-                  <span className="dot" /> <b>{t("plans.features.trainer")}</b>: {plan.trainerAvailable ? t("plans.yes") : t("plans.no")}
-                </li>
-                <li>
+               <li>
                   <span className="dot" /> <b>{t("plans.features.diet")}</b>: {plan.dietConsultation ? t("plans.yes") : t("plans.no")}
                 </li>
                 <li>
