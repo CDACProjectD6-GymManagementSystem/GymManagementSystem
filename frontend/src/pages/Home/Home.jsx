@@ -150,10 +150,7 @@ const Home = () => {
                 <li>
                   <span className="dot" /> <b>{t("plans.features.sauna")}</b>: {plan.sauna ? t("plans.yes") : t("plans.no")}
                 </li>
-                <li>
-                  <span className="dot" /> <b>{t("plans.features.classes")}</b>: {plan.groupClasses ? t("plans.yes") : t("plans.no")}
-                </li>
-                <li>
+               <li>
                   <span className="dot" /> <b>{t("plans.features.duration")}</b>: {plan.duration} {t("plans.mo")}
                 </li>
               </ul>
