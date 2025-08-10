@@ -12,7 +12,7 @@ function Sidebar({ activeTab, setActiveTab, onLogout }) {
   return (
     <div className="bg-dark text-white p-3" style={{ width: 250 }}>
       <div className="mb-4">
-        <strong>FitGym Pro</strong>
+        <strong>Gymmate</strong>
         <div style={{ fontSize: 14 }}>Receptionist Panel</div>
       </div>
       <ul className="nav flex-column">
