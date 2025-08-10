@@ -4,7 +4,7 @@ import {
   getAllEquipments,
   deleteEquipment,
   updateEquipment,
-  toggleEquipmentMaintenance, // Import the toggle function
+  toggleEquipmentMaintenance,
 } from "../../services/AdminService";
 
 const CATEGORY_OPTIONS = [

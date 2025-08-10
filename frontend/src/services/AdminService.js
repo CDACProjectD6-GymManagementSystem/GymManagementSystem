@@ -7,7 +7,6 @@ function getAuthHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-// --- USERS ---
 export const getUsers = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/get-users`, {
@@ -56,7 +55,6 @@ export const updateUser = async (userId, userData) => {
   }
 };
 
-// --- SUBSCRIPTIONS ---
 export const getSubscriptionNames = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/subscription/getnames`, {
@@ -93,7 +91,6 @@ export const updateSubscription = (subId, updateData) => {
   });
 };
 
-// --- EQUIPMENTS ---
 export const addEquipment = async (equipmentData) => {
   try {
     const response = await axios.post(
@@ -143,7 +140,6 @@ export const updateEquipment = async (id, updateDto) => {
   }
 };
 
-// --- RECEPTIONISTS ---
 export const getAllReceptionists = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/receptionist`, {
@@ -183,7 +179,6 @@ export const updateReceptionist = (id, receptionistData) => {
   });
 };
 
-// --- TRAINERS ---
 export const addTrainer = (trainerData) => {
   return axios.post(`${API_BASE_URL}/trainer`, trainerData, {
     headers: getAuthHeaders(),
@@ -215,11 +210,9 @@ export const updateTrainer = (id, trainerData) => {
   }).then(res => res.data);
 };
 
-// --- FEEDBACK ---
 export const getAllFeedbacks = () =>
   axios.get(`${API_BASE_URL}/feedback`, { headers: getAuthHeaders() });
 
-// --- PAYMENTS ---
 export async function fetchPayments() {
   const response = await axios.get(`${API_BASE_URL}/payments`, {
     headers: getAuthHeaders(),
@@ -227,7 +220,6 @@ export async function fetchPayments() {
   return response.data;
 }
 
-// --- DASHBOARD STATS ---
 export async function fetchDashboardStats() {
   const response = await axios.get(`${API_BASE_URL}/dashboardstats`, {
     headers: getAuthHeaders(),

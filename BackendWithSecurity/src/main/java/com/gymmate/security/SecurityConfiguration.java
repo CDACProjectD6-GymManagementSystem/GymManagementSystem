@@ -36,7 +36,6 @@ public class SecurityConfiguration {
 		http.cors();
 
 		http.authorizeHttpRequests(authz -> authz
-				// PUBLIC ENDPOINTS (anyone can access)
 				.requestMatchers("/user/register", "/auth/**", "/subscriptions").permitAll()
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
@@ -49,7 +48,6 @@ public class SecurityConfiguration {
 				// TRAINER ONLY ENDPOINTS
 				.requestMatchers("/trainer/**").hasRole("TRAINER")
 
-				// USER-ONLY ENDPOINTS (and higher, if you want)
 				.requestMatchers("/user/**").hasRole("USER")
 				
 				// Otherwise, authenticated

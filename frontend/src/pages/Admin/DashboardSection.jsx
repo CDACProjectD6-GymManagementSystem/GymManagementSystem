@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { fetchDashboardStats, fetchPayments } from "../../services/AdminService"; // Adjust import path!
+import { fetchDashboardStats, fetchPayments } from "../../services/AdminService";
 
-// StatCard: now smaller (col-lg-3 for 4 cards/row on large screens)
 const StatCard = ({ value, label, color, icon }) => (
   <div className="col-12 col-sm-6 col-lg-3">
     <div className="card text-center border-0 shadow-sm h-100 py-2">
@@ -16,17 +15,14 @@ const StatCard = ({ value, label, color, icon }) => (
 );
 
 const DashboardSection = () => {
-  // Stats state
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState("");
 
-  // Payments state
   const [payments, setPayments] = useState([]);
   const [loadingPayments, setLoadingPayments] = useState(true);
   const [paymentsError, setPaymentsError] = useState("");
 
-  // Fetch stats
   useEffect(() => {
     async function getStats() {
       setLoadingStats(true);
@@ -42,7 +38,6 @@ const DashboardSection = () => {
     getStats();
   }, []);
 
-  // Fetch recent payments
   useEffect(() => {
     async function getPayments() {
       setLoadingPayments(true);
@@ -71,7 +66,6 @@ const DashboardSection = () => {
           Admin Dashboard
         </h2>
 
-        {/* STAT CARDS */}
         <div className="row g-3 mb-4 justify-content-center">
           {loadingStats ? (
             <div className="text-center py-4">Loading dashboard stats…</div>
@@ -132,7 +126,6 @@ const DashboardSection = () => {
           )}
         </div>
 
-        {/* RECENT PAYMENTS TABLE */}
         <h3
           className="text-center fw-bold mb-3"
           style={{ letterSpacing: "0.5px", color: "#222" }}
